@@ -8,9 +8,9 @@ from zipfile import ZipFile, ZIP_DEFLATED
 ROOT = Path(__file__).resolve().parents[1]
 DIST = ROOT / 'dist'
 EXCLUDED = {'build', 'dist', 'node_modules', '.git', '.local', '.local-data',
-            '__pycache__', '.firebase'}
+            '__pycache__', '.firebase', 'models'}
 SUFFIXES = {'.py', '.java', '.cpp', '.h', '.sh', '.md', '.txt', '.json', '.rules',
-            '.js', '.css', '.html', '.svg', '.apk', '.so'}
+            '.js', '.mjs', '.css', '.html', '.svg', '.apk', '.so'}
 NAMES = {'.gitignore', 'Dockerfile', 'CMakeLists.txt'}
 
 

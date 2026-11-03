@@ -12,3 +12,4 @@ node_modules/
 *.keystore
 *.sqlite3
 *-debug.log
+app/src/main/assets/models/

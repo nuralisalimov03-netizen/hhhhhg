@@ -34,7 +34,7 @@ class VisionManifestTests(unittest.TestCase):
             raise RuntimeError('Cached org.json checksum mismatch')
         android = TOOLS / 'platform/android-35/android.jar'
         cls.classpath = os.pathsep.join([str(cls.classes), str(jar), str(android)])
-        sources = [PROJECT/'app/src/main/java/market/chits'/name for name in ['VisionModelManager.java','ModelDownloader.java','OfflineAi.java']]
+        sources = [PROJECT/'app/src/main/java/market/chits'/name for name in ['VisionModelManager.java','ModelDownloader.java','OfflineAi.java','BundledModels.java']]
         sources.append(PROJECT/'tests/java-vision/VisionManifestHarness.java')
         subprocess.run(['java','-jar',str(TOOLS/'ecj.jar'),'-1.8','-proc:none','-warn:none','-classpath',os.pathsep.join([str(jar),str(android)]),'-d',str(cls.classes),*[str(p) for p in sources]], check=True, capture_output=True, text=True)
 

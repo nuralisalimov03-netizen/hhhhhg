@@ -44,9 +44,14 @@ public final class MainActivity extends Activity {
     private volatile int modelProgress;
     private String pendingInstall;
     private ValueCallback<Uri[]> fileCallback;
+    private volatile Uri localUploadUri;
     private VisionModelManager visionModels;
     private static VisionModelManager sharedVisionModels;
-    private final VisionModelManager.Listener modelListener=this::event;
+    private FastModelManager fastModels;
+    private static FastModelManager sharedFastModels;
+    private final FastModelManager.Listener fastListener=value->modelEvent(value,"text");
+    private final AtomicBoolean cancelRequested=new AtomicBoolean(false);
+    private final VisionModelManager.Listener modelListener=value->modelEvent(value,"vision");
     private android.net.ConnectivityManager.NetworkCallback networkCallback;
     private AssistantPhotos assistantPhotos;
     private final AtomicBoolean photoBusy = new AtomicBoolean(false);
@@ -60,8 +65,11 @@ public final class MainActivity extends Activity {
         synchronized(MainActivity.class){
             if(sharedVisionModels==null)sharedVisionModels=new VisionModelManager(getApplicationContext(),null);
             visionModels=sharedVisionModels;
+            if(sharedFastModels==null)sharedFastModels=new FastModelManager(getApplicationContext(),null);
+            fastModels=sharedFastModels;
         }
         visionModels.setListener(modelListener);
+        fastModels.setListener(fastListener);
         try {
             seed("orbita-v6", "apks/orbita.apk", "Орбита", "45 офлайн-игр: головоломки, аркады и 3D.", "Игры");
             seed("breach-v2", "apks/breach.apk", "Прорыв", "Автономный шутер с ботами 3 × 3.", "Игры");
@@ -79,7 +87,7 @@ public final class MainActivity extends Activity {
         web.addJavascriptInterface(new Bridge(), "ChitsNative");
         web.setWebViewClient(new WebViewClient() {
             @Override public void onPageFinished(WebView view, String url) {
-                if (url.startsWith(ORIGIN)) visionModels.start(false);
+                if (url.startsWith(ORIGIN)) startAutomaticModels();
             }
             @Override public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest req) {
                 String url = req.getUrl().toString();
@@ -128,11 +136,21 @@ public final class MainActivity extends Activity {
             android.net.ConnectivityManager cm=(android.net.ConnectivityManager)getSystemService(CONNECTIVITY_SERVICE);
             networkCallback=new android.net.ConnectivityManager.NetworkCallback(){
                 @Override public void onCapabilitiesChanged(android.net.Network network,android.net.NetworkCapabilities caps){
-                    runOnUiThread(()->{if(web!=null)visionModels.start(false);});
+                    runOnUiThread(()->{if(web!=null)startAutomaticModels();});
                 }
             };
             if(cm!=null)cm.registerDefaultNetworkCallback(networkCallback);
         }catch(Exception ignored){ }
+    }
+
+    private void startAutomaticModels(){
+        fastModels.start(false);
+        if(prefs.getBoolean("visionRequested",false)&&!fastModels.isBusy())visionModels.start(false);
+    }
+    private void modelEvent(JSONObject value,String mode){
+        try{value.put("mode",mode);}catch(Exception ignored){ }
+        event(value);
+        if(mode.equals("text")&&value.optString("status").equals("ready")&&prefs!=null&&prefs.getBoolean("visionRequested",false))visionModels.start(false);
     }
 
     private File apkDir() { File dir = new File(getFilesDir(), "apks"); dir.mkdirs(); return dir; }
@@ -270,9 +288,50 @@ public final class MainActivity extends Activity {
     }
     public final class Bridge {
         @JavascriptInterface public String getState() {
-            JSONObject ai=visionModels.state();
-            try { if(modelBusy.get())ai.put("downloading",true); }catch(Exception ignored){ }
+            JSONObject fast=fastModels.state(),photo=visionModels.state();
+            String mode=prefs.getString("assistantMode","text");
+            JSONObject ai;
+            try{ai=new JSONObject((mode.equals("vision")?photo:fast).toString());}catch(Exception e){ai=new JSONObject();}
+            try{
+                if(mode.equals("vision")){
+                    ai.put("available",photo.optBoolean("vision")).put("installed",photo.optBoolean("vision"));
+                    if(!photo.optBoolean("vision"))ai.put("model",photo.optString("targetModel","Qwen-VL 3B · фото"));
+                }
+                if(mode.equals("text")&&!fast.optBoolean("available")&&photo.optBoolean("vision")){
+                    ai.put("available",true).put("installed",true).put("embedded",photo.optBoolean("embedded")).put("model","Qwen-VL 3B · текст без модуля зрения").put("reason","Используется резервная модель. Для более быстрых ответов подготовьте компактную текстовую Qwen");
+                }
+                ai.put("mode",mode).put("currentMode",mode).put("fast",fast).put("photo",photo).put("vision",photo.optBoolean("vision"));
+                if(modelBusy.get())ai.put("downloading",true);
+            }catch(Exception ignored){ }
             return obj("serverUrl",prefs.getString("serverUrl",""),"firebaseConfig",firebaseConfig(),"apps",catalog(),"downloads",records(),"ai",ai,"assistantPhoto",assistantPhotos.state()==null?JSONObject.NULL:assistantPhotos.state()).toString();
+        }
+        @JavascriptInterface public void setAssistantMode(String mode){
+            if(!"text".equals(mode)&&!"vision".equals(mode)){event(obj("type","assistant-mode","status","error","error","Неизвестный режим ИИ"));return;}
+            prefs.edit().putString("assistantMode",mode).commit();
+            event(obj("type","assistant-mode","status","saved","mode",mode));
+        }
+        @JavascriptInterface public void requestLocalApi(String json){
+            workers.execute(()->{
+                String id="";File upload=null;
+                try{
+                    JSONObject request=new JSONObject(json);id=request.getString("id");
+                    if(!id.matches("[a-zA-Z0-9_.:-]{1,100}"))throw new IOException("Некорректный запрос локального сервера");
+                    String uploadName="upload.apk";
+                    if("POST".equals(request.optString("method"))&&"/api/apps".equals(request.optString("path"))){
+                        Uri source=localUploadUri;if(source==null)throw new IOException("Выберите APK через кнопку загрузки");
+                        upload=File.createTempFile("chits-local-upload",".apk",getCacheDir());
+                        try(InputStream in=getContentResolver().openInputStream(source);OutputStream out=new FileOutputStream(upload)){
+                            if(in==null)throw new IOException("Не удалось открыть выбранный APK");copy(in,out,APK_LIMIT);
+                        }
+                        try(android.database.Cursor cursor=getContentResolver().query(source,new String[]{android.provider.OpenableColumns.DISPLAY_NAME},null,null,null)){
+                            if(cursor!=null&&cursor.moveToFirst()&&cursor.getString(0)!=null)uploadName=cursor.getString(0);
+                        }catch(Exception ignored){ }
+                    }
+                    JSONObject response=LocalApiTransport.execute(prefs.getString("serverUrl",""),request,upload,uploadName);
+                    event(obj("type","local-api","id",id,"statusCode",response.getInt("statusCode"),"body",response.get("body")));
+                }catch(Exception e){event(obj("type","local-api","id",id,"statusCode",0,"body",obj("error",message(e))));}
+                finally{if(upload!=null)upload.delete();}
+            });
         }
         @JavascriptInterface public void setFirebaseConfig(String json) {
             try {JSONObject config=normalizeFirebaseConfig(new JSONObject(json));prefs.edit().putString("firebaseConfig",config.toString()).commit();event(obj("type","firebase-config","status","saved"));}
@@ -321,27 +380,42 @@ public final class MainActivity extends Activity {
         }
         @JavascriptInterface public void openApkPicker(){runOnUiThread(()->pick(11));}
         @JavascriptInterface public void importAiModel(){runOnUiThread(()->pick(12));}
-        @JavascriptInterface public void downloadAiModel(){visionModels.start(true);}
+        @JavascriptInterface public void downloadAiModel(){fastModels.start(true);}
+        @JavascriptInterface public void downloadVisionModel(){
+            if(fastModels.isBusy()&&BundledModels.hasRole(getApplicationContext(),"vision")){event(obj("type","ai-model","mode","vision","status","error","error","Дождитесь извлечения моделей из APK"));return;}
+            prefs.edit().putBoolean("visionRequested",true).commit();visionModels.start(true);
+        }
+        @JavascriptInterface public void cancelAssistant(){cancelRequested.set(true);OfflineAi.cancel();}
         @JavascriptInterface public void askAssistant(String prompt){
             if(!inferenceBusy.compareAndSet(false,true)){event(obj("type","assistant","status","error","error","Дождитесь текущего ответа"));return;}
+            cancelRequested.set(false);
             workers.execute(()->{try{
-                if(modelBusy.get()||visionModels.isBusy()||photoBusy.get())throw new IOException("Дождитесь подготовки модели или фотографии");
+                if(modelBusy.get()||photoBusy.get())throw new IOException("Дождитесь подготовки модели или фотографии");
                 if(prompt==null||prompt.trim().isEmpty()||prompt.length()>8000)throw new IOException("Введите сообщение до 8000 символов");
                 File image=assistantPhotos.file();
-                boolean vision=visionModels.isVisionReady();
-                if(image!=null&&!vision)throw new IOException("Для фотографии дождитесь загрузки Qwen-VL и компонента зрения");
-                File model=vision?visionModels.modelFile():modelFile();
-                if(!model.isFile())throw new IOException("Модель ещё не установлена. Подключитесь к Wi-Fi для автоматической загрузки");
-                event(obj("type","assistant","status","generating"));
-                String answer;
+                boolean photoMode=image!=null||prefs.getString("assistantMode","text").equals("vision");
+                boolean visionReady=visionModels.isVisionReady();
+                if(photoMode&&!visionReady)throw new IOException("Для режима фото сначала подготовьте Qwen-VL и компонент зрения");
+                File model=photoMode?visionModels.modelFile():fastModels.modelFile();
+                boolean fallback=!photoMode&&!model.isFile()&&visionReady;
+                if(fallback)model=visionModels.modelFile();
+                if(!model.isFile())throw new IOException("Быстрая текстовая модель ещё не подготовлена. Установите APK с весами или дождитесь загрузки по Wi-Fi");
+                event(obj("type","assistant","status","generating","mode",photoMode?"vision":"text"));
+                String answer="";
                 synchronized(OfflineAi.class){
-                    boolean loaded=vision?OfflineAi.load(model.getAbsolutePath(),visionModels.projectorFile().getAbsolutePath()):OfflineAi.load(model.getAbsolutePath());
+                    if(cancelRequested.get()){event(obj("type","assistant","status","cancelled","text",""));return;}
+                    boolean loaded=photoMode?OfflineAi.load(model.getAbsolutePath(),visionModels.projectorFile().getAbsolutePath()):OfflineAi.load(model.getAbsolutePath());
+                    if(cancelRequested.get()){event(obj("type","assistant","status","cancelled","text",""));return;}
                     if(!loaded)throw new IOException("Модель не загрузилась: проверьте GGUF и свободную память");
-                    answer=image==null?OfflineAi.generate(prompt,256):OfflineAi.generate(prompt,image.getAbsolutePath(),256);
+                    answer=OfflineAi.generateStreaming(prompt,image==null?null:image.getAbsolutePath(),photoMode?128:96,text->{
+                        if(cancelRequested.get())OfflineAi.cancel();
+                        event(obj("type","assistant","status","partial","text",text));
+                    });
                 }
+                if(cancelRequested.get()){event(obj("type","assistant","status","cancelled","text",answer==null?"":answer));return;}
                 if(answer==null||answer.trim().isEmpty())throw new IOException("Модель не вернула текст");
                 event(obj("type","assistant","status","done","text",answer));
-            }catch(Exception e){event(obj("type","assistant","status","error","error",message(e)));}finally{inferenceBusy.set(false);}});
+            }catch(Exception e){event(cancelRequested.get()?obj("type","assistant","status","cancelled","text",""):obj("type","assistant","status","error","error",message(e)));}finally{inferenceBusy.set(false);}});
         }
     }
 
@@ -352,7 +426,7 @@ public final class MainActivity extends Activity {
     }
     @Override protected void onActivityResult(int request,int result,Intent data){
         super.onActivityResult(request,result,data);
-        if(request==13){if(fileCallback!=null){fileCallback.onReceiveValue(result==RESULT_OK&&data!=null?new Uri[]{data.getData()}:null);fileCallback=null;}return;}
+        if(request==13){localUploadUri=result==RESULT_OK&&data!=null?data.getData():null;if(fileCallback!=null){fileCallback.onReceiveValue(localUploadUri!=null?new Uri[]{localUploadUri}:null);fileCallback=null;}return;}
         if(request==14){String id=pendingInstall;pendingInstall=null;if(id!=null&&getPackageManager().canRequestPackageInstalls())install(id);return;}
         if(request==15){
             if(result!=RESULT_OK||data==null||data.getData()==null)return;
@@ -367,7 +441,7 @@ public final class MainActivity extends Activity {
         }
         if((request!=11&&request!=12)||result!=RESULT_OK||data==null||data.getData()==null)return;
         final Uri uri=data.getData();final boolean ai=request==12;
-        if(ai&&(visionModels.isBusy()||inferenceBusy.get()||!modelBusy.compareAndSet(false,true)))return;
+        if(ai&&(fastModels.isBusy()||visionModels.isBusy()||inferenceBusy.get()||!modelBusy.compareAndSet(false,true)))return;
         workers.execute(()->{File temp=null;try{
             temp=File.createTempFile(ai?"model":"import",".part",getFilesDir());
             event(obj("type",ai?"ai-model":"download","status",ai?"downloading":"importing","progress",0));
@@ -376,10 +450,11 @@ public final class MainActivity extends Activity {
             else{String id="local-"+digest(temp).substring(0,24);JSONObject record=apkMetadata(id,temp,"","Импортировано с устройства","Приложения");if(!temp.renameTo(new File(apkDir(),id+".apk")))throw new IOException("Не удалось сохранить APK");saveRecord(record);event(obj("type","download","id",id,"status","done","progress",100,"app",record));}
         }catch(Exception e){if(temp!=null)temp.delete();if(ai)modelBusy.set(false);event(obj("type",ai?"ai-model":"download","status","error","error",message(e)));}});
     }
-    @Override protected void onResume(){super.onResume();if(visionModels!=null && web!=null)new android.os.Handler().postDelayed(()->{if(web!=null)visionModels.start(false);},1500);}
+    @Override protected void onResume(){super.onResume();if(fastModels!=null && web!=null)new android.os.Handler().postDelayed(()->{if(web!=null)startAutomaticModels();},1500);}
     @Override public void onBackPressed(){if(web!=null)web.evaluateJavascript("window.Chits&&window.Chits.goBack?window.Chits.goBack():false",value->{if("false".equals(value)||"null".equals(value))finish();});else super.onBackPressed();}
     @Override protected void onDestroy(){
         if(visionModels!=null)visionModels.clearListener(modelListener);
+        if(fastModels!=null)fastModels.clearListener(fastListener);
         if(networkCallback!=null){try{((android.net.ConnectivityManager)getSystemService(CONNECTIVITY_SERVICE)).unregisterNetworkCallback(networkCallback);}catch(Exception ignored){ }}
         if(fileCallback!=null)fileCallback.onReceiveValue(null);
         if(web!=null){web.removeJavascriptInterface("ChitsNative");web.destroy();web=null;}

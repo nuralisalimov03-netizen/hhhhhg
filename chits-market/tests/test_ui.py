@@ -59,7 +59,7 @@ class MarketUITests(unittest.TestCase):
     def mock_native(self):
         app = {**self.seed, 'id':'orbita-v6', 'bundled':True, 'downloadUrl':'bundled:orbita-v6'}
         other = {'id':'breach-v2', 'title':'Прорыв', 'description':'Офлайн-шутер', 'category':'Игры', 'size':242972, 'sha256':'b'*64, 'bundled':True, 'downloadUrl':'bundled:breach-v2'}
-        state = {'apps':[app,other], 'downloads':[app,other], 'serverUrl':'', 'ai':{'available':False,'installed':False,'vision':False},'assistantPhoto':None}
+        state = {'apps':[app,other], 'downloads':[app,other], 'serverUrl':'', 'ai':{'mode':'text','available':False,'installed':False,'vision':False,'model':'Qwen2.5 0.5B Instruct','fast':{'available':False,'installed':False,'model':'Qwen2.5 0.5B Instruct'},'photo':{'available':False,'installed':False,'model':'Qwen2.5-VL 3B Instruct'}},'assistantPhoto':None}
         self.page.add_init_script('''
           window.nativeState = %s;
           window.ChitsNative = {
@@ -74,7 +74,10 @@ class MarketUITests(unittest.TestCase):
             askAssistant:prompt=>window.lastPrompt=prompt,
             pickAssistantPhoto:()=>window.photoPickerOpened=true,
             clearAssistantPhoto:()=>{window.nativeState.assistantPhoto=null;window.Chits.onNativeEvent({type:'photo',status:'cleared'});},
-            setFirebaseConfig:json=>{window.nativeState.firebaseConfig=JSON.parse(json);window.lastFirebaseConfig=JSON.parse(json);}
+            setFirebaseConfig:json=>{window.nativeState.firebaseConfig=JSON.parse(json);window.lastFirebaseConfig=JSON.parse(json);},
+            cancelAssistant:()=>window.cancelRequested=true,
+            downloadVisionModel:()=>window.visionModelStarted=true,
+            setAssistantMode:mode=>{let ai=window.nativeState.ai;const profile=(mode==='vision'?ai.photo:ai.fast)||{};window.nativeState.ai={...ai,...profile,mode,vision:ai.vision};}
           };
         ''' % json.dumps(state))
 
@@ -149,6 +152,7 @@ class MarketUITests(unittest.TestCase):
         expect(page.locator('#chat-form button[type=submit]')).to_be_disabled()
         page.locator('[data-action="clear-photo"]').click()
         expect(page.locator('#photo-attachment')).to_have_count(0)
+        page.locator('[data-ai-mode="text"]').click()
         expect(page.locator('#chat-form button[type=submit]')).to_be_enabled()
         page.evaluate("photo=>{window.nativeState.assistantPhoto=photo;window.nativeState.ai={available:true,installed:true,vision:true};window.Chits.onNativeEvent({type:'ai-model',status:'ready'});window.Chits.onNativeEvent(photo)}", photo)
         page.locator('#chat-input').fill('Что на фотографии?')
@@ -237,6 +241,139 @@ class MarketUITests(unittest.TestCase):
         page.locator('[data-action="disable-firebase"]').click()
         self.assertFalse(page.evaluate('window.Chits.getState().firebase'))
 
+    def test_fast_text_and_explicit_photo_modes_are_independent(self):
+        self.mock_native()
+        page=self.page
+        page.goto(self.url,wait_until='networkidle')
+        page.evaluate("window.nativeState.ai={mode:'text',available:true,installed:true,vision:false,model:'Qwen2.5 0.5B Instruct',fast:{available:true,installed:true,model:'Qwen2.5 0.5B Instruct',embedded:true},photo:{available:false,installed:false,downloading:false,model:'Qwen2.5-VL 3B Instruct'}};window.dispatchEvent(new Event('focus'));window.Chits.navigate('assistant')")
+        expect(page.locator('[data-ai-mode="text"]')).to_have_attribute('aria-pressed','true')
+        expect(page.locator('#ai-model-panel')).to_contain_text('400 МБ')
+        expect(page.locator('#chat-input')).to_be_enabled()
+        page.locator('[data-ai-mode="vision"]').click()
+        expect(page.locator('[data-ai-mode="vision"]')).to_have_attribute('aria-pressed','true')
+        expect(page.locator('#ai-model-panel')).to_contain_text('3–4 ГБ')
+        expect(page.locator('#chat-input')).to_be_disabled()
+        page.locator('[data-action="download-model"]').click()
+        self.assertTrue(page.evaluate('window.visionModelStarted'))
+        self.assertFalse(page.evaluate('Boolean(window.modelStarted)'))
+        page.evaluate("window.nativeState.ai.photo.downloading=true;window.nativeState.ai.photo.progress=27")
+        page.locator('[data-ai-mode="text"]').click()
+        expect(page.locator('#chat-input')).to_be_enabled()
+        expect(page.locator('.background-model-note')).to_contain_text('27%')
+        page.evaluate("window.Chits.onNativeEvent({type:'ai-model',mode:'vision',status:'downloading',progress:27})")
+        expect(page.locator('[data-ai-mode="text"]')).to_have_attribute('aria-pressed','true')
+        expect(page.locator('#chat-input')).to_be_enabled()
+        expect(page.locator('#ai-model-panel')).to_contain_text('Qwen2.5 0.5B')
+        page.locator('[data-action="pick-photo"]').click()
+        self.assertTrue(page.evaluate('window.photoPickerOpened'))
+        expect(page.locator('[data-ai-mode="vision"]')).to_have_attribute('aria-pressed','true')
+
+    def test_streaming_cancel_preserves_draft_and_model_packaging_is_truthful(self):
+        self.mock_native()
+        page=self.page
+        page.goto(self.url,wait_until='networkidle')
+        page.evaluate("window.nativeState.ai={available:true,installed:true,vision:true,embedded:false,embeddingReason:'В тестовом APK весов нет'};window.dispatchEvent(new Event('focus'));window.Chits.navigate('assistant')")
+        expect(page.locator('.model-packaging')).to_contain_text('В тестовом APK весов нет')
+        page.locator('#chat-input').fill('Тест короткого ответа')
+        page.locator('#chat-form button[type=submit]').click()
+        page.locator('#chat-input').fill('Черновик следующего вопроса')
+        page.locator('#chat-input').evaluate("el=>el.dataset.preserveCheck='same-node'")
+        page.evaluate("window.Chits.onNativeEvent({type:'assistant',status:'generating'});window.Chits.onNativeEvent({type:'assistant',status:'partial',text:'Начало ответа'})")
+        expect(page.locator('#assistant-live')).to_have_text('Начало ответа')
+        page.evaluate("window.Chits.onNativeEvent({type:'assistant',status:'partial',text:'Начало ответа и продолжение'})")
+        expect(page.locator('#assistant-live')).to_have_text('Начало ответа и продолжение')
+        expect(page.locator('#chat-input')).to_have_attribute('data-preserve-check','same-node')
+        expect(page.locator('#chat-input')).to_have_value('Черновик следующего вопроса')
+        page.locator('[data-action="cancel-assistant"]').click()
+        self.assertTrue(page.evaluate('window.cancelRequested'))
+        expect(page.locator('[data-action="cancel-assistant"]')).to_be_disabled()
+        page.evaluate("window.Chits.onNativeEvent({type:'assistant',status:'cancelled',text:'Начало ответа и продолжение'})")
+        expect(page.locator('#assistant-pending')).to_have_count(0)
+        expect(page.locator('.message.assistant').last).to_contain_text('Ответ остановлен')
+        expect(page.locator('#chat-input')).to_be_enabled()
+        expect(page.locator('#chat-input')).to_have_value('Черновик следующего вопроса')
+        page.evaluate("window.nativeState.ai.embedded=true;window.dispatchEvent(new Event('focus'))")
+        expect(page.locator('.model-packaging')).to_contain_text('Модель включена в APK')
+
+    def test_redesigned_search_reduced_motion_and_compact_layout(self):
+        self.mock_native()
+        page=self.page
+        page.emulate_media(reduced_motion='reduce')
+        page.goto(self.url,wait_until='networkidle')
+        expect(page.locator('.spotlight')).to_have_count(3)
+        expect(page.locator('.app-card')).to_have_count(2)
+        expect(page.locator('.official-source')).to_have_count(0)
+        expect(page.locator('#market-region')).to_have_count(0)
+        page.locator('[data-page="search"]').click()
+        page.locator('#app-search').fill('Орбита')
+        expect(page.locator('.app-card')).to_have_count(1)
+        self.assertEqual(page.locator('.nav-item.active').get_attribute('data-page'),'search')
+        self.assertEqual(page.locator('.spotlight').count(),0)
+        self.assertEqual(page.locator('main').evaluate("el=>getComputedStyle(el).animationName"),'none')
+        page.locator('[data-detail="orbita-v6"]').click()
+        self.assertEqual(page.locator('#app-dialog').evaluate("el=>getComputedStyle(el).animationName"),'none')
+        page.locator('[data-action="close-detail"]').click()
+        for width in (320,390):
+            page.set_viewport_size({'width':width,'height':844})
+            for section in ('catalog','search','downloads','assistant','settings'):
+                page.locator('[data-page="'+section+'"]').click()
+                self.assertTrue(page.evaluate('document.documentElement.scrollWidth<=innerWidth'),(width,section))
+
+    def test_native_loopback_transport_login_upload_catalog_and_delete_without_fetch(self):
+        self.mock_native()
+        page=self.page
+        # The UI's loopback API uses native HTTP, not fetch. No browser-security
+        # flags or permission grants are used; real Java transport has its own test.
+        page.add_init_script("""
+          window.nativeState.serverUrl='http://127.0.0.1:8765';
+          window.localRequests=[];window.localApps=[];
+          window.ChitsNative.requestLocalApi=raw=>{
+            const req=JSON.parse(raw);window.localRequests.push(req);
+            let status=200,body={};
+            if(req.path==='/api/auth/login'){
+              const credentials=JSON.parse(req.body);
+              if(credentials.password==='test-only-passphrase')body={token:'test-only-local-token',username:'Leon_Salimov'};
+              else {status=401;body={error:'Тестовый неверный пароль'};}
+            }else if(req.path==='/api/apps'&&req.method==='POST'){
+              window.localApps=[{id:'local-api-test',title:req.fields.title,description:req.fields.description,category:req.fields.category,size:433079,sha256:'a'.repeat(64),versionName:'6.0',packageName:'test.local',downloadUrl:'/files/test.apk'}];
+              status=201;body=window.localApps[0];
+            }else if(req.path.startsWith('/api/apps/')&&req.method==='DELETE'){
+              window.localApps=[];body={ok:true};
+            }else if(req.path==='/api/apps')body={apps:window.localApps};
+            else if(req.path==='/api/auth/logout')body={ok:true};
+            setTimeout(()=>window.Chits.onNativeEvent({type:'local-api',id:req.id,statusCode:status,body}),0);
+          };
+        """)
+        forbidden=[]
+        def forbid(route): forbidden.append(route.request.url);route.abort()
+        page.route('**/api/**',forbid)
+        page.goto(self.url,wait_until='networkidle')
+        expect(page.locator('#connection-badge')).to_contain_text('Сервер подключён')
+        page.locator('[data-page="settings"]').click()
+        page.locator('#admin-password').fill('test-only-passphrase')
+        page.locator('#login-form button').click()
+        expect(page.locator('#upload-form')).to_be_visible()
+        page.locator('#upload-form [name=title]').fill('Через Termux bridge')
+        page.locator('#upload-form [name=description]').fill('Файл остаётся в нативном выборе документа')
+        page.locator('#upload-form [name=file]').set_input_files(str(self.fixture))
+        page.locator('#upload-form button').click()
+        expect(page.locator('#toast')).to_contain_text('опубликовано')
+        posted=page.evaluate("window.localRequests.find(x=>x.path==='/api/apps'&&x.method==='POST')")
+        self.assertTrue(posted['multipart'])
+        self.assertEqual(posted['headers'],{'Authorization':'Bearer test-only-local-token'})
+        self.assertEqual(set(posted['fields']),{'title','description','category'})
+        self.assertNotIn('body',posted)
+        self.assertNotIn('file',posted)
+        item=page.locator('.admin-item').filter(has_text='Через Termux bridge')
+        item.locator('[data-delete-remote]').click();page.locator('#confirm-button').click()
+        expect(page.locator('#toast')).to_contain_text('удалено из каталога')
+        self.assertTrue(page.evaluate("window.localRequests.some(x=>x.method==='DELETE')"))
+        page.locator('[data-action="logout"]').click()
+        page.locator('#admin-password').fill('incorrect-test-password')
+        page.locator('#login-form button').click()
+        expect(page.locator('#login-error')).to_contain_text('Тестовый неверный пароль')
+        self.assertEqual(forbidden,[])
+
     def test_real_backend_desktop_admin_upload_catalog_delete_logout(self):
         page = self.page
         page.goto(self.url, wait_until='networkidle')
@@ -288,7 +425,7 @@ class MarketUITests(unittest.TestCase):
         page = self.page
         page.set_viewport_size({'width':320,'height':720})
         page.goto(self.url, wait_until='networkidle')
-        for section in ('catalog','downloads','assistant','settings'):
+        for section in ('catalog','search','downloads','assistant','settings'):
             page.locator('[data-page="'+section+'"]').click()
             self.assertTrue(page.evaluate('document.documentElement.scrollWidth <= innerWidth'), section)
         page.evaluate("window.nativeState.apps[0].title='<img src=x onerror=alert(1)>';window.dispatchEvent(new Event('focus'));window.Chits.navigate('catalog')")

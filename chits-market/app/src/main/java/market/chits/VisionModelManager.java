@@ -111,6 +111,7 @@ public final class VisionModelManager {
         else if (busy.get()) reason = "Загружаются языковая модель и модуль зрения. После обрыва загрузку можно продолжить";
         else reason = "Qwen со зрением загрузится автоматически по Wi-Fi. Для загрузки через мобильную сеть нажмите кнопку";
         return object("available", vision || legacy, "installed", vision || legacy,
+            "embedded", BundledModels.hasRole(context,"vision") && BundledModels.hasRole(context,"projector"),
             "vision", vision, "downloading", busy.get(), "status", status,
             "progress", progress, "downloadedBytes", downloadedBytes, "totalBytes", totalBytes,
             "component", component, "model", vision || !legacy ? MODEL_LABEL : "Qwen2.5 0.5B · текст; зрение готовится",
@@ -127,7 +128,8 @@ public final class VisionModelManager {
             return;
         }
         if (busy.get()) return;
-        if (!networkAllowed(allowMetered)) {
+        boolean embedded = BundledModels.hasRole(context,"vision") && BundledModels.hasRole(context,"projector");
+        if (!embedded && !networkAllowed(allowMetered)) {
             status = "waiting-wifi";
             error = "";
             emit();
@@ -164,6 +166,16 @@ public final class VisionModelManager {
 
     private void prepare(boolean allowMetered) {
         try {
+            if (BundledModels.hasRole(context,"vision") && BundledModels.hasRole(context,"projector")) {
+                component = "Подготовка фото-модели из APK";
+                BundledModels.restoreVision(context,(role,current,total)->{
+                    downloadedBytes=current;totalBytes=total;progress=(int)(current*100/total);emit();
+                });
+                if(!isVisionReady())throw new IOException("Не удалось подготовить встроенный профиль фото");
+                totalBytes=prefs.getLong("modelBytes",0)+prefs.getLong("projectorBytes",0);
+                downloadedBytes=totalBytes;progress=100;status="ready";component="";error="";
+                return;
+            }
             JSONObject manifest = manifest();
             JSONObject language = manifest.getJSONObject("language");
             JSONObject projector = manifest.getJSONObject("projector");

@@ -25,7 +25,7 @@ with ZipFile('build/classes.jar','w',ZIP_DEFLATED) as z:
     for p in sorted(Path('build/classes').rglob('*.class')): z.write(p,p.relative_to('build/classes').as_posix())
 PY
 "$CHITS_BUILD_TOOLS/d8" --min-api 26 --lib "$CHITS_ANDROID_JAR" --output build/dex build/classes.jar
-"$CHITS_BUILD_TOOLS/aapt" package -f -M app/src/main/AndroidManifest.xml -S app/src/main/res -A app/src/main/assets -I "$CHITS_ANDROID_JAR" -F build/base.apk
+"$CHITS_BUILD_TOOLS/aapt" package -f -0 bin -0 gguf -M app/src/main/AndroidManifest.xml -S app/src/main/res -A app/src/main/assets -I "$CHITS_ANDROID_JAR" -F build/base.apk
 python3 - <<'PY'
 from pathlib import Path
 from zipfile import ZipFile,ZIP_DEFLATED
