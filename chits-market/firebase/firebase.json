@@ -1,0 +1,24 @@
+{
+  "hosting": {
+    "public": "../app/src/main/assets/web",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**", "**/*.local.json"],
+    "headers": [
+      { "source": "**", "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "no-referrer" },
+        { "key": "Content-Security-Policy", "value": "frame-ancestors 'none'; object-src 'none'; base-uri 'none'" }
+      ] },
+      { "source": "**/*.@(html|js|json)", "headers": [
+        { "key": "Cache-Control", "value": "no-cache" }
+      ] }
+    ]
+  },
+  "firestore": { "rules": "firestore.rules", "indexes": "firestore.indexes.json" },
+  "storage": { "rules": "storage.rules" },
+  "emulators": {
+    "firestore": { "host": "127.0.0.1", "port": 8088 },
+    "storage": { "host": "127.0.0.1", "port": 9199 },
+    "ui": { "enabled": false },
+    "singleProjectMode": true
+  }
+}

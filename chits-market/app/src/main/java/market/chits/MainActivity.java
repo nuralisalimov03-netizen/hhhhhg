@@ -34,9 +34,7 @@ import java.util.zip.ZipFile;
 public final class MainActivity extends Activity {
     private static final String ORIGIN = "https://app.chits.local/";
     private static final long APK_LIMIT = 200L * 1024 * 1024;
-    private static final long MODEL_LIMIT = 1200L * 1024 * 1024;
-    private static final String MODEL_REPO = "Qwen/Qwen2.5-0.5B-Instruct-GGUF";
-    private static final String MODEL_NAME = "qwen2.5-0.5b-instruct-q4_k_m.gguf";
+    private static final long MODEL_LIMIT = 4L * 1024 * 1024 * 1024;
     private WebView web;
     private SharedPreferences prefs;
     private final ExecutorService workers = Executors.newFixedThreadPool(2);
@@ -46,12 +44,24 @@ public final class MainActivity extends Activity {
     private volatile int modelProgress;
     private String pendingInstall;
     private ValueCallback<Uri[]> fileCallback;
+    private VisionModelManager visionModels;
+    private static VisionModelManager sharedVisionModels;
+    private final VisionModelManager.Listener modelListener=this::event;
+    private android.net.ConnectivityManager.NetworkCallback networkCallback;
+    private AssistantPhotos assistantPhotos;
+    private final AtomicBoolean photoBusy = new AtomicBoolean(false);
 
     @Override public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         getWindow().setStatusBarColor(Color.rgb(16,27,40));
         getWindow().setNavigationBarColor(Color.rgb(16,27,40));
         prefs = getSharedPreferences("market", MODE_PRIVATE);
+        assistantPhotos = new AssistantPhotos(this);
+        synchronized(MainActivity.class){
+            if(sharedVisionModels==null)sharedVisionModels=new VisionModelManager(getApplicationContext(),null);
+            visionModels=sharedVisionModels;
+        }
+        visionModels.setListener(modelListener);
         try {
             seed("orbita-v6", "apks/orbita.apk", "Орбита", "45 офлайн-игр: головоломки, аркады и 3D.", "Игры");
             seed("breach-v2", "apks/breach.apk", "Прорыв", "Автономный шутер с ботами 3 × 3.", "Игры");
@@ -68,6 +78,9 @@ public final class MainActivity extends Activity {
         settings.setMediaPlaybackRequiresUserGesture(true);
         web.addJavascriptInterface(new Bridge(), "ChitsNative");
         web.setWebViewClient(new WebViewClient() {
+            @Override public void onPageFinished(WebView view, String url) {
+                if (url.startsWith(ORIGIN)) visionModels.start(false);
+            }
             @Override public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest req) {
                 String url = req.getUrl().toString();
                 if (!url.startsWith(ORIGIN)) return null;
@@ -111,6 +124,15 @@ public final class MainActivity extends Activity {
         });
         setContentView(root);
         web.loadUrl(ORIGIN);
+        try{
+            android.net.ConnectivityManager cm=(android.net.ConnectivityManager)getSystemService(CONNECTIVITY_SERVICE);
+            networkCallback=new android.net.ConnectivityManager.NetworkCallback(){
+                @Override public void onCapabilitiesChanged(android.net.Network network,android.net.NetworkCapabilities caps){
+                    runOnUiThread(()->{if(web!=null)visionModels.start(false);});
+                }
+            };
+            if(cm!=null)cm.registerDefaultNetworkCallback(networkCallback);
+        }catch(Exception ignored){ }
     }
 
     private File apkDir() { File dir = new File(getFilesDir(), "apks"); dir.mkdirs(); return dir; }
@@ -186,6 +208,30 @@ public final class MainActivity extends Activity {
         if(url.getUserInfo()!=null)throw new IOException("Логин и пароль нельзя указывать в адресе");
         return url;
     }
+    private JSONObject firebaseConfig(){
+        try{return new JSONObject(prefs.getString("firebaseConfig","{}"));}catch(Exception e){return new JSONObject();}
+    }
+    private JSONObject normalizeFirebaseConfig(JSONObject config)throws Exception{
+        for(String secret:new String[]{"private_key","private_key_id","client_email","password","serviceAccount"})if(config.has(secret))throw new IOException("Это приватные данные. Нужен только публичный firebaseConfig веб-приложения");
+        if(!config.optBoolean("enabled",true))return obj("enabled",false);
+        String project=config.optString("projectId"),bucket=config.optString("storageBucket"),key=config.optString("apiKey");
+        if(!project.matches("[a-z][a-z0-9-]{4,28}[a-z0-9]")||!bucket.matches("[a-z0-9][a-z0-9._-]{1,220}[a-z0-9]")||!key.matches("[a-zA-Z0-9_-]{15,160}"))throw new IOException("Проверьте projectId, storageBucket и apiKey из Firebase Console");
+        JSONObject normalized=obj("enabled",true,"projectId",project,"storageBucket",bucket,"apiKey",key);
+        for(String name:new String[]{"authDomain","appId","messagingSenderId","adminEmail"}){
+            String value=config.optString(name,"").trim();
+            if(value.length()>250)throw new IOException("Поле Firebase слишком длинное");
+            normalized.put(name,value);
+        }
+        return normalized;
+    }
+    private boolean firebaseApk(URL url,String id){
+        JSONObject config=firebaseConfig();
+        if(!config.optBoolean("enabled")||!"https".equals(url.getProtocol())||!"firebasestorage.googleapis.com".equals(url.getHost())||(url.getPort()!=-1&&url.getPort()!=443))return false;
+        try{
+            String expected="/v0/b/"+config.getString("storageBucket")+"/o/"+java.net.URLEncoder.encode("apks/"+id+".apk","UTF-8");
+            return expected.equals(url.getPath());
+        }catch(Exception e){return false;}
+    }
     private HttpURLConnection connection(URL initial) throws Exception {
         URL current=initial;
         for(int i=0;i<8;i++) {
@@ -224,10 +270,23 @@ public final class MainActivity extends Activity {
     }
     public final class Bridge {
         @JavascriptInterface public String getState() {
-            boolean supported=OfflineAi.isSupported();
-            JSONObject ai=obj("available",supported&&modelFile().isFile(),"installed",modelFile().isFile(),"downloading",modelBusy.get(),"progress",modelProgress,"model","Qwen2.5 0.5B Instruct · Q4_K_M","reason",supported?"Скачайте модель один раз, затем общайтесь без интернета":"ИИ требует 64-битный Android ARM64");
-            return obj("serverUrl",prefs.getString("serverUrl",""),"apps",catalog(),"downloads",records(),"ai",ai).toString();
+            JSONObject ai=visionModels.state();
+            try { if(modelBusy.get())ai.put("downloading",true); }catch(Exception ignored){ }
+            return obj("serverUrl",prefs.getString("serverUrl",""),"firebaseConfig",firebaseConfig(),"apps",catalog(),"downloads",records(),"ai",ai,"assistantPhoto",assistantPhotos.state()==null?JSONObject.NULL:assistantPhotos.state()).toString();
         }
+        @JavascriptInterface public void setFirebaseConfig(String json) {
+            try {JSONObject config=normalizeFirebaseConfig(new JSONObject(json));prefs.edit().putString("firebaseConfig",config.toString()).commit();event(obj("type","firebase-config","status","saved"));}
+            catch(Exception e){event(obj("type","firebase-config","status","error","error",message(e)));}
+        }
+        @JavascriptInterface public void pickAssistantPhoto(){
+            if(inferenceBusy.get()||photoBusy.get()){event(obj("type","photo","status","error","error","Дождитесь текущей обработки"));return;}
+            runOnUiThread(()->{try{startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("image/*"),15);}catch(Exception e){event(obj("type","photo","status","error","error","Не удалось открыть выбор фотографии"));}});
+        }
+        @JavascriptInterface public void clearAssistantPhoto(){
+            if(inferenceBusy.get()||photoBusy.get()){event(obj("type","photo","status","error","error","Дождитесь текущей обработки"));return;}
+            assistantPhotos.clear();event(obj("type","photo","status","cleared"));
+        }
+
         @JavascriptInterface public void setServerUrl(String text) {
             try {String value=text.trim();if(!value.isEmpty()){URL url=checkedURL(value);if(url.getQuery()!=null||url.getRef()!=null||!(url.getPath().isEmpty()||url.getPath().equals("/")))throw new IOException("Укажите адрес сервера без пути");value=value.replaceAll("/+$","");}prefs.edit().putString("serverUrl",value).commit();event(obj("type","settings","status","saved"));}
             catch(Exception e){event(obj("type","settings","status","error","error",message(e)));}
@@ -241,8 +300,12 @@ public final class MainActivity extends Activity {
                     temp=new File(apkDir(),id+".part");
                     if(id.equals("orbita-v6")||id.equals("breach-v2")) {try(InputStream in=getAssets().open(id.equals("orbita-v6")?"apks/orbita.apk":"apks/breach.apk");OutputStream out=new FileOutputStream(temp)){copy(in,out,APK_LIMIT);}}
                     else {
-                        URL base=checkedURL(prefs.getString("serverUrl",""));URL url=checkedURL(new URL(base,app.getString("downloadUrl")).toString());
-                        if(!url.getProtocol().equals(base.getProtocol())||!url.getHost().equals(base.getHost())||url.getPort()!=base.getPort())throw new IOException("APK должен находиться на вашем сервере");
+                        String source=app.getString("downloadUrl");
+                        URL url=source.startsWith("https://")?checkedURL(source):checkedURL(new URL(checkedURL(prefs.getString("serverUrl","")),source).toString());
+                        if(!firebaseApk(url,id)){
+                            URL base=checkedURL(prefs.getString("serverUrl",""));
+                            if(!url.getProtocol().equals(base.getProtocol())||!url.getHost().equals(base.getHost())||url.getPort()!=base.getPort())throw new IOException("APK должен находиться на настроенном сервере или в вашем Firebase bucket");
+                        }
                         download(url,temp,app.getLong("size"),app.getString("sha256"),APK_LIMIT,"download",id);
                     }
                     JSONObject record=apkMetadata(id,temp,app.optString("title"),app.optString("description"),app.optString("category","Приложения"));
@@ -258,30 +321,30 @@ public final class MainActivity extends Activity {
         }
         @JavascriptInterface public void openApkPicker(){runOnUiThread(()->pick(11));}
         @JavascriptInterface public void importAiModel(){runOnUiThread(()->pick(12));}
-        @JavascriptInterface public void downloadAiModel(){
-            if(!modelBusy.compareAndSet(false,true))return;
-            workers.execute(()->{File temp=new File(getFilesDir(),"assistant.part");try{
-                if(!OfflineAi.isSupported())throw new IOException("Для ИИ нужен Android ARM64");
-                event(obj("type","ai-model","status","downloading","progress",0));
-                String api="https://huggingface.co/api/models/"+MODEL_REPO;
-                String revision=new JSONObject(readText(api+"/revision/main")).getString("sha");
-                if(!revision.matches("[0-9a-f]{40}"))throw new IOException("Не удалось проверить версию модели");
-                JSONArray entries=new JSONArray(readText(api+"/tree/"+revision+"?recursive=false"));JSONObject item=null;
-                for(int i=0;i<entries.length();i++)if(MODEL_NAME.equals(entries.getJSONObject(i).optString("path")))item=entries.getJSONObject(i);
-                if(item==null)throw new IOException("Модель не найдена в официальном репозитории");
-                JSONObject lfs=item.getJSONObject("lfs");String sha=lfs.getString("oid");long size=item.getLong("size");
-                if(getFilesDir().getUsableSpace()<size+100L*1024*1024)throw new IOException("Освободите место для модели (около 500 МБ)");
-                download(checkedURL("https://huggingface.co/"+MODEL_REPO+"/resolve/"+revision+"/"+MODEL_NAME),temp,size,sha,MODEL_LIMIT,"ai-model","qwen");
-                validateModel(temp);OfflineAi.release();if(!temp.renameTo(modelFile()))throw new IOException("Не удалось сохранить модель");
-                prefs.edit().putString("modelSha256",sha).putString("modelRevision",revision).commit();
-                modelBusy.set(false);event(obj("type","ai-model","status","ready","progress",100));
-            }catch(Exception e){temp.delete();modelBusy.set(false);event(obj("type","ai-model","status","error","error",message(e)));}});
-        }
+        @JavascriptInterface public void downloadAiModel(){visionModels.start(true);}
         @JavascriptInterface public void askAssistant(String prompt){
             if(!inferenceBusy.compareAndSet(false,true)){event(obj("type","assistant","status","error","error","Дождитесь текущего ответа"));return;}
-            workers.execute(()->{try{if(modelBusy.get())throw new IOException("Дождитесь подготовки модели");if(prompt==null||prompt.trim().isEmpty()||prompt.length()>8000)throw new IOException("Введите сообщение до 8000 символов");if(!modelFile().isFile())throw new IOException("Сначала скачайте или импортируйте модель");event(obj("type","assistant","status","generating"));if(!OfflineAi.load(modelFile().getAbsolutePath()))throw new IOException("Модель не загрузилась: проверьте GGUF и свободную память");String answer=OfflineAi.generate(prompt,256);if(answer==null||answer.trim().isEmpty())throw new IOException("Модель не вернула текст");event(obj("type","assistant","status","done","text",answer));}catch(Exception e){event(obj("type","assistant","status","error","error",message(e)));}finally{inferenceBusy.set(false);}});
+            workers.execute(()->{try{
+                if(modelBusy.get()||visionModels.isBusy()||photoBusy.get())throw new IOException("Дождитесь подготовки модели или фотографии");
+                if(prompt==null||prompt.trim().isEmpty()||prompt.length()>8000)throw new IOException("Введите сообщение до 8000 символов");
+                File image=assistantPhotos.file();
+                boolean vision=visionModels.isVisionReady();
+                if(image!=null&&!vision)throw new IOException("Для фотографии дождитесь загрузки Qwen-VL и компонента зрения");
+                File model=vision?visionModels.modelFile():modelFile();
+                if(!model.isFile())throw new IOException("Модель ещё не установлена. Подключитесь к Wi-Fi для автоматической загрузки");
+                event(obj("type","assistant","status","generating"));
+                String answer;
+                synchronized(OfflineAi.class){
+                    boolean loaded=vision?OfflineAi.load(model.getAbsolutePath(),visionModels.projectorFile().getAbsolutePath()):OfflineAi.load(model.getAbsolutePath());
+                    if(!loaded)throw new IOException("Модель не загрузилась: проверьте GGUF и свободную память");
+                    answer=image==null?OfflineAi.generate(prompt,256):OfflineAi.generate(prompt,image.getAbsolutePath(),256);
+                }
+                if(answer==null||answer.trim().isEmpty())throw new IOException("Модель не вернула текст");
+                event(obj("type","assistant","status","done","text",answer));
+            }catch(Exception e){event(obj("type","assistant","status","error","error",message(e)));}finally{inferenceBusy.set(false);}});
         }
     }
+
     private void pick(int request){try{startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("*/*"),request);}catch(Exception e){event(obj("type",request==12?"ai-model":"download","status","error","error","Не найден файловый менеджер"));}}
     private void validateModel(File file)throws Exception{
         try(InputStream in=new FileInputStream(file)){byte[] magic=new byte[4];if(in.read(magic)!=4||magic[0]!='G'||magic[1]!='G'||magic[2]!='U'||magic[3]!='F')throw new IOException("Нужна языковая модель в формате GGUF");}
@@ -291,9 +354,20 @@ public final class MainActivity extends Activity {
         super.onActivityResult(request,result,data);
         if(request==13){if(fileCallback!=null){fileCallback.onReceiveValue(result==RESULT_OK&&data!=null?new Uri[]{data.getData()}:null);fileCallback=null;}return;}
         if(request==14){String id=pendingInstall;pendingInstall=null;if(id!=null&&getPackageManager().canRequestPackageInstalls())install(id);return;}
+        if(request==15){
+            if(result!=RESULT_OK||data==null||data.getData()==null)return;
+            if(inferenceBusy.get()||!photoBusy.compareAndSet(false,true)){event(obj("type","photo","status","error","error","Дождитесь текущей обработки"));return;}
+            final Uri imageUri=data.getData();
+            workers.execute(()->{try{
+                event(obj("type","photo","status","importing"));
+                JSONObject photo=assistantPhotos.importPhoto(imageUri);
+                event(obj("type","photo","status","ready","photo",photo,"id",photo.getString("id"),"name",photo.getString("name"),"width",photo.getInt("width"),"height",photo.getInt("height"),"preview",photo.getString("preview")));
+            }catch(Exception e){event(obj("type","photo","status","error","error",message(e)));}finally{photoBusy.set(false);}});
+            return;
+        }
         if((request!=11&&request!=12)||result!=RESULT_OK||data==null||data.getData()==null)return;
         final Uri uri=data.getData();final boolean ai=request==12;
-        if(ai&&!modelBusy.compareAndSet(false,true))return;
+        if(ai&&(visionModels.isBusy()||inferenceBusy.get()||!modelBusy.compareAndSet(false,true)))return;
         workers.execute(()->{File temp=null;try{
             temp=File.createTempFile(ai?"model":"import",".part",getFilesDir());
             event(obj("type",ai?"ai-model":"download","status",ai?"downloading":"importing","progress",0));
@@ -302,6 +376,13 @@ public final class MainActivity extends Activity {
             else{String id="local-"+digest(temp).substring(0,24);JSONObject record=apkMetadata(id,temp,"","Импортировано с устройства","Приложения");if(!temp.renameTo(new File(apkDir(),id+".apk")))throw new IOException("Не удалось сохранить APK");saveRecord(record);event(obj("type","download","id",id,"status","done","progress",100,"app",record));}
         }catch(Exception e){if(temp!=null)temp.delete();if(ai)modelBusy.set(false);event(obj("type",ai?"ai-model":"download","status","error","error",message(e)));}});
     }
+    @Override protected void onResume(){super.onResume();if(visionModels!=null && web!=null)new android.os.Handler().postDelayed(()->{if(web!=null)visionModels.start(false);},1500);}
     @Override public void onBackPressed(){if(web!=null)web.evaluateJavascript("window.Chits&&window.Chits.goBack?window.Chits.goBack():false",value->{if("false".equals(value)||"null".equals(value))finish();});else super.onBackPressed();}
-    @Override protected void onDestroy(){if(fileCallback!=null)fileCallback.onReceiveValue(null);if(web!=null){web.removeJavascriptInterface("ChitsNative");web.destroy();web=null;}workers.shutdown();super.onDestroy();}
+    @Override protected void onDestroy(){
+        if(visionModels!=null)visionModels.clearListener(modelListener);
+        if(networkCallback!=null){try{((android.net.ConnectivityManager)getSystemService(CONNECTIVITY_SERVICE)).unregisterNetworkCallback(networkCallback);}catch(Exception ignored){ }}
+        if(fileCallback!=null)fileCallback.onReceiveValue(null);
+        if(web!=null){web.removeJavascriptInterface("ChitsNative");web.destroy();web=null;}
+        workers.shutdown();super.onDestroy();
+    }
 }

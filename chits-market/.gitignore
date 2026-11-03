@@ -4,3 +4,11 @@ dist/
 .local/
 __pycache__/
 *.pyc
+node_modules/
+.firebase/
+.env
+*.service-account.json
+*.p12
+*.keystore
+*.sqlite3
+*-debug.log

@@ -1,0 +1,18 @@
+{
+  "name": "chits-market-firebase",
+  "private": true,
+  "type": "module",
+  "description": "Firebase deployment and authorization checks for Chits Market",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "test": "firebase emulators:exec --project demo-chits-market --only firestore,storage \"node --test test-rules.mjs\"",
+    "test:provision": "node --test test-provision.mjs",
+    "provision-admin": "node provision-admin.mjs"
+  },
+  "dependencies": { "firebase-admin": "14.5.0" },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "6.0.0",
+    "firebase": "13.2.0",
+    "firebase-tools": "15.34.2"
+  }
+}

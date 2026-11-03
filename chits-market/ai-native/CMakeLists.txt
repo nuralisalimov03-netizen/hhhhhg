@@ -18,8 +18,28 @@ set(GGML_CPU_KLEIDIAI OFF CACHE BOOL "" FORCE)
 set(GGML_BACKEND_DL OFF CACHE BOOL "" FORCE)
 set(GGML_LLAMAFILE OFF CACHE BOOL "" FORCE)
 add_subdirectory("${LLAMA_SOURCE_DIR}" llama EXCLUDE_FROM_ALL)
+find_package(Threads REQUIRED)
+# Compile only the pinned mtmd library sources, not upstream CLI binaries.
+add_library(chits_mtmd STATIC
+    "${LLAMA_SOURCE_DIR}/tools/mtmd/mtmd.cpp"
+    "${LLAMA_SOURCE_DIR}/tools/mtmd/mtmd-audio.cpp"
+    "${LLAMA_SOURCE_DIR}/tools/mtmd/clip.cpp"
+    "${LLAMA_SOURCE_DIR}/tools/mtmd/mtmd-helper.cpp")
+target_include_directories(chits_mtmd PUBLIC "${LLAMA_SOURCE_DIR}/tools/mtmd")
+target_include_directories(chits_mtmd PRIVATE "${LLAMA_SOURCE_DIR}" "${LLAMA_SOURCE_DIR}/vendor")
+target_link_libraries(chits_mtmd PUBLIC ggml llama PRIVATE Threads::Threads)
+target_compile_features(chits_mtmd PRIVATE cxx_std_17)
+target_compile_options(chits_mtmd PRIVATE -Wno-cast-qual)
 add_library(chits_ai SHARED chits_ai.cpp)
 target_include_directories(chits_ai PRIVATE "${LLAMA_SOURCE_DIR}/include" "${LLAMA_SOURCE_DIR}/ggml/include")
-target_link_libraries(chits_ai PRIVATE llama)
+target_link_libraries(chits_ai PRIVATE chits_mtmd llama)
 # 16 KiB page alignment supports current Android ARM64 devices as well as 4 KiB.
 target_link_options(chits_ai PRIVATE "-Wl,-z,max-page-size=16384")
+
+# An optional host harness checks real image decoding/resizing without model weights.
+if(CHITS_BUILD_IMAGE_TESTS)
+    enable_testing()
+    add_executable(chits_image_test image_test.cpp)
+    target_link_libraries(chits_image_test PRIVATE chits_mtmd)
+    add_test(NAME chits_image_decode_and_resize COMMAND chits_image_test)
+endif()

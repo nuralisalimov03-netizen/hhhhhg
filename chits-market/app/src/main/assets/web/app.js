@@ -12,7 +12,7 @@
   const state = {
     page: 'catalog', apps: [], deviceApps: [], downloads: [], progress: {}, query: '', category: 'all',
     serverUrl: '', connected: false, loading: false, catalogError: '',
-    token: '', admin: '', ai: {available: false, installed: false, model: 'Qwen2.5 0.5B Instruct'},
+    token: '', admin: '', ai: {available: false, installed: false, vision:false, model: 'Qwen2.5-VL 3B Instruct'}, photo:null,
     messages: storage.get('messages', []), chatDraft: '', assistantBusy: false,
     uploadBusy: false, detailId: null, confirm: null, serverGeneration: 0
   };
@@ -65,14 +65,27 @@
         if (typeof data.serverUrl === 'string') state.serverUrl = data.serverUrl;
         if (Array.isArray(data.downloads)) state.downloads = cleanApps(data.downloads);
         if (Array.isArray(data.apps)) state.deviceApps = cleanApps(data.apps);
-        if (data.ai) state.ai = {...state.ai, ...data.ai};
+        if (data.ai) {state.ai = {...state.ai, ...data.ai};if(data.ai.status)state.ai.waitingWifi=data.ai.status==='waiting-wifi';}
+        if (Object.prototype.hasOwnProperty.call(data, 'assistantPhoto')) state.photo = safePhoto(data.assistantPhoto);
+        if (typeof data.firebaseConfig?.enabled === 'boolean' && window.ChitsFirebase) {
+          window.ChitsFirebase.configure(data.firebaseConfig);
+          storage.set('firebaseConfig', window.ChitsFirebase.getConfig());
+        }
       }
     } catch (_) { toast('Не удалось прочитать данные устройства'); }
+  }
+  const firebase = () => window.ChitsFirebase;
+  const firebaseMode = () => Boolean(firebase()?.configured());
+  const catalogKey = () => firebaseMode() ? 'firebase:' + firebase().getConfig().projectId : state.serverUrl;
+  function safePhoto(photo) {
+    if (!photo || typeof photo !== 'object') return null;
+    const preview = typeof photo.preview === 'string' && /^data:image\/(jpeg|png|webp);base64,[a-zA-Z0-9+/=]+$/.test(photo.preview) && photo.preview.length < 4000000 ? photo.preview : '';
+    return {id:String(photo.id || ''), name:String(photo.name || 'Фотография').slice(0,120), width:Number(photo.width)||0,height:Number(photo.height)||0,preview};
   }
   function updateBadge() {
     const badge = $('#connection-badge');
     badge.classList.toggle('online', state.connected);
-    $('span', badge).textContent = state.connected ? 'Сервер подключён' : 'Локальный режим';
+    $('span', badge).textContent = state.connected ? firebaseMode() ? 'Firebase подключён' : 'Сервер подключён' : 'Локальный режим';
     const count = $('#download-counter');
     count.textContent = state.downloads.length;
     count.hidden = !state.downloads.length;
@@ -186,7 +199,7 @@
     try {
       const data = {...app};
       if (!bundled) {
-      const absolute = new URL(url, state.serverUrl + '/');
+      const absolute = new URL(url, state.serverUrl ? state.serverUrl + '/' : location.href);
       if (!['https:', 'http:'].includes(absolute.protocol)) throw new Error();
       data.downloadUrl = absolute.href;
       }
@@ -210,6 +223,14 @@
     return value;
   }
   async function request(path, options = {}, timeout = 20000) {
+    if (firebaseMode()) {
+      if (path === '/api/apps' && (!options.method || options.method === 'GET')) return firebase().apps();
+      if (path === '/api/auth/login') return firebase().login(JSON.parse(options.body));
+      if (path === '/api/auth/logout') { firebase().logout(); return {ok:true}; }
+      if (path === '/api/apps' && options.method === 'POST') return firebase().upload(options.body);
+      if (path.startsWith('/api/apps/') && options.method === 'DELETE') return firebase().delete(decodeURIComponent(path.slice('/api/apps/'.length)));
+      throw new Error('Неизвестная операция Firebase');
+    }
     if (!state.serverUrl) throw new Error('Сначала подключите сервер в настройках.');
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeout);
@@ -228,7 +249,7 @@
     } finally { clearTimeout(timer); }
   }
   async function refreshCatalog(silent = false) {
-    if (!state.serverUrl) {
+    if (!state.serverUrl && !firebaseMode()) {
       state.connected = false;
       state.catalogError = '';
       if (!silent) toast('Подключите сервер в настройках для новых приложений');
@@ -244,7 +265,7 @@
       if (generation !== state.serverGeneration) return;
       if (!Array.isArray(data.apps)) throw new Error('Сервер вернул неизвестный формат каталога.');
       state.apps = cleanApps(data.apps);
-      storage.set('catalog', {serverUrl: state.serverUrl, apps: state.apps});
+      storage.set('catalog', {serverUrl: catalogKey(), apps: state.apps});
       state.connected = true;
       if (!silent) toast('Каталог обновлён');
     } catch (error) {
@@ -257,10 +278,43 @@
     }
   }
   function renderSettings() {
-    main.innerHTML = `<div class="page-heading"><div><div class="eyebrow">ВАШ МАРКЕТ, ВАШИ ПРАВИЛА</div><h1>Настройки.</h1></div></div><div class="settings-layout"><div><section class="settings-section"><div class="section-heading"><h2>Подключение</h2>${icon('settings')}</div><p class="muted">Новые приложения приходят с вашего сервера. Сохранённые APK и локальный помощник не зависят от него.</p><form id="server-form" style="margin-top:18px"><label class="field"><span>Адрес сервера</span><input id="server-url" name="url" type="url" inputmode="url" autocomplete="url" placeholder="https://market.example.com" value="${esc(state.serverUrl)}"><small>Для удалённого доступа используйте HTTPS. Домашний localhost работает только на самом устройстве.</small></label><button class="button full" type="submit">Сохранить и проверить ${icon('arrow')}</button><p id="server-error" class="form-error" role="alert" hidden></p></form><div class="status-line">${icon(state.connected ? 'check' : 'lock')}${state.connected ? 'Сервер отвечает · каталог актуален' : 'Локальный режим · сохранённые APK доступны'}</div>${!state.serverUrl ? '<div class="inline-note">Сервер пока не подключён. Его адрес появится после размещения серверной части Chits Market.</div>' : state.serverUrl.startsWith('http:') ? '<div class="inline-note error">HTTP не шифрует соединение. Для удалённого входа администратора настройте HTTPS.</div>' : ''}</section><section class="settings-section"><div class="section-heading"><h2>На этом устройстве</h2>${icon('shield')}</div><p class="muted">${native ? 'Chits Market работает на Android. Установкой управляет система; приложения не устанавливаются скрыто.' : 'Открыта браузерная версия интерфейса. Установка и хранение APK доступны в Android-приложении.'}</p><button class="button secondary full" data-action="import" style="margin-top:16px">${icon('upload')}Добавить локальный APK</button></section></div><section class="settings-section" id="admin-section"><div class="section-heading"><h2>Для администратора</h2>${icon('lock')}</div>${state.token ? adminPanel() : loginPanel()}</section></div><div class="build-label"><span>Chits Market · 1.0</span><span>Сделан, чтобы быть рядом</span></div>`;
+    const fb = firebaseMode();
+    const config = firebase()?.getConfig() || {enabled:false};
+    main.innerHTML = `<div class="page-heading"><div><div class="eyebrow">ВАШ МАРКЕТ, ВАШИ ПРАВИЛА</div><h1>Настройки.</h1></div></div><div class="settings-layout"><div>
+      <section class="settings-section"><div class="section-heading"><h2>Firebase</h2>${icon('shield')}</div>
+        <p class="muted">Ваш облачный каталог, APK и вход администратора. Переписка и фотографии помощника остаются на телефоне.</p>
+        ${fb ? `<div class="inline-note"><strong>${esc(config.projectId)}</strong><br>${esc(config.storageBucket)}<br>${state.connected ? 'Каталог доступен' : 'Офлайн · используем сохранённый каталог'}</div>` : '<div class="inline-note">Проект ещё не подключён. Создайте Firebase по инструкции и вставьте публичную конфигурацию ниже.</div>'}
+        <form id="firebase-form" style="margin-top:18px"><label class="field"><span>Публичная конфигурация Firebase · JSON</span><textarea id="firebase-config" name="config" rows="7" spellcheck="false" placeholder='{"enabled":true,"apiKey":"…","projectId":"…","storageBucket":"…","appId":"…","adminEmail":"…"}'>${esc(config.enabled ? JSON.stringify(config,null,2) : '')}</textarea><small>Вставьте web-конфигурацию вашего проекта и adminEmail. Это публичные параметры; пароль и serviceAccount сюда не вводят.</small></label><button class="button full" type="submit">${icon('check')}Подключить Firebase</button><p id="firebase-error" class="form-error" role="alert" hidden></p></form>
+        ${fb ? '<button class="text-link" data-action="disable-firebase" style="margin-top:17px">Отключить Firebase на устройстве</button>' : ''}
+      </section>
+      ${!fb ? `<section class="settings-section"><div class="section-heading"><h2>Свой сервер · альтернатива</h2>${icon('settings')}</div><p class="muted">Можно использовать собственный сервер Chits Market вместо Firebase. Сохранённые APK доступны без него.</p><form id="server-form" style="margin-top:18px"><label class="field"><span>Адрес сервера</span><input id="server-url" name="url" type="url" inputmode="url" autocomplete="url" placeholder="https://market.example.com" value="${esc(state.serverUrl)}"><small>Удалённый доступ — через HTTPS. Домашний localhost работает только на самом устройстве.</small></label><button class="button full" type="submit">Сохранить и проверить ${icon('arrow')}</button><p id="server-error" class="form-error" role="alert" hidden></p></form><div class="status-line">${icon(state.connected ? 'check' : 'lock')}${state.connected ? 'Сервер отвечает · каталог актуален' : 'Локальный режим · сохранённые APK доступны'}</div></section>` : ''}
+      <section class="settings-section"><div class="section-heading"><h2>На этом устройстве</h2>${icon('shield')}</div><p class="muted">${native ? 'Установкой управляет Android. Приложения не устанавливаются скрыто.' : 'Открыта браузерная панель маркета. Установка и хранение APK доступны в Android-приложении.'}</p><button class="button secondary full" data-action="import" style="margin-top:16px">${icon('upload')}Добавить локальный APK</button></section>
+      </div><section class="settings-section" id="admin-section"><div class="section-heading"><h2>Для администратора</h2>${icon('lock')}</div>${state.token ? adminPanel() : loginPanel()}</section></div><div class="build-label"><span>Chits Market · 1.1</span><span>Сделан, чтобы быть рядом</span></div>`;
+  }
+  async function saveFirebase(form) {
+    try {
+      const raw = JSON.parse(String(new FormData(form).get('config') || '{}'));
+      if (!firebase()) throw new Error('Модуль Firebase не загрузился');
+      const config = firebase().configure({...raw,enabled:true});
+      state.serverGeneration++; state.token=''; state.admin=''; state.connected=false;
+      storage.set('firebaseConfig', config);
+      if(native && typeof native.setFirebaseConfig==='function') native.setFirebaseConfig(JSON.stringify(config));
+      const cached=storage.get('catalog',{});
+      state.apps=cached.serverUrl===catalogKey()?cleanApps(cached.apps):[];
+      render();
+      await refreshCatalog();
+    } catch(error) {setFormError('#firebase-error', error instanceof SyntaxError ? 'Нужен JSON-объект: проверьте кавычки и запятые.' : error.message);}
+  }
+  function disableFirebase() {
+    firebase()?.configure({enabled:false});
+    storage.set('firebaseConfig',{enabled:false});
+    if(native && typeof native.setFirebaseConfig==='function')native.setFirebaseConfig(JSON.stringify({enabled:false}));
+    state.serverGeneration++;state.token='';state.admin='';state.connected=false;
+    const cached=storage.get('catalog',{});state.apps=cached.serverUrl===catalogKey()?cleanApps(cached.apps):[];
+    render();if(state.serverUrl)refreshCatalog(true);
   }
   function loginPanel() {
-    return `<p class="muted">Войдите, чтобы публиковать APK в каталоге с телефона или другого устройства.</p><form id="login-form" style="margin-top:18px"><label class="field"><span>Никнейм</span><input name="username" id="admin-username" autocomplete="username" value="Leon_Salimov" maxlength="80" required></label><label class="field"><span>Пароль</span><input name="password" id="admin-password" type="password" autocomplete="current-password" maxlength="200" placeholder="Ваш пароль" required></label><button class="button full" type="submit" ${!state.serverUrl ? 'disabled' : ''}>Войти в панель ${icon('arrow')}</button><p id="login-error" class="form-error" role="alert" hidden></p></form><p class="hint">${!state.serverUrl ? 'Сначала укажите адрес сервера в разделе «Подключение».' : 'Вход требует соединения с сервером. Пароль не сохраняется в приложении.'}</p>`;
+    return `<p class="muted">Войдите, чтобы публиковать APK в каталоге с телефона или другого устройства.</p><form id="login-form" style="margin-top:18px"><label class="field"><span>Никнейм</span><input name="username" id="admin-username" autocomplete="username" value="Leon_Salimov" maxlength="80" required></label><label class="field"><span>Пароль</span><input name="password" id="admin-password" type="password" autocomplete="current-password" maxlength="200" placeholder="Ваш пароль" required></label><button class="button full" type="submit" ${!state.serverUrl && !firebaseMode() ? 'disabled' : ''}>Войти в панель ${icon('arrow')}</button><p id="login-error" class="form-error" role="alert" hidden></p></form><p class="hint">${!state.serverUrl && !firebaseMode() ? 'Сначала подключите Firebase или укажите адрес сервера.' : 'Вход требует соединения с сервером. Пароль не сохраняется в приложении.'}</p>`;
   }
   function adminPanel() {
     return `<div class="admin-welcome"><div><strong>${esc(state.admin)}</strong><small>АДМИНИСТРАТОР МАРКЕТА</small></div><button class="text-link" data-action="logout">Выйти</button></div><form id="upload-form"><label class="field"><span>Название приложения</span><input name="title" maxlength="80" placeholder="Например, Моя игра" required></label><label class="field"><span>Описание</span><textarea name="description" maxlength="3000" placeholder="Для чего приложение и что в нём интересного" required></textarea></label><label class="field"><span>Категория</span><select name="category"><option>Игры</option><option>Инструменты</option><option>Обучение</option><option>Общение</option><option>Приложения</option></select></label><label class="field"><span>APK-файл</span><input name="file" type="file" accept=".apk,application/vnd.android.package-archive" required><small>Загружайте только APK, которыми имеете право делиться. Для пользователей будет рассчитана контрольная сумма.</small></label><button class="button full" type="submit" ${state.uploadBusy ? 'disabled' : ''}>${icon('upload')}${state.uploadBusy ? 'Публикуем приложение…' : 'Опубликовать в маркете'}</button><p id="upload-error" class="form-error" role="alert" hidden></p></form><div class="admin-apps"><div class="section-heading"><h3>В вашем каталоге</h3><small>${state.apps.length}</small></div>${state.apps.map(app => `<div class="admin-item"><div><strong>${esc(appName(app))}</strong><small>${esc(app.versionName || 'APK')} · ${size(app.size)}</small></div><button class="icon-button" data-delete-remote="${esc(app.id)}" aria-label="Удалить из каталога ${esc(appName(app))}">${icon('trash')}</button></div>`).join('') || '<p class="muted">Здесь появятся опубликованные приложения.</p>'}</div>`;
@@ -304,7 +358,7 @@
     const fields = new FormData(form);
     const file = fields.get('file');
     if (!file || !file.size || !file.name.toLowerCase().endsWith('.apk')) { setFormError('#upload-error', 'Выберите APK-файл приложения.'); return; }
-    if (file.size > 1024 ** 3) { setFormError('#upload-error', 'APK больше 1 ГБ. Выберите файл меньшего размера.'); return; }
+    if (file.size > 200 * 1024 ** 2) { setFormError('#upload-error', 'APK больше 200 МБ. Выберите файл меньшего размера.'); return; }
     const button = $('button[type=submit]', form);
     state.uploadBusy = true;
     button.disabled = true;
@@ -319,30 +373,56 @@
     finally { state.uploadBusy = false; if (state.page === 'settings' && (!state.token || !$('#upload-error')?.textContent)) renderSettings(); else if (button.isConnected) {button.disabled = false; button.innerHTML = icon('upload')+'Опубликовать в маркете';} }
   }
   function renderAssistant() {
-    const installed = state.ai.available || state.ai.installed;
+    const available = Boolean(state.ai.available);
+    const installed = Boolean(state.ai.installed);
+    const vision = Boolean(state.ai.vision);
     const downloading = state.ai.downloading;
+    const waitingWifi = state.ai.waitingWifi || state.ai.status === 'waiting-wifi';
     const progress = Math.max(0, Math.min(100, Number(state.ai.progress) || 0));
-    main.innerHTML = `<div class="assistant-layout"><div class="page-heading"><div><div class="eyebrow">ПОМНЮ, КАК ЭТО ДЕЛАЕТСЯ</div><h1>На вашей стороне.</h1></div></div><section class="assistant-intro"><div class="assistant-symbol" aria-hidden="true">${icon('assistant')}</div><div class="eyebrow">CHITS ASSISTANT</div><h2>Маленькая модель.<br>Лично для вас.</h2><p>Локальный собеседник на телефоне. После загрузки модели отвечает без интернета — переписка не уходит на сервер.</p><div class="assistant-status"><i></i>${installed ? 'Модель на устройстве · офлайн' : 'Сначала нужна загрузка модели'}</div></section><section class="settings-section" id="ai-model-panel"><div class="section-heading"><h2>Модель помощника</h2>${icon('shield')}</div><p class="muted">${esc(state.ai.model || 'Qwen2.5 0.5B Instruct')} · около 400 МБ. Это небольшая языковая модель: она может ошибаться и не обладает всеми возможностями ChatGPT.</p>${installed ? '<div class="status-line">'+icon('check')+'Готова к работе без интернета</div>' : downloading ? `<div class="progress-track"><i style="width:${progress}%"></i></div><div class="progress-copy"><span>Загружаем модель…</span><span>${Math.round(progress)}%</span></div>` : `<button class="button full" data-action="download-model" style="margin-top:16px">${icon('download')}Скачать модель один раз</button><p class="hint">Нужен интернет для первого скачивания. Используйте Wi-Fi; модель займёт место в памяти телефона.</p>`}<button class="button secondary full" data-action="import-model" style="margin-top:12px" ${downloading || state.assistantBusy ? 'disabled' : ''}>${icon('upload')}Импорт GGUF с устройства</button>${state.ai.error ? `<p class="form-error" role="alert">${esc(state.ai.error)}</p>` : ''}${state.ai.reason && !installed ? `<p class="hint">${esc(state.ai.reason)}</p>` : ''}</section><div class="suggestions" aria-label="Быстрая справка"><button class="suggestion" data-help="offline">Как установить без сети?</button><button class="suggestion" data-help="upload">Как добавить приложение?</button><button class="suggestion" data-help="model">Что умеет офлайн-ИИ?</button></div><div id="chat-messages" class="chat-messages" role="log" aria-label="Переписка с помощником">${state.messages.map(messageHTML).join('')}${state.assistantBusy ? '<div class="message assistant" id="assistant-pending"><div class="message-label">CHITS ASSISTANT · НА УСТРОЙСТВЕ</div><p>Думаю над ответом… На небольшой модели это может занять время.</p><div class="loading-line" style="margin:12px 0 0"></div></div>' : ''}</div><form id="chat-form" class="chat-form"><input id="chat-input" name="prompt" maxlength="2000" placeholder="${installed ? 'Спросите что-нибудь…' : 'Сначала скачайте модель'}" aria-label="Сообщение помощнику" autocomplete="off" value="${esc(state.chatDraft)}" ${!installed || state.assistantBusy ? 'disabled' : ''}><button type="submit" aria-label="Отправить сообщение" ${!installed || state.assistantBusy ? 'disabled' : ''}>${icon('arrow')}</button></form><p class="chat-footnote">Ответы создаёт локальная модель. Проверяйте важные факты. Кнопки выше открывают обычную справку маркета.</p></div>`;
+    const modelSize = state.ai.totalBytes ? size(state.ai.totalBytes) : 'около 3–3,5 ГБ';
+    const photoBlocked = state.photo && !vision;
+    const canSend = available && !state.assistantBusy && !photoBlocked;
+    main.innerHTML = `<div class="assistant-layout"><div class="page-heading"><div><div class="eyebrow">ПРИВАТНО. ПРЯМО НА ТЕЛЕФОНЕ.</div><h1>На вашей стороне.</h1></div></div>
+      <section class="assistant-intro"><div class="assistant-symbol" aria-hidden="true">${icon('assistant')}</div><div class="eyebrow">CHITS ASSISTANT</div><h2>Поговорим.<br>И посмотрим фото.</h2><p>После подготовки модели отвечает и разбирает фотографии без интернета. Снимки и вопросы не отправляются в Firebase или на сервер.</p><div class="assistant-status"><i></i>${vision ? 'Текст и фотографии · офлайн' : available ? 'Текст готов · фото требуют визуальной модели' : 'Подготовка локальной модели'}</div></section>
+      <section class="settings-section" id="ai-model-panel"><div class="section-heading"><h2>Модель на устройстве</h2>${icon('shield')}</div><p class="muted">${esc(state.ai.targetModel || state.ai.model || 'Qwen2.5-VL 3B Instruct')} · ${esc(modelSize)}. Нужна для офлайн-общения и фотографий. Может ошибаться; возможности и скорость отличаются от ChatGPT.</p>
+      ${downloading ? `<div class="progress-track"><i style="width:${progress}%"></i></div><div class="progress-copy"><span>${esc(state.ai.component || state.ai.file || state.ai.currentFile || 'Загружаем модель…')}</span><span>${Math.round(progress)}%</span></div><p class="hint">Оставьте приложение открытым. Модель и визуальный модуль скачиваются в память телефона.</p>` : vision && installed ? '<div class="status-line">'+icon('check')+'Текст и фото готовы к работе без интернета</div>' : `<div class="inline-note">${waitingWifi ? 'Ждём Wi-Fi: загрузка начнётся автоматически при подключении.' : 'При первом запуске загрузка начнётся автоматически через Wi-Fi.'} Понадобится ${esc(modelSize)} трафика и свободное место.</div><button class="button full" data-action="download-model" style="margin-top:16px">${icon('download')}${waitingWifi ? 'Скачать сейчас · разрешить мобильную сеть' : available ? 'Подготовить модель для фотографий' : 'Скачать модель сейчас'}</button><p class="hint">Ручной запуск разрешает мобильную сеть. После подготовки модели интернет для ответов и фото не нужен.</p>`}
+      <button class="button secondary full" data-action="import-model" style="margin-top:12px" ${downloading || state.assistantBusy ? 'disabled' : ''}>${icon('upload')}Импорт текстовой GGUF-модели</button><p class="hint">Для фотографий нужны языковая модель и отдельный модуль зрения. Автоматическая загрузка подготовит оба файла.</p>${state.ai.error ? `<p class="form-error" role="alert">${esc(state.ai.error)}</p>` : ''}${state.ai.reason && !vision ? `<p class="hint">${esc(state.ai.reason)}</p>` : ''}</section>
+      <div class="suggestions" aria-label="Быстрая справка"><button class="suggestion" data-help="offline">Как установить без сети?</button><button class="suggestion" data-help="upload">Как добавить приложение?</button><button class="suggestion" data-help="model">Как работают фото и ИИ?</button></div>
+      <div id="chat-messages" class="chat-messages" role="log" aria-label="Переписка с помощником">${state.messages.map(messageHTML).join('')}${state.assistantBusy ? '<div class="message assistant" id="assistant-pending"><div class="message-label">CHITS ASSISTANT · НА УСТРОЙСТВЕ</div><p>Думаю над ответом… Обработка фотографии может занять больше времени.</p><div class="loading-line" style="margin:12px 0 0"></div></div>' : ''}</div>
+      <div class="chat-composer">${state.photo ? `<div class="photo-attachment" id="photo-attachment">${state.photo.preview ? `<img src="${esc(state.photo.preview)}" alt="Предпросмотр выбранной фотографии">` : `<span class="photo-placeholder">${icon('photo')}</span>`}<div><strong>${esc(state.photo.name)}</strong><small>${state.photo.width && state.photo.height ? state.photo.width+' × '+state.photo.height+' · ' : ''}Только на устройстве</small></div><button type="button" class="icon-button" data-action="clear-photo" aria-label="Убрать фотографию" ${state.assistantBusy ? 'disabled' : ''}>${icon('close')}</button></div>${photoBlocked ? '<p class="photo-warning" role="status">Фото прикреплено. Для его анализа дождитесь загрузки визуальной модели или уберите фото, чтобы отправить текст.</p>' : ''}` : ''}
+      <form id="chat-form" class="chat-form"><button type="button" class="photo-button" data-action="pick-photo" aria-label="Прикрепить фотографию" ${state.assistantBusy ? 'disabled' : ''}>${icon('photo')}</button><input id="chat-input" name="prompt" maxlength="2000" placeholder="${available ? state.photo ? 'Что вы хотите узнать о фото?' : 'Спросите что-нибудь…' : 'Сначала подготовьте модель'}" aria-label="Сообщение помощнику" autocomplete="off" value="${esc(state.chatDraft)}" ${!available || state.assistantBusy ? 'disabled' : ''}><button type="submit" aria-label="Отправить сообщение" ${canSend ? '' : 'disabled'}>${icon('arrow')}</button></form></div>
+      <p class="chat-footnote">Фото обрабатывается локально и не попадает в Firebase. Ответы могут быть неточными; проверяйте важные факты.</p></div>`;
   }
   function messageHTML(message) {
     const label = message.role === 'user' ? 'ВЫ' : message.role === 'help' ? 'СПРАВКА МАРКЕТА · БЕЗ ИИ' : 'CHITS ASSISTANT · НА УСТРОЙСТВЕ';
-    return `<article class="message ${message.role === 'user' ? 'user' : 'assistant'}"><div class="message-label">${label}</div><p>${esc(message.text)}</p></article>`;
+    return `<article class="message ${message.role === 'user' ? 'user' : 'assistant'}"><div class="message-label">${label}</div>${message.photoName ? `<div class="message-photo-label">${icon('photo')}Фото: ${esc(message.photoName)}</div>` : ''}<p>${esc(message.text)}</p></article>`;
   }
-  function addMessage(role, text) {
-    state.messages.push({role, text:String(text).slice(0,16000)});
+  function addMessage(role, text, photoName) {
+    state.messages.push({role, text:String(text).slice(0,16000), ...(photoName ? {photoName:String(photoName).slice(0,120)} : {})});
     state.messages = state.messages.slice(-24);
-    storage.set('messages', state.messages);
+    // Only conversation text and attachment names persist. Never persist image data.
+    storage.set('messages', state.messages.map(({role,text,photoName})=>({role,text,...(photoName?{photoName}:{} )})));
     if (state.page === 'assistant') {
       renderAssistant();
       const target = $('#chat-messages');
       if (target) target.scrollIntoView({block:'end',behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
     }
   }
+  function pickPhoto() {
+    if (state.assistantBusy) return;
+    if (!native || typeof native.pickAssistantPhoto !== 'function') {toast('Выбор фото доступен в Android-приложении. Снимок не загружается на сервер.');return;}
+    try {native.pickAssistantPhoto();}catch(_){toast('Не удалось открыть выбор фотографии');}
+  }
+  function clearPhoto() {
+    if (state.assistantBusy) return;
+    if (!native || typeof native.clearAssistantPhoto !== 'function') {toast('Управление фото доступно в Android-приложении');return;}
+    try {native.clearAssistantPhoto();}catch(_){toast('Не удалось убрать фотографию');}
+  }
   function help(kind) {
     const entries = {
       offline:'1. Откройте «Загрузки». Встроенные приложения уже сохранены; другие сначала нужно скачать из каталога.\n2. Нажмите «Установить».\n3. Если Android попросит, разрешите установку из Chits Market в системных настройках, вернитесь и подтвердите её.\nИнтернет для сохранённого APK не нужен. Если приложение само требует сеть, маркет не может сделать его офлайн.',
-      upload:'Подключите адрес вашего сервера в «Настройках». Войдите в панель администратора, заполните название, описание и категорию, выберите APK и нажмите «Опубликовать».\nСервер должен быть доступен по интернету для загрузки с другого устройства. Для подключения и входа используйте HTTPS. Публикация потребует соединения; сохранённые APK устанавливаются без него.',
-      model:'После первого скачивания языковая модель работает прямо на телефоне, без сервера ИИ. Она умеет вести простой разговор и помогать с короткими вопросами.\nЭто небольшая модель, а не полная офлайн-копия ChatGPT: ответы могут быть неточными, скорость зависит от телефона. Интернет нужен только для первого получения модели. Кнопки справки работают без модели и не генерируют ответы.'
+      upload:'Подключите Firebase в «Настройках» (или свой сервер). Войдите в панель администратора, заполните название, описание и категорию, выберите APK и нажмите «Опубликовать».\nСервер должен быть доступен по интернету для загрузки с другого устройства. Для подключения и входа используйте HTTPS. Публикация потребует соединения; сохранённые APK устанавливаются без него.',
+      model:'После первоначальной загрузки Qwen2.5-VL работает прямо на телефоне: отвечает на вопросы и разбирает выбранную фотографию без интернета. Фото и переписка не отправляются в Firebase. Для фото нужны оба файла — модель и визуальный модуль.\nЭто небольшая модель, а не полная офлайн-копия ChatGPT: ответы могут быть неточными, скорость зависит от телефона. Интернет нужен только для первого получения модели. Кнопки справки работают без модели и не генерируют ответы.'
     };
     addMessage('help', entries[kind] || entries.offline);
   }
@@ -350,16 +430,18 @@
     const prompt = String(new FormData(form).get('prompt') || '').trim();
     if (!prompt || state.assistantBusy) return;
     if (!native || typeof native.askAssistant !== 'function') { toast('Локальная модель доступна в Android-приложении'); return; }
-    if (!state.ai.available && !state.ai.installed) { toast('Сначала скачайте модель помощника'); return; }
+    if (!state.ai.available) { toast('Сначала подготовьте модель помощника'); return; }
+    if (state.photo && !state.ai.vision) {toast('Для фотографии нужна готовая визуальная модель');return;}
     state.chatDraft = '';
     state.assistantBusy = true;
-    addMessage('user', prompt);
+    addMessage('user', prompt, state.photo?.name);
     try { native.askAssistant(prompt); } catch (_) { state.assistantBusy = false; addMessage('help','Не удалось запустить модель на устройстве. Попробуйте ещё раз.'); }
   }
   function downloadModel() {
     if (!native || typeof native.downloadAiModel !== 'function') { toast('Загрузка локальной модели доступна в Android-приложении'); return; }
     if (state.ai.downloading) return;
     state.ai.downloading = true;
+    state.ai.waitingWifi = false;
     state.ai.error = '';
     state.ai.progress = 0;
     renderAssistant();
@@ -411,7 +493,21 @@
       if (event.app && !downloaded(event.app.id)) state.downloads.push(event.app);
       render();
       if (event.error) toast(event.error); else if (event.type !== 'state') toast('Данные устройства обновлены');
+    } else if (event.type === 'photo') {
+      if (event.status === 'ready') {state.photo=safePhoto(event); if(state.page==='assistant')renderAssistant();}
+      else if(event.status==='cleared'){state.photo=null;if(state.page==='assistant')renderAssistant();}
+      else if(event.status==='error')toast(event.error||'Не удалось прочитать фотографию');
+    } else if(event.type === 'firebase-config') {
+      if(event.status==='error') {state.serverGeneration++;readNativeState();state.connected=false;setFormError('#firebase-error',event.error||'Не удалось сохранить Firebase');toast(event.error||'Firebase не настроен');}
+      else if(event.status==='saved') toast('Публичная конфигурация Firebase сохранена');
     } else if (event.type === 'ai-model') {
+      state.ai.status=event.status;
+      state.ai.waitingWifi=event.status==='waiting-wifi';
+      state.ai.file=event.file||event.currentFile||'';
+      state.ai.component=event.component||'';
+      if(event.downloadedBytes)state.ai.downloadedBytes=event.downloadedBytes;
+      if(event.totalBytes)state.ai.totalBytes=event.totalBytes;
+      if(event.model)state.ai.model=event.model;
       state.ai.downloading = event.status === 'downloading';
       state.ai.progress = event.progress || 0;
       state.ai.error = event.status === 'error' ? event.error || 'Не удалось загрузить модель' : '';
@@ -430,7 +526,7 @@
     if (state.page !== 'catalog') { navigate('catalog'); return true; }
     return false;
   }
-  window.Chits = {onNativeEvent, navigate, goBack, refresh:() => refreshCatalog(), getState:() => ({page:state.page,apps:allApps(),downloads:state.downloads,connected:state.connected,ai:state.ai})};
+  window.Chits = {onNativeEvent, navigate, goBack, refresh:() => refreshCatalog(), getState:() => ({page:state.page,apps:allApps(),downloads:state.downloads,connected:state.connected,ai:state.ai,photo:state.photo,firebase:firebaseMode()})};
 
   document.addEventListener('input', event => {
     if (event.target.id === 'app-search') { state.query = event.target.value; renderCatalogResults(); }
@@ -438,9 +534,10 @@
   });
   document.addEventListener('submit', event => {
     const id = event.target.id;
-    if (!['server-form','login-form','upload-form','chat-form'].includes(id)) return;
+    if (!['server-form','firebase-form','login-form','upload-form','chat-form'].includes(id)) return;
     event.preventDefault();
     if (id === 'server-form') saveServer(event.target);
+    if (id === 'firebase-form') saveFirebase(event.target);
     if (id === 'login-form') login(event.target);
     if (id === 'upload-form') upload(event.target);
     if (id === 'chat-form') askAssistant(event.target);
@@ -475,8 +572,11 @@
     if (action === 'import') importApk();
     if (action === 'close-detail') closeDetail();
     if (action === 'close-confirm') closeConfirm();
-    if (action === 'logout') {const token=state.token;state.token='';state.admin='';if(token && state.serverUrl)request('/api/auth/logout',{method:'POST',headers:{Authorization:'Bearer '+token}}).catch(()=>{});renderSettings();toast('Вы вышли из панели администратора');}
+    if (action === 'logout') {const token=state.token;state.token='';state.admin='';if(token && (state.serverUrl || firebaseMode()))request('/api/auth/logout',{method:'POST',headers:{Authorization:'Bearer '+token}}).catch(()=>{});renderSettings();toast('Вы вышли из панели администратора');}
     if (action === 'download-model') downloadModel();
+    if (action === 'pick-photo') pickPhoto();
+    if (action === 'clear-photo') clearPhoto();
+    if (action === 'disable-firebase') disableFirebase();
     if (action === 'import-model') {if(native && typeof native.importAiModel==='function')native.importAiModel();else toast('Импорт GGUF доступен в Android-приложении');}
   });
   ['app-dialog','confirm-dialog'].forEach(id => {
@@ -485,13 +585,16 @@
     dialog.addEventListener('close', () => {document.body.classList.remove('dialog-open');if(id==='app-dialog')state.detailId=null;else state.confirm=null;});
   });
   window.addEventListener('offline', () => {state.connected=false;updateBadge();});
-  window.addEventListener('online', () => {if(state.serverUrl)refreshCatalog(true);});
-  window.addEventListener('focus', () => {readNativeState();updateBadge();if(state.page==='downloads')renderDownloads();});
+  window.addEventListener('online', () => {if(state.serverUrl||firebaseMode())refreshCatalog(true);});
+  window.addEventListener('focus', () => {readNativeState();updateBadge();if(state.page==='downloads')renderDownloads();else if(state.page==='assistant')renderAssistant();});
 
   state.serverUrl = storage.get('serverUrl', '') || (!native && ['http:','https:'].includes(location.protocol) ? location.origin : '');
+  const storedFirebase=storage.get('firebaseConfig',null);
+  if(storedFirebase && firebase()){try{firebase().configure(storedFirebase);}catch(_) {}}
   readNativeState();
+  if(firebaseMode() && native && typeof native.setFirebaseConfig==='function')native.setFirebaseConfig(JSON.stringify(firebase().getConfig()));
   const cached = storage.get('catalog', {});
-  if (!state.apps.length && cached.serverUrl === state.serverUrl) state.apps = cleanApps(cached.apps);
+  if (!state.apps.length && cached.serverUrl === catalogKey()) state.apps = cleanApps(cached.apps);
   navigate('catalog');
-  if (state.serverUrl) refreshCatalog(true);
+  if (state.serverUrl || firebaseMode()) refreshCatalog(true);
 })();

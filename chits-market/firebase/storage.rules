@@ -1,0 +1,22 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function admin() {
+      return request.auth != null && request.auth.token.chitsAdmin == true;
+    }
+    match /apks/{fileName} {
+      allow get: if fileName.matches('^[A-Za-z0-9_-]{1,100}[.]apk$');
+      // No public bucket listing is needed: Firestore provides the catalog.
+      allow list: if false;
+      allow create, update: if admin()
+        && fileName.matches('^[A-Za-z0-9_-]{1,100}[.]apk$')
+        && request.resource.size > 0 && request.resource.size <= 209715200
+        && request.resource.contentType in ['application/vnd.android.package-archive', 'application/octet-stream']
+        && request.resource.metadata.sha256.matches('^[0-9a-f]{64}$');
+      allow delete: if admin();
+    }
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

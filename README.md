@@ -1,14 +1,14 @@
-# Chits Market 1.0
+# Chits Market 1.1
 
-[**Скачать Chits Market APK**](https://raw.githubusercontent.com/nuralisalimov03-netizen/hhhhhg/downloads/offline-games-v1/Chits-Market.apk) · [Исходники и сервер ZIP](https://raw.githubusercontent.com/nuralisalimov03-netizen/hhhhhg/downloads/offline-games-v1/Chits-Market-source.zip)
+[**Скачать Chits Market APK**](https://raw.githubusercontent.com/nuralisalimov03-netizen/hhhhhg/downloads/offline-games-v1/Chits-Market.apk) · [Исходники и Firebase ZIP](https://raw.githubusercontent.com/nuralisalimov03-netizen/hhhhhg/downloads/offline-games-v1/Chits-Market-source.zip)
 
-Магазин приложений для **Android 8.0+ ARM64**: русский интерфейс с анимациями, каталог, сохранение APK и установка без интернета через системный установщик Android. «Орбита» и «Прорыв» уже включены.
+Магазин приложений для **Android 8.0+ ARM64**: русский интерфейс с анимациями, сохранение APK и установка без интернета. «Орбита» и «Прорыв» уже включены. Обновление 1.1 устанавливается поверх 1.0 с тем же ключом подписи.
 
-Для удалённых загрузок предусмотрены сервер и панель администратора. Сервер нужно самостоятельно разместить на хостинге с HTTPS: [инструкция](chits-market/server/README.md). Публичный сервер не развёрнут; пароль администратора, база данных и ключ подписи не публикуются. На своём сервере создайте администратора при первом запуске.
+**Qwen‑VL загружается автоматически по Wi-Fi**, с продолжением после обрыва и проверкой SHA-256. Языковая модель и компонент зрения занимают ориентировочно 3–4 ГБ. Затем можно прикреплять фотографии и задавать вопросы полностью офлайн: снимки не отправляются в Firebase. Небольшая модель существенно слабее ChatGPT; семантические ответы на настоящем телефоне пока не проверены.
 
-Встроен настоящий локальный ИИ-движок llama.cpp. Модель Qwen2.5 0.5B скачивается отдельно один раз (около 400–500 МБ), после чего работает офлайн. Эта небольшая модель существенно слабее ChatGPT. Установка и генерация на реальном Android пока не проверены; прошли 7 API-тестов и 5 браузерных тестов с имитацией Android-моста, подпись APK проверена.
+Подготовлена серверная часть на **Firebase Hosting + Auth + Firestore + Storage**, защищённая ролью администратора. Настоящий проект пока не создан/подключён: [пошаговая инструкция Firebase](chits-market/firebase/README.md). Для Storage нужен тариф Blaze с платёжным аккаунтом. Публичный Firebase config можно вставить в настройки APK без пересборки. Пароли, приватные ключи и база администратора не публикуются.
 
-[Документация проекта](chits-market/README.md) · [Контрольные суммы Chits Market](Chits-Market-SHA256SUMS.txt)
+[Документация проекта и проверок](chits-market/README.md) · [Контрольные суммы](Chits-Market-SHA256SUMS.txt)
 
 ---
 

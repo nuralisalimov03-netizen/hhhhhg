@@ -5,6 +5,8 @@ Requires the prepared Python Playwright package and /usr/bin/chromium. Creates
 its own temporary backend database, test-only administrator and loopback server.
 No production credentials, stored application data or repository files change.
 """
+import base64
+import hashlib
 import importlib.util
 import json
 from pathlib import Path
@@ -57,7 +59,7 @@ class MarketUITests(unittest.TestCase):
     def mock_native(self):
         app = {**self.seed, 'id':'orbita-v6', 'bundled':True, 'downloadUrl':'bundled:orbita-v6'}
         other = {'id':'breach-v2', 'title':'Прорыв', 'description':'Офлайн-шутер', 'category':'Игры', 'size':242972, 'sha256':'b'*64, 'bundled':True, 'downloadUrl':'bundled:breach-v2'}
-        state = {'apps':[app,other], 'downloads':[app,other], 'serverUrl':'', 'ai':{'available':False,'installed':False}}
+        state = {'apps':[app,other], 'downloads':[app,other], 'serverUrl':'', 'ai':{'available':False,'installed':False,'vision':False},'assistantPhoto':None}
         self.page.add_init_script('''
           window.nativeState = %s;
           window.ChitsNative = {
@@ -69,7 +71,10 @@ class MarketUITests(unittest.TestCase):
             openApkPicker:()=>window.importOpened=true,
             importAiModel:()=>window.modelImportOpened=true,
             downloadAiModel:()=>window.modelStarted=true,
-            askAssistant:prompt=>window.lastPrompt=prompt
+            askAssistant:prompt=>window.lastPrompt=prompt,
+            pickAssistantPhoto:()=>window.photoPickerOpened=true,
+            clearAssistantPhoto:()=>{window.nativeState.assistantPhoto=null;window.Chits.onNativeEvent({type:'photo',status:'cleared'});},
+            setFirebaseConfig:json=>{window.nativeState.firebaseConfig=JSON.parse(json);window.lastFirebaseConfig=JSON.parse(json);}
           };
         ''' % json.dumps(state))
 
@@ -116,15 +121,121 @@ class MarketUITests(unittest.TestCase):
         self.assertTrue(page.evaluate('window.modelStarted'))
         page.evaluate("window.Chits.onNativeEvent({type:'ai-model',status:'downloading',progress:52})")
         expect(page.locator('#ai-model-panel')).to_contain_text('52%')
-        page.evaluate("window.nativeState.ai={installed:true,available:true};window.Chits.onNativeEvent({type:'ai-model',status:'ready'})")
+        page.evaluate("window.nativeState.ai={installed:true,available:true,vision:true};window.Chits.onNativeEvent({type:'ai-model',status:'ready'})")
         expect(page.locator('#chat-input')).to_be_enabled()
         page.locator('#chat-input').fill('Привет')
-        page.locator('#chat-form button').click()
+        page.locator('#chat-form button[type=submit]').click()
         self.assertEqual(page.evaluate('window.lastPrompt'), 'Привет')
         page.evaluate("window.Chits.onNativeEvent({type:'assistant',status:'done',text:'Тестовый ответ локальной модели'})")
         expect(page.locator('.message.assistant')).to_contain_text('Тестовый ответ локальной модели')
         page.locator('[data-help="offline"]').click()
         expect(page.locator('.message').last).to_contain_text('БЕЗ ИИ')
+
+    def test_native_mock_photo_privacy_vision_gate_and_wifi_autoload(self):
+        self.mock_native()
+        page = self.page
+        page.goto(self.url, wait_until='networkidle')
+        page.locator('[data-page="assistant"]').click()
+        page.evaluate("window.Chits.onNativeEvent({type:'ai-model',status:'waiting-wifi',totalBytes:3500000000})")
+        expect(page.locator('#ai-model-panel')).to_contain_text('Ждём Wi-Fi')
+        expect(page.locator('[data-action="download-model"]')).to_contain_text('разрешить мобильную сеть')
+        page.locator('[data-action="pick-photo"]').click()
+        self.assertTrue(page.evaluate('window.photoPickerOpened'))
+        preview = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII='
+        photo = {'type':'photo','status':'ready','id':'test-photo','name':'Тестовое фото.png','width':1,'height':1,'preview':preview}
+        page.evaluate("photo=>{window.nativeState.assistantPhoto=photo;window.nativeState.ai={available:true,installed:true,vision:false};window.Chits.onNativeEvent(photo);window.dispatchEvent(new Event('focus'));}", photo)
+        expect(page.locator('#photo-attachment img')).to_be_visible()
+        expect(page.locator('.photo-warning')).to_contain_text('визуальной модели')
+        expect(page.locator('#chat-form button[type=submit]')).to_be_disabled()
+        page.locator('[data-action="clear-photo"]').click()
+        expect(page.locator('#photo-attachment')).to_have_count(0)
+        expect(page.locator('#chat-form button[type=submit]')).to_be_enabled()
+        page.evaluate("photo=>{window.nativeState.assistantPhoto=photo;window.nativeState.ai={available:true,installed:true,vision:true};window.Chits.onNativeEvent({type:'ai-model',status:'ready'});window.Chits.onNativeEvent(photo)}", photo)
+        page.locator('#chat-input').fill('Что на фотографии?')
+        page.locator('#chat-form button[type=submit]').click()
+        self.assertEqual(page.evaluate('window.lastPrompt'), 'Что на фотографии?')
+        expect(page.locator('[data-action="clear-photo"]')).to_be_disabled()
+        self.assertNotIn('data:image', page.evaluate('JSON.stringify(localStorage)'))
+        self.assertNotIn(preview.split(',')[1], page.evaluate('JSON.stringify(localStorage)'))
+        expect(page.locator('.message.user')).to_contain_text('Тестовое фото.png')
+        page.evaluate("window.Chits.onNativeEvent({type:'assistant',status:'done',text:'Тестовый локальный ответ о фото'})")
+        expect(page.locator('#photo-attachment')).to_be_visible()
+        expect(page.locator('[data-action="clear-photo"]')).to_be_enabled()
+
+    def test_firebase_mock_rest_login_apk_upload_catalog_and_delete(self):
+        # All Google HTTP endpoints are mocked. This does not validate a live
+        # Firebase project, deployed rules or a real administrator account.
+        self.mock_native()
+        page = self.page
+        config = {'enabled':True,'apiKey':'test-public-api-key','authDomain':'chits-ui-test.firebaseapp.com',
+                  'projectId':'chits-ui-test','storageBucket':'chits-ui-test.firebasestorage.app',
+                  'appId':'test-public-app-id','adminEmail':'test-admin@example.com'}
+        def b64(value): return base64.urlsafe_b64encode(json.dumps(value).encode()).decode().rstrip('=')
+        token = b64({'alg':'RS256'})+'.'+b64({'chitsAdmin':True,'sub':'test-admin'})+'.test-signature'
+        documents = {}; storage_uploads = []; deleted = []; logins = []; refreshes = []
+        headers={'Access-Control-Allow-Origin':'*','Access-Control-Allow-Methods':'GET,POST,PATCH,DELETE,OPTIONS','Access-Control-Allow-Headers':'*'}
+        def google(route):
+            req = route.request
+            if req.method == 'OPTIONS': route.fulfill(status=204,headers=headers); return
+            if 'identitytoolkit.googleapis.com' in req.url:
+                data=req.post_data_json; logins.append(data)
+                self.assertEqual(data['email'], config['adminEmail'])
+                self.assertEqual(data['password'], 'test-only-passphrase')
+                body={'idToken':token,'refreshToken':'test-only-refresh-token','expiresIn':'60'}
+            elif 'securetoken.googleapis.com' in req.url:
+                refreshes.append(req.post_data)
+                self.assertIn('grant_type=refresh_token',req.post_data)
+                body={'id_token':token,'refresh_token':'test-only-rotated-refresh-token','expires_in':'3600'}
+            elif 'firebasestorage.googleapis.com' in req.url:
+                self.assertEqual(req.headers.get('authorization'),'Firebase '+token)
+                if req.method=='POST':
+                    raw=req.post_data_buffer; storage_uploads.append(raw)
+                    self.assertIn(hashlib.sha256(self.fixture.read_bytes()).hexdigest().encode(),raw)
+                    body={'name':'test-object'}
+                else: deleted.append(req.url); body={}
+            elif 'firestore.googleapis.com' in req.url:
+                if req.method=='GET': body={'documents':list(documents.values())}
+                elif req.method=='PATCH':
+                    self.assertEqual(req.headers.get('authorization'),'Bearer '+token)
+                    identity=req.url.split('/apps/')[1].split('?')[0]
+                    doc={'name':'projects/chits-ui-test/databases/(default)/documents/apps/'+identity,'fields':req.post_data_json['fields']}
+                    documents[identity]=doc; body=doc
+                else:
+                    identity=req.url.split('/apps/')[1].split('?')[0]; documents.pop(identity,None);body={}
+            else: self.fail('Unexpected Google request '+req.url)
+            route.fulfill(status=200,headers=headers,content_type='application/json',body=json.dumps(body))
+        page.route('https://*.googleapis.com/**',google)
+        page.goto(self.url,wait_until='networkidle')
+        page.locator('[data-page="settings"]').click()
+        page.locator('#firebase-config').fill(json.dumps(config))
+        page.locator('#firebase-form button').click()
+        expect(page.locator('#connection-badge')).to_contain_text('Firebase подключён')
+        self.assertEqual(page.evaluate('window.lastFirebaseConfig.projectId'), config['projectId'])
+        page.locator('#admin-password').fill('test-only-passphrase')
+        page.locator('#login-form button').click()
+        expect(page.locator('#upload-form')).to_be_visible()
+        page.locator('#upload-form [name=title]').fill('Firebase test APK')
+        page.locator('#upload-form [name=description]').fill('Тест публикации через mocked Firebase REST')
+        page.locator('#upload-form [name=file]').set_input_files(str(self.fixture))
+        page.locator('#upload-form button').click()
+        expect(page.locator('#toast')).to_contain_text('опубликовано',timeout=15000)
+        self.assertEqual(len(storage_uploads),1)
+        self.assertEqual(len(documents),1)
+        self.assertEqual(len(logins),1)
+        self.assertEqual(len(refreshes),1)
+        saved=page.evaluate('JSON.stringify(localStorage)')
+        for secret in ('test-only-passphrase','test-only-refresh-token',token):self.assertNotIn(secret,saved)
+        item=page.locator('.admin-item').filter(has_text='Firebase test APK')
+        expect(item).to_have_count(1)
+        item.locator('[data-delete-remote]').click()
+        page.locator('#confirm-button').click()
+        expect(page.locator('#toast')).to_contain_text('удалено из каталога')
+        self.assertEqual(documents,{})
+        self.assertEqual(len(deleted),1)
+        page.locator('[data-action="logout"]').click()
+        expect(page.locator('#login-form')).to_be_visible()
+        page.locator('[data-action="disable-firebase"]').click()
+        self.assertFalse(page.evaluate('window.Chits.getState().firebase'))
 
     def test_real_backend_desktop_admin_upload_catalog_delete_logout(self):
         page = self.page

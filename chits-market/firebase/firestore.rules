@@ -1,0 +1,36 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function admin() {
+      return request.auth != null && request.auth.token.chitsAdmin == true;
+    }
+    function validApp(appId) {
+      let app = request.resource.data;
+      return appId.matches('^[A-Za-z0-9_-]{1,100}$')
+        && app.keys().hasAll(['id', 'title', 'description', 'category', 'versionName', 'packageName', 'size', 'sha256', 'storagePath'])
+        && app.keys().hasOnly(['id', 'title', 'description', 'category', 'versionName', 'packageName', 'size', 'sha256', 'storagePath', 'fileName', 'createdAt', 'updatedAt'])
+        && app.id is string && app.id == appId
+        && app.title is string && app.title.size() > 0 && app.title.size() <= 120
+        && app.description is string && app.description.size() <= 5000
+        && app.category is string && app.category.size() > 0 && app.category.size() <= 60
+        && app.versionName is string && app.versionName.size() <= 80
+        && app.packageName is string && app.packageName.size() <= 200
+        && app.size is int && app.size > 0 && app.size <= 209715200
+        && app.sha256 is string && app.sha256.matches('^[0-9a-f]{64}$')
+        && app.storagePath is string && app.storagePath == 'apks/' + appId + '.apk'
+        && (!app.keys().hasAny(['fileName']) || (app.fileName is string && app.fileName.size() <= 180))
+        && (!app.keys().hasAny(['createdAt']) || app.createdAt is timestamp)
+        && (!app.keys().hasAny(['updatedAt']) || app.updatedAt is timestamp);
+    }
+    match /apps/{appId} {
+      allow get, list: if true;
+      allow create, update: if admin() && validApp(appId);
+      allow delete: if admin();
+    }
+    // No client, including an administrator, may grant roles or write elsewhere.
+    // The chitsAdmin claim can only be set with trusted Firebase Admin credentials.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
