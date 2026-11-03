@@ -1,0 +1,33 @@
+{
+  "name": "Weqrom",
+  "package": "com.zhiliaoapp.musically",
+  "base_sha256": "9f34642dd5d62f96cc84bdf2a1e44f198f78fb5e813944ac1058714abef551bc",
+  "sha256": "f61daff09584dd2de1e09fafd32403ca5c9e54551b9945983145f32d654b6f4d",
+  "bytes": 379087023,
+  "modified_entries": [
+    "res/am/b.png",
+    "res/an/b.png",
+    "res/ao/b.png",
+    "AndroidManifest.xml",
+    "resources.arsc",
+    "res/aq/a.png",
+    "res/ap/a.png",
+    "res/ar/a.xml",
+    "res/mipmap-anydpi-v26/ttmod_launcher_cheese.xml",
+    "res/mipmap-anydpi-v26/ttmod_launcher_hlx.xml",
+    "res/mipmap-anydpi-v26/ttmod_launcher_md.xml",
+    "res/mipmap-anydpi-v26/ttmod_launcher_metal.xml",
+    "res/mipmap-anydpi-v26/ttmod_launcher_nostalgic.xml",
+    "res/mipmap-anydpi-v26/ttmod_launcher_parody.xml"
+  ],
+  "added_entries": [
+    "assets/weqrom/NOTICE.txt"
+  ],
+  "resource_literal_indices": [
+    26685
+  ],
+  "executables_unchanged": true,
+  "runtime_tested": false,
+  "signature_verified": true,
+  "source_attribution": "TikTok You 5.0 / TikTok47.4.3"
+}

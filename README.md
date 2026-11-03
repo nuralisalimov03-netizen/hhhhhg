@@ -1,3 +1,13 @@
+# Weqrom 1.0
+
+[**Скачать Weqrom-Builder.zip — 11 МБ**](https://raw.githubusercontent.com/nuralisalimov03-netizen/hhhhhg/downloads/offline-games-v1/Weqrom-Builder.zip) · [Инструкция и проверки](weqrom/README.md)
+
+Weqrom — отдельная сборка на основе предоставленного TikTok You 47.4.3 с новым названием, чёрно-зелёным значком W и собственной подписью. Для получения APK распакуйте ZIP, откройте `index.html` в Яндекс Браузере на компьютере и выберите ранее скачанный `TikTok_You-5.0.47.4.3.apk`. Сборщик локально восстановит точный подписанный **Weqrom.apk**, проверив контрольные суммы. Исходный APK никуда не отправляется; Python не нужен.
+
+Weqrom заменяет TikTok. Из-за другой подписи перед установкой нужно сохранить локальные черновики и удалить прежнюю сборку. Код и модуль региона исходника сохранены без изменений; запуск, вход и работа в России на телефоне ещё не проверены.
+
+---
+
 # Chits Market 1.2
 
 [**Скачать Chits Market APK**](https://raw.githubusercontent.com/nuralisalimov03-netizen/hhhhhg/downloads/offline-games-v1/Chits-Market.apk) · [Исходники ZIP](https://raw.githubusercontent.com/nuralisalimov03-netizen/hhhhhg/downloads/offline-games-v1/Chits-Market-source.zip)

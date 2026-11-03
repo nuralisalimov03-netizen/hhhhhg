@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#080e0b">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+  <title>Weqrom — подготовка APK</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTgiIGZpbGw9IiNiOGZjODIiLz48cGF0aCBkPSJNMTIgMThoOGw1IDI0IDYtMTdoNWw2IDE3IDUtMjRoN2wtOSAzMGgtOGwtNC0xMy01IDEzaC04eiIgZmlsbD0iIzEwMTgwYiIvPjwvc3ZnPg==">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <a class="brand" href="#main" aria-label="Weqrom"><span class="logo" aria-hidden="true">W</span><span>weqrom<span class="brand-dot">.</span></span></a>
+      <span class="offline"><i aria-hidden="true"></i> БЕЗ СЕРВЕРА</span>
+    </header>
+
+    <section class="hero" id="main" aria-labelledby="title">
+      <p class="eyebrow">ВАШ APK. НА ВАШЕМ КОМПЬЮТЕРЕ.</p>
+      <h1 id="title">Это <span>Weqrom.</span></h1>
+      <p class="intro">Выберите уже скачанный TikTok You. Эта страница подготовит из него отдельный установочный файл Weqrom — прямо в браузере.</p>
+      <div class="privacy-note"><span aria-hidden="true">◈</span><p>APK остаётся на вашем компьютере. Страница не отправляет файлы в Интернет и не входит в аккаунты.</p></div>
+    </section>
+
+    <section class="builder" aria-labelledby="builder-title">
+      <div class="section-heading"><h2 id="builder-title">Два простых шага</h2><span class="version">WEQROM 1.0</span></div>
+      <div class="step">
+        <span class="step-number" aria-hidden="true">01</span>
+        <div class="step-content">
+          <h3>Выберите исходный APK</h3>
+          <p id="source-description">Нужен тот же файл TikTok You, который вы загрузили в релиз.</p>
+          <label class="file-picker" for="source-file"><span class="file-symbol" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8zM14 3v5h5M9 12h6M9 16h6"/></svg></span><span><strong>Выбрать APK с компьютера</strong><small id="file-name">Файл ещё не выбран</small></span><span class="file-plus" aria-hidden="true">＋</span></label>
+          <input id="source-file" type="file" accept=".apk,application/vnd.android.package-archive" aria-describedby="source-description file-name">
+        </div>
+      </div>
+      <div class="step second-step">
+        <span class="step-number" aria-hidden="true">02</span>
+        <div class="step-content">
+          <h3>Подготовьте Weqrom</h3>
+          <p>Сначала проверим исходный файл. Затем соберём заранее подписанный APK и проверим результат.</p>
+          <button class="primary-button" id="build-button" type="button" disabled><span>Собрать Weqrom</span><span aria-hidden="true">→</span></button>
+        </div>
+      </div>
+      <div class="build-status" aria-live="polite">
+        <div class="status-row"><span class="status-dot" id="status-dot" aria-hidden="true"></span><p id="status" role="status">Проверяем комплект сборки…</p></div>
+        <progress id="progress" max="100" value="0" aria-label="Этапы подготовки APK"></progress>
+        <p id="message" role="alert" hidden></p>
+      </div>
+      <a class="download-link" id="download-link" href="#" download="Weqrom.apk" hidden><span><strong>Скачать Weqrom.apk</strong><small id="target-size">Готовый установочный файл</small></span><span aria-hidden="true">↓</span></a>
+    </section>
+
+    <section class="details" aria-labelledby="before-install-title">
+      <h2 id="before-install-title">Перед установкой на телефон</h2>
+      <p>Weqrom основан на TikTok You. Здесь меняются название, оформление и подпись приложения; исходный модуль модификации сохранён. Работа входа, ленты и смены региона на телефоне ещё не подтверждена.</p>
+      <p>У Weqrom тот же пакет TikTok, но новый ключ подписи. Для замены старого TikTok может понадобиться его удаление. <strong>Сначала сохраните локальные черновики и другие нужные данные.</strong> Эта страница сама ничего на телефоне не удаляет.</p>
+      <p class="small-print">Проверка контрольных сумм подтверждает точность сборки. Авторство и безопасность сторонней основы она не подтверждает. Для подготовки нужен современный браузер; большому APK потребуется свободная оперативная память и место на диске.</p>
+    </section>
+    <footer><span>WEQROM · ЛОКАЛЬНАЯ ПОДГОТОВКА APK</span><span>Просто выбрать. Просто сохранить.</span></footer>
+  </main>
+  <script src="patch.js"></script>
+  <script src="builder.js"></script>
+</body>
+</html>
