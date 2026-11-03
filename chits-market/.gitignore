@@ -1,0 +1,6 @@
+build/
+dist/
+.local-data/
+.local/
+__pycache__/
+*.pyc
