@@ -146,6 +146,9 @@ public class BridgeHarness {
   ModIntegration.showSettingsFromArgs(new Object[]{new Object()});
   check(WeqromUi.lastSettings==activity,"Original lifecycle Activity fallback failed");
   check(ModIntegration.regions().size()==3,"Actual country table not used");
+  settings.r=0;settings.q=false;int colorWrites=settings.colorWrites;
+  ModIntegration.setAccent(context,0xffff385d);
+  check(settings.r==0&&!settings.q&&settings.colorWrites==colorWrites,"Default red needlessly enabled global recoloring");
   System.out.println("Bridge migration, live setter, persistence, welcome, theme guard and settings entry passed");
  }
 }''',

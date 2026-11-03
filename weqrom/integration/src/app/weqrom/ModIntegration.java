@@ -154,8 +154,13 @@ public final class ModIntegration {
     public static void setAccent(Context context, int color) {
         if ((color >>> 24) != 255) throw new IllegalArgumentException("Accent must be opaque");
         bc settings = ac.e();
-        if (settings.r != color) settings.a(color);
-        if (!settings.q) settings.f(true);
+        // Keep the client's native red palette on a fresh install. Applying an
+        // unrelated language/theme option need not activate global recoloring.
+        boolean nativeRed = color == DEFAULT_COLOR && settings.r == 0 && !settings.q;
+        if (!nativeRed) {
+            if (settings.r != color) settings.a(color);
+            if (!settings.q) settings.f(true);
+        }
         SharedPreferences own = WeqromUi.preferences(context);
         if (own.getInt("like_color", 0) != color) own.edit().putInt("like_color", color).apply();
     }

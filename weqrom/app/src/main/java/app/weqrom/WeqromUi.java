@@ -93,7 +93,10 @@ public final class WeqromUi {
     }
 
     public static SharedPreferences preferences(Context context) {
-        return context.getApplicationContext().getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
+        // attachBaseContext can run before LoadedApk binds the Application.
+        Context application = context.getApplicationContext();
+        Context storage = application != null ? application : context;
+        return storage.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
     }
 
     public static Options options(Context context) {

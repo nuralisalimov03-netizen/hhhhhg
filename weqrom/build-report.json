@@ -2,7 +2,7 @@
   "name": "Weqrom",
   "package": "com.zhiliaoapp.musically",
   "base_sha256": "9f34642dd5d62f96cc84bdf2a1e44f198f78fb5e813944ac1058714abef551bc",
-  "sha256": "bae30279eedcd6bddbd22b4c2a3813c6b3f52390abd86e92cf631d97190a1927",
+  "sha256": "c4dd35ede02ad147c3d3be403d6b7b7e4c49b94878bae202e1c0a5fd8a4a3ec3",
   "bytes": 379099311,
   "modified_entries": [
     "classes46.dex",
@@ -28,8 +28,8 @@
   "added_entries": [
     "assets/weqrom/NOTICE.txt"
   ],
-  "version": "47.4.3-weqrom.1.1",
-  "version_code": 2024704031,
+  "version": "47.4.3-weqrom.1.2",
+  "version_code": 2024704032,
   "min_sdk": 26,
   "resource_literal_indices": [
     26685
@@ -44,8 +44,8 @@
   "original_native_libraries_unchanged": true,
   "modified_mod": {
     "base_mod_sha256": "bde52db9f754198d414fe5520840f8880bae586e303eebeb6edf03790d9f51a2",
-    "mod_sha256": "86d8e6bd2eafd9f1a279f501e183f841d6f83c89eb06131939f5af85dcdecdc2",
-    "mod_bytes": 1050328,
+    "mod_sha256": "e71234113aee09ef87c3dc86b5e37be3fc03c4ab019c0dd7a6671eb19b14b52a",
+    "mod_bytes": 1050380,
     "region": {
       "class": "LZ/bc;",
       "method": "<clinit>()V",
@@ -62,11 +62,11 @@
       ],
       "ui_attribution_elsewhere_retained": true
     },
-    "stable_api_version": 2026110301,
+    "stable_api_version": 2026110302,
     "loader": {
       "classes46.dex": {
         "original_stable_api": 1792428213,
-        "weqrom_stable_api": 2026110301,
+        "weqrom_stable_api": 2026110302,
         "modified_dex": [
           "classes46.dex"
         ],
@@ -86,7 +86,7 @@
       },
       "classes50.dex": {
         "original_stable_api": 1792428213,
-        "weqrom_stable_api": 2026110301,
+        "weqrom_stable_api": 2026110302,
         "modified_dex": [
           "classes50.dex"
         ],
@@ -106,7 +106,7 @@
       },
       "classes52.dex": {
         "original_stable_api": 1792428213,
-        "weqrom_stable_api": 2026110301,
+        "weqrom_stable_api": 2026110302,
         "modified_dex": [
           "classes52.dex"
         ],
