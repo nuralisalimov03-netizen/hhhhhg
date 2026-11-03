@@ -57,13 +57,25 @@ public class ac { public static bc cached;
     'Z/bc.java': '''package Z;
 import android.content.SharedPreferences;
 public class bc { public int b=1,r; public boolean H=true,q,F=true,E=true; public int regionWrites,colorWrites;
- private SharedPreferences p; public bc(SharedPreferences p){this.p=p;}
- public void c(int i){b=i;regionWrites++;p.edit().putInt("selected_region",i).putString("selected_region_iso",ue.a[i].d).apply();}
- public void e(boolean v){F=v;p.edit().putBoolean("auto_updates_enable",v).apply();}
- public void m(boolean v){E=v;p.edit().putBoolean("statistics_enable",v).apply();}
- public void a(int v){r=v;colorWrites++;p.edit().putInt("accent_color",v).apply();}
- public void f(boolean v){q=v;p.edit().putBoolean("custom_colors_enabled",v).apply();}
- public void b(){H=true;p.edit().putBoolean("startup_consent_accepted",true).apply();} }
+ public boolean c,d,e,f,h,i,j,k,p,z; public int featureWrites;
+ private SharedPreferences prefs; public bc(SharedPreferences preferences){prefs=preferences;}
+ public void c(int i){b=i;regionWrites++;prefs.edit().putInt("selected_region",i).putString("selected_region_iso",ue.a[i].d).apply();}
+ public void e(boolean v){F=v;prefs.edit().putBoolean("auto_updates_enable",v).apply();}
+ public void m(boolean v){E=v;prefs.edit().putBoolean("statistics_enable",v).apply();}
+ public void a(int v){r=v;colorWrites++;prefs.edit().putInt("accent_color",v).apply();}
+ public void f(boolean v){q=v;prefs.edit().putBoolean("custom_colors_enabled",v).apply();}
+ private void feature(String key,boolean value){featureWrites++;prefs.edit().putBoolean(key,value).apply();}
+ public void g(boolean v){d=v;feature("hide_ads",v);}
+ public void h(boolean v){c=v;feature("hide_lives",v);}
+ public void i(boolean v){e=v;feature("hide_photos",v);}
+ public void j(boolean v){j=v;feature("hide_stories",v);}
+ public void k(boolean v){k=v;feature("simple_mode",v);}
+ public void a(boolean v){p=v;feature("always_show_progress_bar",v);}
+ public void l(boolean v){z=v;feature("skip_quality_picker",v);}
+ public void c(boolean v){f=v;feature("anti_burnout",v);}
+ public void b(boolean v){h=v;feature("anti_burnout_enable_on_start",v);}
+ public void d(boolean v){i=v;feature("anti_burnout_hide_system_bars",v);}
+ public void b(){H=true;prefs.edit().putBoolean("startup_consent_accepted",true).apply();} }
 ''',
     'Z/f3.java': '''package Z;
 public class f3 { public static java.lang.ref.WeakReference f; }
@@ -77,7 +89,7 @@ public class FeedTheme { public static int calls;
     'app/weqrom/WeqromUi.java': '''package app.weqrom;
 import android.content.*;import android.app.Activity;
 public class WeqromUi { public static Integration backend; public static Activity lastSettings;
- public interface Integration { void apply(Activity a,Options o);void openAdvanced(Activity a);boolean hasRegionHook();boolean hasThemeHook();boolean hasLikeColorHook(); }
+ public interface Integration { void apply(Activity a,Options o);void openAdvanced(Activity a);boolean featureEnabled(Activity a,String key);void setFeature(Activity a,String key,boolean enabled);boolean hasRegionHook();boolean hasThemeHook();boolean hasLikeColorHook(); }
  public static class Options { public String region="US",theme="light",language="ru"; public int likeColor=0xff3287ff; }
  public static void initialize(Context c){}
  public static SharedPreferences preferences(Context c){return c.getSharedPreferences("weqrom",0);}
@@ -149,6 +161,21 @@ public class BridgeHarness {
   settings.r=0;settings.q=false;int colorWrites=settings.colorWrites;
   ModIntegration.setAccent(context,0xffff385d);
   check(settings.r==0&&!settings.q&&settings.colorWrites==colorWrites,"Default red needlessly enabled global recoloring");
+  check(ModIntegration.featureKeys().length==10,"Expected checked original feature list");
+  for(String key:ModIntegration.featureKeys()){
+   WeqromUi.backend.setFeature(activity,key,true);
+   check(WeqromUi.backend.featureEnabled(activity,key),"Native panel did not read actual feature cache: "+key);
+   check(ModIntegration.featureEnabled(context,key)&&mod.getBoolean(key,false),"Feature did not update actual cache/preferences: "+key);
+   int featureWrites=settings.featureWrites;ModIntegration.setFeature(context,key,true);
+   check(settings.featureWrites==featureWrites,"Unchanged feature called setter again: "+key);
+   ModIntegration.setFeature(context,key,false);
+   check(!ModIntegration.featureEnabled(context,key)&&!mod.getBoolean(key,true),"Feature did not disable: "+key);
+  }
+  try{ModIntegration.setFeature(context,"fake_fast_network",true);throw new AssertionError("Unknown feature accepted");}catch(IllegalArgumentException expected){}
+  mod.edit().putBoolean("hide_ads",true).apply();ModIntegration.applySavedFeatures(context);
+  check(settings.d,"Independent launcher preference did not reach live hook cache");
+  int featureWrites=settings.featureWrites;ModIntegration.initialize(context);
+  check(settings.d&&settings.featureWrites==featureWrites,"Later initialize reset feature or rewrote unchanged settings");
   System.out.println("Bridge migration, live setter, persistence, welcome, theme guard and settings entry passed");
  }
 }''',

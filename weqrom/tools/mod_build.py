@@ -17,11 +17,13 @@ try:
     from .region_patch import patch_region_smali
     from .welcome_patch import patch_welcome_smali
     from .loader_patch import patch_loader_smali, WEQROM_STABLE_API
+    from .diagnostic_patch import patch_main_text, patch_bootstrap_text
 except ImportError:
     from setup_mod_tools import ensure_jar
     from region_patch import patch_region_smali
     from welcome_patch import patch_welcome_smali
     from loader_patch import patch_loader_smali, WEQROM_STABLE_API
+    from diagnostic_patch import patch_main_text, patch_bootstrap_text
 
 PROJECT = Path(__file__).resolve().parents[1]
 MOD_ENTRY = 'assets/tty/bundled/classes.dex'
@@ -80,7 +82,7 @@ def build_mod(source, tools, output):
     region = patch_region_smali(smali)
     welcome = patch_welcome_smali(smali)
     main = smali / 'com/windukk/mod/Main.smali'
-    main.write_text(patch_startup(main.read_text()))
+    main.write_text(patch_startup(patch_main_text(main.read_text())))
 
     classes = output / 'classes'
     if classes.exists():
@@ -96,17 +98,26 @@ def build_mod(source, tools, output):
         '-classpath', tools / 'platform/android-35/android.jar', '-d', classes, '@' + str(source_list))
     compiled = output / 'weqrom-ui.jar'
     with ZipFile(compiled, 'w', ZIP_DEFLATED) as archive:
-        packaged = list((classes / 'app/weqrom').rglob('*.class'))
+        packaged = list((classes / 'app/weqrom').glob('ModIntegration*.class'))
         if not packaged:
             raise ValueError('Compiled Weqrom package missing')
         for path in sorted(packaged):
             archive.write(path, path.relative_to(classes).as_posix())
+    parent_jar = output / 'weqrom-parent.jar'
+    with ZipFile(parent_jar, 'w', ZIP_DEFLATED) as archive:
+        for path in sorted((classes / 'app/weqrom').rglob('*.class')):
+            if not path.name.startswith('ModIntegration'):
+                archive.write(path, path.relative_to(classes).as_posix())
+    parent_dex = output / 'parent-dex'
+    parent_dex.mkdir(exist_ok=True)
+    run(tools / 'build-tools/android-15/d8', '--min-api', '26', '--lib',
+        tools / 'platform/android-35/android.jar', '--output', parent_dex, parent_jar)
     # Compile-only original-client API stubs under Z/ and other namespaces are
     # excluded above. The final DEX uses the actual retained original classes.
     dex_dir = output / 'new-dex'
     dex_dir.mkdir(exist_ok=True)
     run(tools / 'build-tools/android-15/d8', '--min-api', '26', '--lib',
-        tools / 'platform/android-35/android.jar', '--output', dex_dir, compiled)
+        tools / 'platform/android-35/android.jar', '--classpath', parent_jar, '--output', dex_dir, compiled)
     ui_smali = output / 'ui-smali'
     if ui_smali.exists():
         shutil.rmtree(ui_smali)
@@ -123,7 +134,8 @@ def build_mod(source, tools, output):
     result = output / 'classes.dex'
     run('java', '-cp', jar, 'com.android.tools.smali.smali.Main', 'a', '-a', '26', smali, '-o', result)
     payload = result.read_bytes()
-    replacements = {MOD_ENTRY: payload, MANIFEST_ENTRY: refresh_manifest(manifest, payload)}
+    replacements = {MOD_ENTRY: payload, MANIFEST_ENTRY: refresh_manifest(manifest, payload),
+                    'classes57.dex': (parent_dex / 'classes.dex').read_bytes()}
     loader_reports = {}
     with ZipFile(source) as apk:
         for name in ('classes46.dex', 'classes50.dex', 'classes52.dex'):
@@ -136,6 +148,9 @@ def build_mod(source, tools, output):
                 shutil.rmtree(loader_smali)
             run('java', '-cp', jar, 'com.android.tools.smali.baksmali.Main', 'd', original_loader, '-o', loader_smali)
             loader_reports[name] = patch_loader_smali(loader_smali, dex_name=name)
+            if name == 'classes52.dex':
+                bootstrap = loader_smali / 'com/windukk/stable/StableBootstrap.smali'
+                bootstrap.write_text(patch_bootstrap_text(bootstrap.read_text()))
             built_loader = folder / 'classes.dex'
             run('java', '-cp', jar, 'com.android.tools.smali.smali.Main', 'a', '-a', '26', loader_smali, '-o', built_loader)
             replacements[name] = built_loader.read_bytes()
@@ -143,6 +158,8 @@ def build_mod(source, tools, output):
              'mod_bytes': len(payload), 'region': region, 'welcome': welcome,
              'stable_api_version': WEQROM_STABLE_API, 'loader': loader_reports,
              'startup_hook': 'Main.start immediately after ModSettings initialization',
+             'independent_ui_dex': 'classes57.dex',
+             'bootstrap_diagnostics': True,
              'signature_verification_retained': True, 'remote_public_key_retained': True,
              'android_runtime_tested': False}
     (output / 'mod-report.json').write_text(json.dumps(audit, ensure_ascii=False, indent=2))

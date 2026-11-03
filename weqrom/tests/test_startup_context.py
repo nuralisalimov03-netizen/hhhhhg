@@ -96,7 +96,7 @@ public class StartupContextHarness {
    BootContext base=new BootContext();
    base.memory.values.put("region","DE");base.memory.values.put("theme","light");
    base.memory.values.put("like_color",0xff3287ff);base.memory.values.put("language","be");
-   base.memory.values.put("welcome_complete",true);base.memory.values.put("haptics",true);
+   base.memory.values.put("welcome_complete",true);base.memory.values.put("hello_revision",3);base.memory.values.put("haptics",true);
    WeqromUi.initialize(base);WeqromUi.initialize(base);
    WeqromUi.Options existing=WeqromUi.options(base);
    check("DE".equals(existing.region)&&"light".equals(existing.theme),"Early startup overwrote existing choices");
@@ -125,7 +125,7 @@ class StartupContextTests(unittest.TestCase):
         harness.write_text(HARNESS)
         compiler = ['java', '-jar', str(ECJ), '-1.8', '-proc:none', '-warn:none']
         # Production UI compiles against the genuine Android SDK, not doubles.
-        subprocess.run([*compiler, '-classpath', str(ANDROID), '-d', str(cls.production), str(UI)],
+        subprocess.run([*compiler, '-classpath', str(ANDROID), '-d', str(cls.production), *[str(p) for p in sorted(UI.parent.glob('*.java'))]],
                        check=True, capture_output=True, text=True)
         subprocess.run([*compiler, '-classpath', os.pathsep.join((str(cls.production), str(ANDROID))),
                         '-d', str(cls.doubles), str(context), str(harness)],

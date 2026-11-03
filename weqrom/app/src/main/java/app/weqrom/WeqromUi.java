@@ -23,6 +23,15 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
+import android.text.TextWatcher;
+import android.text.Editable;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import java.util.List;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -39,10 +48,6 @@ public final class WeqromUi {
     private static final int ACCENT = 0xff9bff75;
     private static final String[] LANGUAGE_CODES = {"ru", "be", "en"};
     private static final String[] LANGUAGE_NAMES = {"Русский", "Беларуская", "English"};
-    private static final String[] GREETINGS = {"Привет", "Прывітанне", "Hello", "Bonjour", "Hola", "Ciao", "Hallo", "Сәлем", "Merhaba", "你好", "こんにちは", "안녕하세요", "مرحبا"};
-    private static final String[] REGION_CODES = {"BY", "KZ", "US", "GB", "DE", "FR", "PL", "TR", "UA", "AM", "GE", "AZ", "UZ", "LT", "LV", "EE", "CA", "JP", "KR"};
-    private static final String[] REGION_NAMES_RU = {"Беларусь", "Казахстан", "США", "Великобритания", "Германия", "Франция", "Польша", "Турция", "Украина", "Армения", "Грузия", "Азербайджан", "Узбекистан", "Литва", "Латвия", "Эстония", "Канада", "Япония", "Южная Корея"};
-    private static final String[] REGION_NAMES_EN = {"Belarus", "Kazakhstan", "United States", "United Kingdom", "Germany", "France", "Poland", "Türkiye", "Ukraine", "Armenia", "Georgia", "Azerbaijan", "Uzbekistan", "Lithuania", "Latvia", "Estonia", "Canada", "Japan", "South Korea"};
     private static final int[] LIKE_COLORS = {0xffff385d, 0xff3287ff, 0xff9bff75, 0xffa579ff, 0xffffaa40, 0xffef6fce};
     private static volatile Integration integration;
     private static WeakReference<Panel> active = new WeakReference<Panel>(null);
@@ -56,6 +61,8 @@ public final class WeqromUi {
         boolean hasThemeHook();
         boolean hasLikeColorHook();
         void openAdvanced(Activity activity);
+        boolean featureEnabled(Activity activity, String key);
+        void setFeature(Activity activity, String key, boolean enabled);
     }
 
     public static final class Options {
@@ -108,7 +115,7 @@ public final class WeqromUi {
     public static String theme(Context context) { return options(context).theme; }
     public static int likeColor(Context context) { return options(context).likeColor; }
     public static String language(Context context) { return options(context).language; }
-    public static boolean isWelcomeComplete(Context context) { return preferences(context).getBoolean("welcome_complete", false); }
+    public static boolean isWelcomeComplete(Context context) { return preferences(context).getBoolean("welcome_complete", false) && preferences(context).getInt("hello_revision", 0) >= 3; }
 
     public static void showWelcome(Activity activity) { showWelcome(activity, null); }
 
@@ -127,14 +134,26 @@ public final class WeqromUi {
         show(activity, false, continueToFeed);
     }
 
-    public static void showSettings(final Activity activity) {
+    public static void showSettings(final Activity activity) { showSettings(activity, null); }
+
+    public static void showSettings(final Activity activity, final Runnable onClose) {
         if (activity == null || activity.isFinishing() || activity.isDestroyed()) return;
         if (Looper.myLooper() != Looper.getMainLooper()) {
-            activity.runOnUiThread(new Runnable() { public void run() { showSettings(activity); } });
+            activity.runOnUiThread(new Runnable() { public void run() { showSettings(activity, onClose); } });
             return;
         }
         initialize(activity);
-        show(activity, true, null);
+        show(activity, true, onClose);
+    }
+
+    public static void showRegionSettings(final Activity activity, final Runnable onClose) {
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            activity.runOnUiThread(new Runnable() { public void run() { showRegionSettings(activity, onClose); } });
+            return;
+        }
+        showSettings(activity, onClose);
+        Panel panel = active.get();
+        if (panel != null && panel.activity == activity && !panel.closed) panel.regionPicker();
     }
 
     private static void show(Activity activity, boolean settings, Runnable continueToFeed) {
@@ -161,9 +180,9 @@ public final class WeqromUi {
         AlertDialog pickerDialog;
         LinearLayout root;
         LinearLayout body;
-        TextView greeting;
+        NativeHelloView helloView;
         int page;
-        int greetingIndex;
+        boolean closeCallbackSent;
         int background;
         int foreground;
         int secondary;
@@ -172,23 +191,6 @@ public final class WeqromUi {
         boolean closed;
         boolean hiddenForStop;
         boolean lifecycleRegistered;
-
-        final Runnable greetingTick = new Runnable() {
-            public void run() {
-                if (closed || page != 0 || !dialog.isShowing()) return;
-                if (animate()) {
-                    greeting.animate().alpha(0f).translationY(-dp(7)).setDuration(170).withEndAction(new Runnable() {
-                        public void run() {
-                            if (closed || page != 0) return;
-                            nextGreeting();
-                            greeting.setTranslationY(dp(7));
-                            greeting.animate().alpha(1f).translationY(0f).setDuration(280).setInterpolator(new DecelerateInterpolator()).start();
-                        }
-                    }).start();
-                } else nextGreeting();
-                handler.postDelayed(this, 2300);
-            }
-        };
 
         Panel(Activity activity, boolean settings, Runnable continueToFeed) {
             this.activity = activity;
@@ -214,7 +216,8 @@ public final class WeqromUi {
             root.setBackgroundColor(background);
             root.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
                 public android.view.WindowInsets onApplyWindowInsets(View view, android.view.WindowInsets insets) {
-                    view.setPadding(dp(24) + insets.getSystemWindowInsetLeft(), dp(18) + insets.getSystemWindowInsetTop(),
+                    if (page == 0) view.setPadding(0, 0, 0, 0);
+                    else view.setPadding(dp(24) + insets.getSystemWindowInsetLeft(), dp(18) + insets.getSystemWindowInsetTop(),
                         dp(24) + insets.getSystemWindowInsetRight(), dp(16) + insets.getSystemWindowInsetBottom());
                     return insets;
                 }
@@ -257,11 +260,22 @@ public final class WeqromUi {
         }
 
         void render() {
-            handler.removeCallbacks(greetingTick);
-            if (greeting != null) greeting.animate().cancel();
+            if (helloView != null) { helloView.dispose(); helloView = null; }
             root.removeAllViews();
             refreshPalette();
             root.setBackgroundColor(background);
+            Window window = dialog.getWindow();
+            if (window != null) {
+                window.setStatusBarColor(page == 0 ? Color.TRANSPARENT : background);
+                window.setNavigationBarColor(page == 0 ? Color.TRANSPARENT : background);
+                int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+                if (page == 0) flags |= View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
+                else if (!dark()) flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+                window.getDecorView().setSystemUiVisibility(flags);
+            }
+            if (page == 0) { root.setPadding(0, 0, 0, 0); greetingPage(); root.requestApplyInsets(); return; }
+            root.setPadding(dp(24), dp(22), dp(24), dp(20));
+            root.requestApplyInsets();
             LinearLayout header = new LinearLayout(activity);
             header.setGravity(Gravity.CENTER_VERTICAL);
             TextView logo = text("W", 25, 0xff10200e, true);
@@ -290,40 +304,20 @@ public final class WeqromUi {
             LinearLayout.LayoutParams bodyParams = new LinearLayout.LayoutParams(-1, 0, 1f);
             bodyParams.topMargin = dp(18);
             root.addView(body, bodyParams);
-            if (page == 0) greetingPage();
-            else if (page == 1) languagePage();
+            if (page == 1) languagePage();
             else if (page == 2) readyPage();
             else settingsPage();
         }
 
         void greetingPage() {
-            LinearLayout center = new LinearLayout(activity);
-            center.setOrientation(LinearLayout.VERTICAL);
-            center.setGravity(Gravity.CENTER);
-            body.addView(center, new LinearLayout.LayoutParams(-1, 0, 1f));
-            TextView label = text("WELCOME / ВІТАЕМ", 11, secondary, true);
-            label.setLetterSpacing(0.14f);
-            center.addView(label);
-            greeting = text(GREETINGS[greetingIndex], 48, foreground, true);
-            greeting.setGravity(Gravity.CENTER);
-            greeting.setMinHeight(dp(106));
-            greeting.setMaxLines(1);
-            greeting.setTextDirection(View.TEXT_DIRECTION_FIRST_STRONG);
-            center.addView(greeting, new LinearLayout.LayoutParams(-1, dp(112)));
-            TextView hint = text(tr("Ваш ритм. Ваша лента.", "Ваш рытм. Ваша стужка.", "Your pace. Your feed."), 17, secondary, false);
-            hint.setGravity(Gravity.CENTER);
-            center.addView(hint);
-            Button next = primary(tr("Нажмите, чтобы продолжить", "Націсніце, каб працягнуць", "Tap to continue"));
-            next.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { haptic(v); changePage(1); } });
-            body.addView(next, new LinearLayout.LayoutParams(-1, dp(58)));
-            footnote(tr("Лёгкий интерфейс. Ничего лишнего.", "Лёгкі інтэрфейс. Нічога лішняга.", "A lighter interface. Room to breathe."));
-            if (animate()) handler.postDelayed(greetingTick, 2100);
-        }
-
-        void nextGreeting() {
-            greetingIndex = (greetingIndex + 1) % GREETINGS.length;
-            greeting.setText(GREETINGS[greetingIndex]);
-            greeting.setContentDescription(GREETINGS[greetingIndex]);
+            helloView = new NativeHelloView(activity);
+            helloView.setLanguage(prefs.getString("language", "ru"));
+            helloView.setReducedMotion(!animate());
+            helloView.setOnContinueListener(new Runnable() {
+                public void run() { if (!closed && page == 0) { page = 1; render(); } }
+            });
+            root.addView(helloView, new LinearLayout.LayoutParams(-1, -1));
+            helloView.resume();
         }
 
         void languagePage() {
@@ -390,7 +384,7 @@ public final class WeqromUi {
             finish.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     haptic(v);
-                    prefs.edit().putBoolean("welcome_complete", true).apply();
+                    prefs.edit().putBoolean("welcome_complete", true).putInt("hello_revision", 3).apply();
                     apply();
                     close();
                     if (continueToFeed != null && !activity.isFinishing() && !activity.isDestroyed()) continueToFeed.run();
@@ -409,6 +403,18 @@ public final class WeqromUi {
             list.setOrientation(LinearLayout.VERTICAL);
             scroll.addView(list);
             body.addView(scroll, new LinearLayout.LayoutParams(-1, 0, 1f));
+            TextView build = text("Weqrom 1.3", 12, secondary, false);
+            list.addView(build);
+            note(list, BootstrapStatus.failureSummary(activity));
+            if (integration == null) note(list, tr("Выбор сохранится на телефоне. Функции ленты доступны после успешного запуска модуля.", "Выбар захаваецца на тэлефоне. Функцыі стужкі даступныя пасля паспяховага запуску модуля.", "Choices stay on this phone. Feed features require the module to start successfully."));
+            addRow(list, tr("Отчёт о запуске", "Справаздача аб запуску", "Startup report"),
+                tr("Скопировать для проверки ошибки", "Скапіяваць для праверкі памылкі", "Copy to inspect an error"), new View.OnClickListener() {
+                    public void onClick(View view) {
+                        ClipboardManager clipboard = (ClipboardManager) activity.getSystemService(Context.CLIPBOARD_SERVICE);
+                        if (clipboard != null) clipboard.setPrimaryClip(ClipData.newPlainText("Weqrom startup", BootstrapStatus.dump(activity)));
+                        Toast.makeText(activity, tr("Отчёт скопирован", "Справаздача скапіявана", "Report copied"), Toast.LENGTH_SHORT).show();
+                    }
+                });
             section(list, tr("РЕГИОН И ЯЗЫК", "РЭГІЁН І МОВА", "REGION & LANGUAGE"));
             addRow(list, tr("Регион мода", "Рэгіён мода", "Mod region"), regionName(region(activity)), new View.OnClickListener() { public void onClick(View v) { regionPicker(); } });
             note(list, regionHook() ? tr("Страна SIM и оператора, которую мод сообщает клиенту. Не переносит аккаунт и не меняет IP.", "Краіна SIM і аператара, якую мод паведамляе кліенту. Не пераносіць акаўнт і не мяняе IP.", "SIM and operator country reported to the client. Does not migrate your account or change your IP.")
@@ -444,6 +450,9 @@ public final class WeqromUi {
             }
             list.addView(colors, new LinearLayout.LayoutParams(-1, dp(58)));
             if (!likeHook()) note(list, tr("Цвет сохранён. Изменение цвета в ленте недоступно.", "Колер захаваны. Змена колеру ў стужцы недаступная.", "Color saved. Changing feed colors is unavailable."));
+            section(list, tr("ЛЕНТА И СКАЧИВАНИЕ", "СТУЖКА І СПАМПОЎКІ", "FEED & DOWNLOADS"));
+            for (final FeatureCatalog.Entry feature : FeatureCatalog.all()) addFeatureSwitch(list, feature);
+            note(list, tr("Некоторые изменения видны в новых видео или после повторного открытия ленты.", "Некаторыя змены бачныя ў новых відэа або пасля паўторнага адкрыцця стужкі.", "Some changes appear on new videos or after reopening the feed."));
             section(list, tr("КОМФОРТ", "КАМФОРТ", "COMFORT"));
             addSwitch(list, tr("Меньше анимации", "Менш анімацыі", "Reduce motion"), "reduced_motion", false);
             note(list, tr("Переходы панелей короче. Системное отключение анимаций учитывается всегда.", "Пераходы панэляў карацейшыя. Сістэмнае адключэнне анімацый улічваецца заўсёды.", "Shorter panel transitions. System animation settings are always respected."));
@@ -455,8 +464,13 @@ public final class WeqromUi {
             if (settings) addRow(list, tr("Показать приветствие", "Паказаць прывітанне", "Replay welcome"), "", new View.OnClickListener() {
                 public void onClick(View v) {
                     prefs.edit().putBoolean("welcome_complete", false).apply();
-                    close();
-                    showWelcome(activity);
+                    if (continueToFeed != null) {
+                        activity.startActivity(new android.content.Intent(activity, WeqromLauncherActivity.class));
+                        close();
+                    } else {
+                        close();
+                        showWelcome(activity);
+                    }
                 }
             });
             note(list, tr("Настройки сохраняются на телефоне. Без фонового сервиса и постоянных анимаций.", "Налады захоўваюцца на тэлефоне. Без фонавага сэрвісу і пастаянных анімацый.", "Settings stay on your phone. No background service or continuous animation."));
@@ -470,11 +484,66 @@ public final class WeqromUi {
         }
 
         void regionPicker() {
-            final String[] names = new String[REGION_CODES.length];
-            for (int i = 0; i < names.length; i++) names[i] = regionName(REGION_CODES[i]);
-            picker(tr("Регион", "Рэгіён", "Region"), names, indexOf(REGION_CODES, region(activity)), new Selection() {
-                public void selected(int which) { prefs.edit().putString("region", REGION_CODES[which]).apply(); apply(); render(); }
+            if (pickerDialog != null) pickerDialog.dismiss();
+            LinearLayout box = new LinearLayout(activity);
+            box.setOrientation(LinearLayout.VERTICAL);
+            box.setPadding(dp(16), dp(6), dp(16), 0);
+            EditText search = new EditText(activity);
+            search.setSingleLine(true);
+            search.setHint(tr("Поиск страны или кода", "Пошук краіны або кода", "Country or code"));
+            search.setTextColor(foreground); search.setHintTextColor(secondary);
+            box.addView(search, new LinearLayout.LayoutParams(-1, dp(54)));
+            final ListView countries = new ListView(activity);
+            final java.util.ArrayList<RegionCatalog.Entry> results = new java.util.ArrayList<RegionCatalog.Entry>(RegionCatalog.all());
+            final ArrayAdapter<String> adapter = new ArrayAdapter<String>(activity, android.R.layout.simple_list_item_single_choice) {
+                @Override public View getView(int position, View recycled, ViewGroup parent) {
+                    View row = super.getView(position, recycled, parent);
+                    if (row instanceof TextView) ((TextView) row).setTextColor(foreground);
+                    row.setMinimumHeight(dp(48));
+                    return row;
+                }
+            };
+            for (RegionCatalog.Entry entry : results) adapter.add(entry.label(language(activity)) + " · " + entry.iso);
+            countries.setAdapter(adapter);
+            countries.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+            for (int i = 0; i < results.size(); i++) if (results.get(i).iso.equalsIgnoreCase(region(activity))) countries.setItemChecked(i, true);
+            box.addView(countries, new LinearLayout.LayoutParams(-1, dp(340)));
+            search.addTextChangedListener(new TextWatcher() {
+                public void beforeTextChanged(CharSequence v, int start, int count, int after) {}
+                public void onTextChanged(CharSequence v, int start, int before, int count) {
+                    results.clear(); results.addAll(RegionCatalog.search(v.toString(), language(activity)));
+                    adapter.setNotifyOnChange(false);
+                    adapter.clear();
+                    for (RegionCatalog.Entry entry : results) adapter.add(entry.label(language(activity)) + " · " + entry.iso);
+                    adapter.notifyDataSetChanged();
+                    // Checked positions belong to the current filtered list,
+                    // not to the previous full country array.
+                    countries.clearChoices();
+                    String selected = prefs.getString("region", DEFAULT_REGION);
+                    for (int i = 0; i < results.size(); i++) {
+                        if (results.get(i).iso.equalsIgnoreCase(selected)) countries.setItemChecked(i, true);
+                    }
+                    countries.invalidateViews();
+                }
+                public void afterTextChanged(Editable v) {}
             });
+            pickerDialog = new AlertDialog.Builder(activity, dark() ? android.R.style.Theme_Material_Dialog_Alert : android.R.style.Theme_Material_Light_Dialog_Alert)
+                .setTitle(tr("191 регион — TikTok You", "191 рэгіён — TikTok You", "191 regions — TikTok You"))
+                .setView(box).setNegativeButton(tr("Отмена", "Скасаваць", "Cancel"), null).create();
+            final AlertDialog current = pickerDialog;
+            countries.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    if (position < 0 || position >= results.size()) return;
+                    RegionCatalog.Entry entry = results.get(position);
+                    prefs.edit().putString("region", entry.iso).apply();
+                    activity.getSharedPreferences("ttmod_settings", Context.MODE_PRIVATE).edit()
+                        .putInt("selected_region", entry.index).putString("selected_region_iso", entry.iso.toLowerCase(Locale.ROOT))
+                        .putBoolean("region_spoof_enabled", true).apply();
+                    apply(); current.dismiss(); if (!closed) render();
+                }
+            });
+            current.setOnDismissListener(new DialogInterface.OnDismissListener() { public void onDismiss(DialogInterface d) { if (pickerDialog == current) pickerDialog = null; } });
+            current.show();
         }
 
         void languagePicker() {
@@ -574,6 +643,29 @@ public final class WeqromUi {
             parent.addView(row, params);
         }
 
+        void addFeatureSwitch(LinearLayout parent, final FeatureCatalog.Entry feature) {
+            LinearLayout row = new LinearLayout(activity);
+            row.setGravity(Gravity.CENTER_VERTICAL);
+            row.setPadding(dp(16), dp(8), dp(12), dp(8)); row.setBackground(shape(surface, 18, border));
+            row.addView(text(feature.title(language(activity)), 15, foreground, true), new LinearLayout.LayoutParams(0, -2, 1f));
+            final Switch control = new Switch(activity);
+            boolean value = activity.getSharedPreferences("ttmod_settings", Context.MODE_PRIVATE).getBoolean(feature.key, feature.defaultEnabled);
+            Integration bridge = integration;
+            if (bridge != null) try { value = bridge.featureEnabled(activity, feature.key); } catch (RuntimeException unavailable) {}
+            control.setChecked(value); control.setMinHeight(dp(48)); control.setContentDescription(feature.title(language(activity)));
+            control.setOnCheckedChangeListener(new android.widget.CompoundButton.OnCheckedChangeListener() {
+                public void onCheckedChanged(android.widget.CompoundButton button, boolean value) {
+                    activity.getSharedPreferences("ttmod_settings", Context.MODE_PRIVATE).edit().putBoolean(feature.key, value).apply();
+                    Integration bridge = integration;
+                    if (bridge != null) try { bridge.setFeature(activity, feature.key, value); }
+                    catch (RuntimeException failed) { Toast.makeText(activity, tr("Настройка сохранена. Применение не удалось.", "Налада захаваная. Ужыць не атрымалася.", "Saved. Could not apply this setting."), Toast.LENGTH_SHORT).show(); }
+                }
+            });
+            row.addView(control);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-1, -2); params.bottomMargin = dp(8);
+            parent.addView(row, params);
+        }
+
         void addSwitch(LinearLayout parent, String title, final String key, boolean initial) {
             LinearLayout row = new LinearLayout(activity);
             row.setGravity(Gravity.CENTER_VERTICAL);
@@ -646,8 +738,7 @@ public final class WeqromUi {
         }
 
         void changePage(final int target) {
-            handler.removeCallbacks(greetingTick);
-            if (greeting != null) greeting.animate().cancel();
+            if (helloView != null) helloView.pause();
             if (!animate()) { page = target; render(); return; }
             body.animate().alpha(0f).translationY(-dp(7)).setDuration(150).withEndAction(new Runnable() {
                 public void run() {
@@ -695,10 +786,8 @@ public final class WeqromUi {
         boolean likeHook() { Integration bridge = integration; return bridge != null && bridge.hasLikeColorHook(); }
 
         String regionName(String code) {
-            int index = indexOf(REGION_CODES, code);
-            if (index < 0) return code;
-            if ("ru".equals(language(activity)) || "be".equals(language(activity))) return REGION_NAMES_RU[index] + " · " + code;
-            return REGION_NAMES_EN[index] + " · " + code;
+            RegionCatalog.Entry entry = RegionCatalog.find(code);
+            return entry == null ? code : entry.label(language(activity)) + " · " + entry.iso;
         }
 
         String languageName() {
@@ -717,11 +806,7 @@ public final class WeqromUi {
 
         void pauseMotion() {
             handler.removeCallbacksAndMessages(null);
-            if (greeting != null) {
-                greeting.animate().cancel();
-                greeting.setAlpha(1f);
-                greeting.setTranslationY(0f);
-            }
+            if (helloView != null) helloView.pause();
             if (body != null) {
                 body.animate().cancel();
                 body.setAlpha(1f);
@@ -736,11 +821,7 @@ public final class WeqromUi {
                 hiddenForStop = false;
                 dialog.show();
             }
-            if (page == 0 && dialog.isShowing()) {
-                if (greeting != null) { greeting.setAlpha(1f); greeting.setTranslationY(0f); }
-                handler.removeCallbacks(greetingTick);
-                if (animate()) handler.postDelayed(greetingTick, 2100);
-            }
+            if (page == 0 && dialog.isShowing() && helloView != null) helloView.resume();
         }
 
         void cleanup() {
@@ -748,12 +829,19 @@ public final class WeqromUi {
             closed = true;
             hiddenForStop = false;
             pauseMotion();
+            if (helloView != null) { helloView.dispose(); helloView = null; }
             if (pickerDialog != null) pickerDialog.dismiss();
             if (lifecycleRegistered) {
                 activity.getApplication().unregisterActivityLifecycleCallbacks(this);
                 lifecycleRegistered = false;
             }
             if (active.get() == this) active.clear();
+            // A rotation or theme recreation must let Android replace the host
+            // Activity. Its dismissal callback normally finishes that host.
+            if (settings && continueToFeed != null && !closeCallbackSent && !activity.isChangingConfigurations()) {
+                closeCallbackSent = true;
+                continueToFeed.run();
+            }
         }
 
         public void onActivityCreated(Activity a, Bundle state) {}

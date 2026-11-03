@@ -26,8 +26,8 @@ except ImportError:
 PROJECT = Path(__file__).resolve().parents[1]
 BASE_SHA = '9f34642dd5d62f96cc84bdf2a1e44f198f78fb5e813944ac1058714abef551bc'
 BASE_CERT = '54ae4101cf1b18658c3b1cf0a49bea4d28a3b053a9622251dba92f74fc54dec7'
-RELEASE_VERSION = '47.4.3-weqrom.1.2'
-RELEASE_CODE = 2024704032
+RELEASE_VERSION = '47.4.3-weqrom.1.3'
+RELEASE_CODE = 2024704033
 PNG_ICONS = {'res/ap/a.png':56,'res/am/b.png':84,'res/an/b.png':112,
              'res/ao/b.png':168,'res/aq/a.png':224}
 XML_ICONS = ['res/ar/a.xml'] + [f'res/mipmap-anydpi-v26/ttmod_launcher_{name}.xml'
@@ -170,7 +170,11 @@ def release_manifest(data):
     # The original dynamically loaded mod already uses DEX038 (Android8).
     # Declare that real floor instead of promising Android6 support.
     minimum.raw, minimum.kind, minimum.data = NO_INDEX, 0x10, 26
-    return document.build()
+    try:
+        from .launcher_manifest import add_weqrom_launcher
+    except ImportError:
+        from launcher_manifest import add_weqrom_launcher
+    return add_weqrom_launcher(document.build())
 
 
 def checked(command,**kw):
@@ -209,12 +213,14 @@ def main():
         for name in XML_ICONS:replacements[name]=vector
         before=inspect_manifest(z.read('AndroidManifest.xml'));after=inspect_manifest(replacements['AndroidManifest.xml'])
         if before['package']!=after['package']:raise SystemExit('Replacement package unexpectedly changed')
-    notice=('Weqrom 1.2. Based on user-provided TikTok You 5.0 / TikTok47.4.3.\n'
+    notice=('Weqrom 1.3. Based on user-provided TikTok You 5.0 / TikTok47.4.3.\n'
             'Original TikTok DEX/native libraries retained. Bundled mod UI/settings hooks modified.\n'
             'New native greeting/settings, Belarus mod-region default, theme/accent controls.\n'
             'Not an official TikTok release. Android runtime/login/server region not verified.\n'
             'Base SHA256: '+BASE_SHA+'\n').encode()
-    unsigned=build/'unsigned.apk';repack(source,unsigned,replacements,{'assets/weqrom/NOTICE.txt':notice})
+    parent_dex = replacements.pop('classes57.dex')
+    additions = {'assets/weqrom/NOTICE.txt': notice, 'classes57.dex': parent_dex}
+    unsigned=build/'unsigned.apk';repack(source,unsigned,replacements,additions)
     aligned=build/'aligned.apk';checked([sdk/'zipalign','-P','16','-f','4',unsigned,aligned])
     signing=args.signing_dir;signing.mkdir(parents=True,exist_ok=True,mode=0o700)
     key=signing/'release.p12';password=signing/'password'
@@ -246,7 +252,7 @@ def main():
                 if entry.filename in mod_replacements:continue
                 if hashlib.sha256(old.read(entry)).digest()!=hashlib.sha256(new.read(entry.filename)).digest():raise SystemExit('Executable payload changed: '+entry.filename)
     report={'name':'Weqrom','package':before['package'],'base_sha256':BASE_SHA,'sha256':sha(target),
-            'bytes':target.stat().st_size,'modified_entries':changed,'added_entries':['assets/weqrom/NOTICE.txt'],
+            'bytes':target.stat().st_size,'modified_entries':changed,'added_entries':list(additions),
             'version':RELEASE_VERSION,'version_code':RELEASE_CODE,'min_sdk':26,
             'resource_literal_indices':indices,'executables_unchanged':False,
             'modified_executable_entries':[name for name in mod_replacements if name.endswith('.dex')],

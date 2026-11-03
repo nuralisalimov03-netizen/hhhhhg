@@ -63,6 +63,7 @@ public final class ModIntegration {
                 .putBoolean("statistics_enable", false)
                 .putInt(MIGRATION, SCHEMA).apply();
         }
+        applySavedFeatures(context);
         WeqromUi.initialize(context);
         SharedPreferences own = WeqromUi.preferences(context);
         // The new welcome must also appear for users who accepted the old popup.
@@ -81,12 +82,21 @@ public final class ModIntegration {
 
     private static final WeqromUi.Integration BACKEND = new WeqromUi.Integration() {
         public void apply(Activity activity, WeqromUi.Options options) {
+            if (WeqromUi.isWelcomeComplete(activity) && !ac.e().H) ac.e().b();
             setRegion(activity, options.region);
             setAccent(activity, options.likeColor);
             setTheme(activity, options.theme);
         }
 
         public void openAdvanced(Activity activity) { ModIntegration.openAdvanced(activity); }
+
+        public boolean featureEnabled(Activity activity, String key) {
+            return ModIntegration.featureEnabled(activity, key);
+        }
+
+        public void setFeature(Activity activity, String key, boolean enabled) {
+            ModIntegration.setFeature(activity, key, enabled);
+        }
 
         public boolean hasRegionHook() { return true; }
         public boolean hasThemeHook() { return themeAvailable; }
@@ -163,6 +173,60 @@ public final class ModIntegration {
         }
         SharedPreferences own = WeqromUi.preferences(context);
         if (own.getInt("like_color", 0) != color) own.edit().putInt("like_color", color).apply();
+    }
+
+    /** Exact optional keys supported by the original bundled mod, not UI-only flags. */
+    public static String[] featureKeys() {
+        return new String[] {"hide_ads", "hide_lives", "hide_photos", "hide_stories",
+            "simple_mode", "always_show_progress_bar", "skip_quality_picker", "anti_burnout",
+            "anti_burnout_enable_on_start", "anti_burnout_hide_system_bars"};
+    }
+
+    public static boolean featureEnabled(Context context, String key) {
+        bc settings = ac.e();
+        if (key == null) throw new IllegalArgumentException("Feature is required");
+        switch (key) {
+            case "hide_ads": return settings.d;
+            case "hide_lives": return settings.c;
+            case "hide_photos": return settings.e;
+            case "hide_stories": return settings.j;
+            case "simple_mode": return settings.k;
+            case "always_show_progress_bar": return settings.p;
+            case "skip_quality_picker": return settings.z;
+            case "anti_burnout": return settings.f;
+            case "anti_burnout_enable_on_start": return settings.h;
+            case "anti_burnout_hide_system_bars": return settings.i;
+            default: throw new IllegalArgumentException("Unsupported feature: " + key);
+        }
+    }
+
+    /** Existing setters update both the hook's live cache and its real preference. */
+    public static void setFeature(Context context, String key, boolean enabled) {
+        if (featureEnabled(context, key) == enabled) return;
+        bc settings = ac.e();
+        switch (key) {
+            case "hide_ads": settings.g(enabled); break;
+            case "hide_lives": settings.h(enabled); break;
+            case "hide_photos": settings.i(enabled); break;
+            case "hide_stories": settings.j(enabled); break;
+            case "simple_mode": settings.k(enabled); break;
+            case "always_show_progress_bar": settings.a(enabled); break;
+            case "skip_quality_picker": settings.l(enabled); break;
+            case "anti_burnout": settings.c(enabled); break;
+            case "anti_burnout_enable_on_start": settings.b(enabled); break;
+            case "anti_burnout_hide_system_bars": settings.d(enabled); break;
+            default: throw new IllegalArgumentException("Unsupported feature: " + key);
+        }
+    }
+
+    /** Also consumes settings written by Weqrom's independent launcher panel. */
+    public static void applySavedFeatures(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences(MOD_PREFERENCES, Context.MODE_PRIVATE);
+        for (String key : featureKeys()) {
+            boolean current = featureEnabled(context, key);
+            boolean saved = preferences.getBoolean(key, current);
+            if (saved != current) setFeature(context, key, saved);
+        }
     }
 
     public static void showWelcome(final Activity activity) {

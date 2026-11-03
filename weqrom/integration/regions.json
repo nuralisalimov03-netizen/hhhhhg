@@ -1,0 +1,1726 @@
+{
+  "sourceSha256": "9f34642dd5d62f96cc84bdf2a1e44f198f78fb5e813944ac1058714abef551bc",
+  "sourceClass": "Z.ue.a",
+  "count": 191,
+  "regions": [
+    {
+      "index": 0,
+      "id": 0,
+      "iso": "AU",
+      "nameEnglish": "Australia",
+      "nameRussian": "Австралия",
+      "mccMnc": "50501",
+      "operator": "Telstra"
+    },
+    {
+      "index": 1,
+      "id": 1,
+      "iso": "AT",
+      "nameEnglish": "Austria",
+      "nameRussian": "Австрия",
+      "mccMnc": "23201",
+      "operator": "A1 Telekom"
+    },
+    {
+      "index": 2,
+      "id": 2,
+      "iso": "AZ",
+      "nameEnglish": "Azerbaijan",
+      "nameRussian": "Азербайджан",
+      "mccMnc": "40001",
+      "operator": "Azercell"
+    },
+    {
+      "index": 3,
+      "id": 3,
+      "iso": "AL",
+      "nameEnglish": "Albania",
+      "nameRussian": "Албания",
+      "mccMnc": "27601",
+      "operator": "ONE"
+    },
+    {
+      "index": 4,
+      "id": 4,
+      "iso": "DZ",
+      "nameEnglish": "Algeria",
+      "nameRussian": "Алжир",
+      "mccMnc": "60301",
+      "operator": "Mobilis"
+    },
+    {
+      "index": 5,
+      "id": 5,
+      "iso": "AO",
+      "nameEnglish": "Angola",
+      "nameRussian": "Ангола",
+      "mccMnc": "63102",
+      "operator": "Unitel"
+    },
+    {
+      "index": 6,
+      "id": 6,
+      "iso": "AD",
+      "nameEnglish": "Andorra",
+      "nameRussian": "Андорра",
+      "mccMnc": "21303",
+      "operator": "Andorra Telecom"
+    },
+    {
+      "index": 7,
+      "id": 7,
+      "iso": "AG",
+      "nameEnglish": "Antigua and Barbuda",
+      "nameRussian": "Антигуа и Барбуда",
+      "mccMnc": "344920",
+      "operator": "Flow"
+    },
+    {
+      "index": 8,
+      "id": 8,
+      "iso": "AR",
+      "nameEnglish": "Argentina",
+      "nameRussian": "Аргентина",
+      "mccMnc": "722310",
+      "operator": "Claro"
+    },
+    {
+      "index": 9,
+      "id": 9,
+      "iso": "AM",
+      "nameEnglish": "Armenia",
+      "nameRussian": "Армения",
+      "mccMnc": "28305",
+      "operator": "Team Telecom"
+    },
+    {
+      "index": 10,
+      "id": 11,
+      "iso": "BS",
+      "nameEnglish": "Bahamas",
+      "nameRussian": "Багамы",
+      "mccMnc": "364030",
+      "operator": "BTC"
+    },
+    {
+      "index": 11,
+      "id": 12,
+      "iso": "BD",
+      "nameEnglish": "Bangladesh",
+      "nameRussian": "Бангладеш",
+      "mccMnc": "47001",
+      "operator": "Grameenphone"
+    },
+    {
+      "index": 12,
+      "id": 13,
+      "iso": "BB",
+      "nameEnglish": "Barbados",
+      "nameRussian": "Барбадос",
+      "mccMnc": "342600",
+      "operator": "Flow"
+    },
+    {
+      "index": 13,
+      "id": 14,
+      "iso": "BY",
+      "nameEnglish": "Belarus",
+      "nameRussian": "Беларусь",
+      "mccMnc": "25701",
+      "operator": "A1"
+    },
+    {
+      "index": 14,
+      "id": 15,
+      "iso": "BZ",
+      "nameEnglish": "Belize",
+      "nameRussian": "Белиз",
+      "mccMnc": "70267",
+      "operator": "DigiCell"
+    },
+    {
+      "index": 15,
+      "id": 16,
+      "iso": "BE",
+      "nameEnglish": "Belgium",
+      "nameRussian": "Бельгия",
+      "mccMnc": "20601",
+      "operator": "Proximus"
+    },
+    {
+      "index": 16,
+      "id": 17,
+      "iso": "BJ",
+      "nameEnglish": "Benin",
+      "nameRussian": "Бенин",
+      "mccMnc": "61603",
+      "operator": "MTN"
+    },
+    {
+      "index": 17,
+      "id": 18,
+      "iso": "BM",
+      "nameEnglish": "Bermuda",
+      "nameRussian": "Бермуды",
+      "mccMnc": "35000",
+      "operator": "One Communications"
+    },
+    {
+      "index": 18,
+      "id": 19,
+      "iso": "BG",
+      "nameEnglish": "Bulgaria",
+      "nameRussian": "Болгария",
+      "mccMnc": "28401",
+      "operator": "A1 Bulgaria"
+    },
+    {
+      "index": 19,
+      "id": 20,
+      "iso": "BO",
+      "nameEnglish": "Bolivia",
+      "nameRussian": "Боливия",
+      "mccMnc": "73602",
+      "operator": "Entel"
+    },
+    {
+      "index": 20,
+      "id": 21,
+      "iso": "BA",
+      "nameEnglish": "Bosnia and Herzegovina",
+      "nameRussian": "Босния и Герцеговина",
+      "mccMnc": "21805",
+      "operator": "m:tel"
+    },
+    {
+      "index": 21,
+      "id": 22,
+      "iso": "BW",
+      "nameEnglish": "Botswana",
+      "nameRussian": "Ботсвана",
+      "mccMnc": "65201",
+      "operator": "Mascom"
+    },
+    {
+      "index": 22,
+      "id": 23,
+      "iso": "BR",
+      "nameEnglish": "Brazil",
+      "nameRussian": "Бразилия",
+      "mccMnc": "72406",
+      "operator": "Vivo"
+    },
+    {
+      "index": 23,
+      "id": 24,
+      "iso": "BN",
+      "nameEnglish": "Brunei",
+      "nameRussian": "Бруней",
+      "mccMnc": "52811",
+      "operator": "DST"
+    },
+    {
+      "index": 24,
+      "id": 25,
+      "iso": "BF",
+      "nameEnglish": "Burkina Faso",
+      "nameRussian": "Буркина-Фасо",
+      "mccMnc": "61301",
+      "operator": "Onatel"
+    },
+    {
+      "index": 25,
+      "id": 26,
+      "iso": "BI",
+      "nameEnglish": "Burundi",
+      "nameRussian": "Бурунди",
+      "mccMnc": "64201",
+      "operator": "Econet"
+    },
+    {
+      "index": 26,
+      "id": 27,
+      "iso": "BT",
+      "nameEnglish": "Bhutan",
+      "nameRussian": "Бутан",
+      "mccMnc": "40211",
+      "operator": "B-Mobile"
+    },
+    {
+      "index": 27,
+      "id": 28,
+      "iso": "VU",
+      "nameEnglish": "Vanuatu",
+      "nameRussian": "Вануату",
+      "mccMnc": "54105",
+      "operator": "Digicel"
+    },
+    {
+      "index": 28,
+      "id": 30,
+      "iso": "GB",
+      "nameEnglish": "United Kingdom",
+      "nameRussian": "Великобритания",
+      "mccMnc": "23410",
+      "operator": "O2"
+    },
+    {
+      "index": 29,
+      "id": 31,
+      "iso": "HU",
+      "nameEnglish": "Hungary",
+      "nameRussian": "Венгрия",
+      "mccMnc": "21630",
+      "operator": "Telekom"
+    },
+    {
+      "index": 30,
+      "id": 32,
+      "iso": "VE",
+      "nameEnglish": "Venezuela",
+      "nameRussian": "Венесуэла",
+      "mccMnc": "73404",
+      "operator": "Movistar"
+    },
+    {
+      "index": 31,
+      "id": 33,
+      "iso": "TL",
+      "nameEnglish": "Timor-Leste",
+      "nameRussian": "Восточный Тимор",
+      "mccMnc": "51402",
+      "operator": "Telemor"
+    },
+    {
+      "index": 32,
+      "id": 34,
+      "iso": "VN",
+      "nameEnglish": "Vietnam",
+      "nameRussian": "Вьетнам",
+      "mccMnc": "45204",
+      "operator": "Viettel"
+    },
+    {
+      "index": 33,
+      "id": 35,
+      "iso": "GA",
+      "nameEnglish": "Gabon",
+      "nameRussian": "Габон",
+      "mccMnc": "62801",
+      "operator": "Libertis"
+    },
+    {
+      "index": 34,
+      "id": 36,
+      "iso": "HT",
+      "nameEnglish": "Haiti",
+      "nameRussian": "Гаити",
+      "mccMnc": "37203",
+      "operator": "Natcom"
+    },
+    {
+      "index": 35,
+      "id": 37,
+      "iso": "GY",
+      "nameEnglish": "Guyana",
+      "nameRussian": "Гайана",
+      "mccMnc": "73801",
+      "operator": "GTT"
+    },
+    {
+      "index": 36,
+      "id": 38,
+      "iso": "GM",
+      "nameEnglish": "Gambia",
+      "nameRussian": "Гамбия",
+      "mccMnc": "60702",
+      "operator": "Africell"
+    },
+    {
+      "index": 37,
+      "id": 39,
+      "iso": "GH",
+      "nameEnglish": "Ghana",
+      "nameRussian": "Гана",
+      "mccMnc": "62001",
+      "operator": "MTN"
+    },
+    {
+      "index": 38,
+      "id": 40,
+      "iso": "GP",
+      "nameEnglish": "Guadeloupe",
+      "nameRussian": "Гваделупа",
+      "mccMnc": "34001",
+      "operator": "Orange"
+    },
+    {
+      "index": 39,
+      "id": 41,
+      "iso": "GT",
+      "nameEnglish": "Guatemala",
+      "nameRussian": "Гватемала",
+      "mccMnc": "70402",
+      "operator": "Tigo"
+    },
+    {
+      "index": 40,
+      "id": 42,
+      "iso": "GN",
+      "nameEnglish": "Guinea",
+      "nameRussian": "Гвинея",
+      "mccMnc": "61101",
+      "operator": "Orange"
+    },
+    {
+      "index": 41,
+      "id": 43,
+      "iso": "GW",
+      "nameEnglish": "Guinea-Bissau",
+      "nameRussian": "Гвинея-Бисау",
+      "mccMnc": "63203",
+      "operator": "Orange"
+    },
+    {
+      "index": 42,
+      "id": 44,
+      "iso": "DE",
+      "nameEnglish": "Germany",
+      "nameRussian": "Германия",
+      "mccMnc": "26201",
+      "operator": "Telekom"
+    },
+    {
+      "index": 43,
+      "id": 45,
+      "iso": "HN",
+      "nameEnglish": "Honduras",
+      "nameRussian": "Гондурас",
+      "mccMnc": "708002",
+      "operator": "Tigo"
+    },
+    {
+      "index": 44,
+      "id": 46,
+      "iso": "HK",
+      "nameEnglish": "Hong Kong",
+      "nameRussian": "Гонконг",
+      "mccMnc": "45400",
+      "operator": "CSL"
+    },
+    {
+      "index": 45,
+      "id": 47,
+      "iso": "GD",
+      "nameEnglish": "Grenada",
+      "nameRussian": "Гренада",
+      "mccMnc": "352110",
+      "operator": "Flow"
+    },
+    {
+      "index": 46,
+      "id": 48,
+      "iso": "GL",
+      "nameEnglish": "Greenland",
+      "nameRussian": "Гренландия",
+      "mccMnc": "29001",
+      "operator": "Tele Greenland"
+    },
+    {
+      "index": 47,
+      "id": 49,
+      "iso": "GR",
+      "nameEnglish": "Greece",
+      "nameRussian": "Греция",
+      "mccMnc": "20201",
+      "operator": "Cosmote"
+    },
+    {
+      "index": 48,
+      "id": 50,
+      "iso": "GE",
+      "nameEnglish": "Georgia",
+      "nameRussian": "Грузия",
+      "mccMnc": "28202",
+      "operator": "MagtiCom"
+    },
+    {
+      "index": 49,
+      "id": 51,
+      "iso": "DK",
+      "nameEnglish": "Denmark",
+      "nameRussian": "Дания",
+      "mccMnc": "23801",
+      "operator": "TDC"
+    },
+    {
+      "index": 50,
+      "id": 52,
+      "iso": "DJ",
+      "nameEnglish": "Djibouti",
+      "nameRussian": "Джибути",
+      "mccMnc": "63801",
+      "operator": "Evatis"
+    },
+    {
+      "index": 51,
+      "id": 53,
+      "iso": "DM",
+      "nameEnglish": "Dominica",
+      "nameRussian": "Доминика",
+      "mccMnc": "366110",
+      "operator": "Flow"
+    },
+    {
+      "index": 52,
+      "id": 54,
+      "iso": "DO",
+      "nameEnglish": "Dominican Republic",
+      "nameRussian": "Доминиканская Республика",
+      "mccMnc": "37001",
+      "operator": "Claro"
+    },
+    {
+      "index": 53,
+      "id": 55,
+      "iso": "CD",
+      "nameEnglish": "DR Congo",
+      "nameRussian": "Демократическая Республика Конго",
+      "mccMnc": "63001",
+      "operator": "Vodacom"
+    },
+    {
+      "index": 54,
+      "id": 56,
+      "iso": "EG",
+      "nameEnglish": "Egypt",
+      "nameRussian": "Египет",
+      "mccMnc": "60202",
+      "operator": "Vodafone"
+    },
+    {
+      "index": 55,
+      "id": 57,
+      "iso": "ZM",
+      "nameEnglish": "Zambia",
+      "nameRussian": "Замбия",
+      "mccMnc": "64501",
+      "operator": "Airtel"
+    },
+    {
+      "index": 56,
+      "id": 58,
+      "iso": "ZW",
+      "nameEnglish": "Zimbabwe",
+      "nameRussian": "Зимбабве",
+      "mccMnc": "64804",
+      "operator": "Econet"
+    },
+    {
+      "index": 57,
+      "id": 59,
+      "iso": "IL",
+      "nameEnglish": "Israel",
+      "nameRussian": "Израиль",
+      "mccMnc": "42501",
+      "operator": "Partner"
+    },
+    {
+      "index": 58,
+      "id": 61,
+      "iso": "ID",
+      "nameEnglish": "Indonesia",
+      "nameRussian": "Индонезия",
+      "mccMnc": "51010",
+      "operator": "Telkomsel"
+    },
+    {
+      "index": 59,
+      "id": 62,
+      "iso": "JO",
+      "nameEnglish": "Jordan",
+      "nameRussian": "Иордания",
+      "mccMnc": "41601",
+      "operator": "Zain"
+    },
+    {
+      "index": 60,
+      "id": 63,
+      "iso": "IQ",
+      "nameEnglish": "Iraq",
+      "nameRussian": "Ирак",
+      "mccMnc": "41805",
+      "operator": "Asiacell"
+    },
+    {
+      "index": 61,
+      "id": 65,
+      "iso": "IE",
+      "nameEnglish": "Ireland",
+      "nameRussian": "Ирландия",
+      "mccMnc": "27201",
+      "operator": "Vodafone"
+    },
+    {
+      "index": 62,
+      "id": 66,
+      "iso": "IS",
+      "nameEnglish": "Iceland",
+      "nameRussian": "Исландия",
+      "mccMnc": "27401",
+      "operator": "Síminn"
+    },
+    {
+      "index": 63,
+      "id": 67,
+      "iso": "ES",
+      "nameEnglish": "Spain",
+      "nameRussian": "Испания",
+      "mccMnc": "21401",
+      "operator": "Movistar"
+    },
+    {
+      "index": 64,
+      "id": 68,
+      "iso": "IT",
+      "nameEnglish": "Italy",
+      "nameRussian": "Италия",
+      "mccMnc": "22201",
+      "operator": "TIM"
+    },
+    {
+      "index": 65,
+      "id": 69,
+      "iso": "CV",
+      "nameEnglish": "Cape Verde",
+      "nameRussian": "Кабо-Верде",
+      "mccMnc": "62501",
+      "operator": "CV Móvel"
+    },
+    {
+      "index": 66,
+      "id": 70,
+      "iso": "KZ",
+      "nameEnglish": "Kazakhstan",
+      "nameRussian": "Казахстан",
+      "mccMnc": "40101",
+      "operator": "Beeline"
+    },
+    {
+      "index": 67,
+      "id": 71,
+      "iso": "KH",
+      "nameEnglish": "Cambodia",
+      "nameRussian": "Камбоджа",
+      "mccMnc": "45601",
+      "operator": "Cellcard"
+    },
+    {
+      "index": 68,
+      "id": 72,
+      "iso": "CM",
+      "nameEnglish": "Cameroon",
+      "nameRussian": "Камерун",
+      "mccMnc": "62401",
+      "operator": "MTN"
+    },
+    {
+      "index": 69,
+      "id": 73,
+      "iso": "CA",
+      "nameEnglish": "Canada",
+      "nameRussian": "Канада",
+      "mccMnc": "302720",
+      "operator": "Rogers"
+    },
+    {
+      "index": 70,
+      "id": 74,
+      "iso": "QA",
+      "nameEnglish": "Qatar",
+      "nameRussian": "Катар",
+      "mccMnc": "42701",
+      "operator": "Ooredoo"
+    },
+    {
+      "index": 71,
+      "id": 75,
+      "iso": "KE",
+      "nameEnglish": "Kenya",
+      "nameRussian": "Кения",
+      "mccMnc": "63902",
+      "operator": "Safaricom"
+    },
+    {
+      "index": 72,
+      "id": 76,
+      "iso": "CY",
+      "nameEnglish": "Cyprus",
+      "nameRussian": "Кипр",
+      "mccMnc": "28001",
+      "operator": "Cytamobile-Vodafone"
+    },
+    {
+      "index": 73,
+      "id": 77,
+      "iso": "KI",
+      "nameEnglish": "Kiribati",
+      "nameRussian": "Кирибати",
+      "mccMnc": "54501",
+      "operator": "ATHKL"
+    },
+    {
+      "index": 74,
+      "id": 79,
+      "iso": "CO",
+      "nameEnglish": "Colombia",
+      "nameRussian": "Колумбия",
+      "mccMnc": "732101",
+      "operator": "Claro"
+    },
+    {
+      "index": 75,
+      "id": 80,
+      "iso": "KM",
+      "nameEnglish": "Comoros",
+      "nameRussian": "Коморы",
+      "mccMnc": "65401",
+      "operator": "Comores Telecom"
+    },
+    {
+      "index": 76,
+      "id": 82,
+      "iso": "CR",
+      "nameEnglish": "Costa Rica",
+      "nameRussian": "Коста-Рика",
+      "mccMnc": "71201",
+      "operator": "ICE"
+    },
+    {
+      "index": 77,
+      "id": 83,
+      "iso": "CI",
+      "nameEnglish": "Ivory Coast",
+      "nameRussian": "Кот-д'Ивуар",
+      "mccMnc": "61203",
+      "operator": "Orange"
+    },
+    {
+      "index": 78,
+      "id": 85,
+      "iso": "KW",
+      "nameEnglish": "Kuwait",
+      "nameRussian": "Кувейт",
+      "mccMnc": "41902",
+      "operator": "Zain"
+    },
+    {
+      "index": 79,
+      "id": 87,
+      "iso": "LA",
+      "nameEnglish": "Laos",
+      "nameRussian": "Лаос",
+      "mccMnc": "45701",
+      "operator": "Lao Telecom"
+    },
+    {
+      "index": 80,
+      "id": 88,
+      "iso": "LV",
+      "nameEnglish": "Latvia",
+      "nameRussian": "Латвия",
+      "mccMnc": "24701",
+      "operator": "LMT"
+    },
+    {
+      "index": 81,
+      "id": 89,
+      "iso": "LS",
+      "nameEnglish": "Lesotho",
+      "nameRussian": "Лесото",
+      "mccMnc": "65101",
+      "operator": "Vodacom"
+    },
+    {
+      "index": 82,
+      "id": 90,
+      "iso": "LR",
+      "nameEnglish": "Liberia",
+      "nameRussian": "Либерия",
+      "mccMnc": "61801",
+      "operator": "Lonestar"
+    },
+    {
+      "index": 83,
+      "id": 91,
+      "iso": "LB",
+      "nameEnglish": "Lebanon",
+      "nameRussian": "Ливан",
+      "mccMnc": "41501",
+      "operator": "Alfa"
+    },
+    {
+      "index": 84,
+      "id": 92,
+      "iso": "LT",
+      "nameEnglish": "Lithuania",
+      "nameRussian": "Литва",
+      "mccMnc": "24601",
+      "operator": "Telia"
+    },
+    {
+      "index": 85,
+      "id": 93,
+      "iso": "LI",
+      "nameEnglish": "Liechtenstein",
+      "nameRussian": "Лихтенштейн",
+      "mccMnc": "29501",
+      "operator": "Swisscom"
+    },
+    {
+      "index": 86,
+      "id": 94,
+      "iso": "LU",
+      "nameEnglish": "Luxembourg",
+      "nameRussian": "Люксембург",
+      "mccMnc": "27001",
+      "operator": "POST"
+    },
+    {
+      "index": 87,
+      "id": 95,
+      "iso": "MU",
+      "nameEnglish": "Mauritius",
+      "nameRussian": "Маврикий",
+      "mccMnc": "61701",
+      "operator": "my.t"
+    },
+    {
+      "index": 88,
+      "id": 96,
+      "iso": "MR",
+      "nameEnglish": "Mauritania",
+      "nameRussian": "Мавритания",
+      "mccMnc": "60901",
+      "operator": "Mauritel"
+    },
+    {
+      "index": 89,
+      "id": 97,
+      "iso": "MG",
+      "nameEnglish": "Madagascar",
+      "nameRussian": "Мадагаскар",
+      "mccMnc": "64604",
+      "operator": "Telma"
+    },
+    {
+      "index": 90,
+      "id": 98,
+      "iso": "YT",
+      "nameEnglish": "Mayotte",
+      "nameRussian": "Майотта",
+      "mccMnc": "64710",
+      "operator": "SFR"
+    },
+    {
+      "index": 91,
+      "id": 99,
+      "iso": "MO",
+      "nameEnglish": "Macau",
+      "nameRussian": "Макао",
+      "mccMnc": "45501",
+      "operator": "CTM"
+    },
+    {
+      "index": 92,
+      "id": 100,
+      "iso": "MW",
+      "nameEnglish": "Malawi",
+      "nameRussian": "Малави",
+      "mccMnc": "65001",
+      "operator": "TNM"
+    },
+    {
+      "index": 93,
+      "id": 101,
+      "iso": "MY",
+      "nameEnglish": "Malaysia",
+      "nameRussian": "Малайзия",
+      "mccMnc": "50212",
+      "operator": "Maxis"
+    },
+    {
+      "index": 94,
+      "id": 102,
+      "iso": "ML",
+      "nameEnglish": "Mali",
+      "nameRussian": "Мали",
+      "mccMnc": "61001",
+      "operator": "Malitel"
+    },
+    {
+      "index": 95,
+      "id": 103,
+      "iso": "MV",
+      "nameEnglish": "Maldives",
+      "nameRussian": "Мальдивы",
+      "mccMnc": "47201",
+      "operator": "Dhiraagu"
+    },
+    {
+      "index": 96,
+      "id": 104,
+      "iso": "MT",
+      "nameEnglish": "Malta",
+      "nameRussian": "Мальта",
+      "mccMnc": "27801",
+      "operator": "Epic"
+    },
+    {
+      "index": 97,
+      "id": 105,
+      "iso": "MA",
+      "nameEnglish": "Morocco",
+      "nameRussian": "Марокко",
+      "mccMnc": "60401",
+      "operator": "Maroc Telecom"
+    },
+    {
+      "index": 98,
+      "id": 106,
+      "iso": "MQ",
+      "nameEnglish": "Martinique",
+      "nameRussian": "Мартиника",
+      "mccMnc": "34001",
+      "operator": "Orange"
+    },
+    {
+      "index": 99,
+      "id": 107,
+      "iso": "MH",
+      "nameEnglish": "Marshall Islands",
+      "nameRussian": "Маршалловы Острова",
+      "mccMnc": "55101",
+      "operator": "NTA"
+    },
+    {
+      "index": 100,
+      "id": 108,
+      "iso": "MX",
+      "nameEnglish": "Mexico",
+      "nameRussian": "Мексика",
+      "mccMnc": "334020",
+      "operator": "Telcel"
+    },
+    {
+      "index": 101,
+      "id": 109,
+      "iso": "FM",
+      "nameEnglish": "Micronesia",
+      "nameRussian": "Микронезия",
+      "mccMnc": "55001",
+      "operator": "FSMTC"
+    },
+    {
+      "index": 102,
+      "id": 110,
+      "iso": "MZ",
+      "nameEnglish": "Mozambique",
+      "nameRussian": "Мозамбик",
+      "mccMnc": "64301",
+      "operator": "mcel"
+    },
+    {
+      "index": 103,
+      "id": 111,
+      "iso": "MD",
+      "nameEnglish": "Moldova",
+      "nameRussian": "Молдова",
+      "mccMnc": "25901",
+      "operator": "Orange"
+    },
+    {
+      "index": 104,
+      "id": 112,
+      "iso": "MC",
+      "nameEnglish": "Monaco",
+      "nameRussian": "Монако",
+      "mccMnc": "21201",
+      "operator": "Monaco Telecom"
+    },
+    {
+      "index": 105,
+      "id": 113,
+      "iso": "MN",
+      "nameEnglish": "Mongolia",
+      "nameRussian": "Монголия",
+      "mccMnc": "42899",
+      "operator": "Mobicom"
+    },
+    {
+      "index": 106,
+      "id": 114,
+      "iso": "MM",
+      "nameEnglish": "Myanmar",
+      "nameRussian": "Мьянма",
+      "mccMnc": "41401",
+      "operator": "MPT"
+    },
+    {
+      "index": 107,
+      "id": 115,
+      "iso": "NA",
+      "nameEnglish": "Namibia",
+      "nameRussian": "Намибия",
+      "mccMnc": "64901",
+      "operator": "MTC"
+    },
+    {
+      "index": 108,
+      "id": 116,
+      "iso": "NR",
+      "nameEnglish": "Nauru",
+      "nameRussian": "Науру",
+      "mccMnc": "53602",
+      "operator": "Digicel"
+    },
+    {
+      "index": 109,
+      "id": 117,
+      "iso": "NP",
+      "nameEnglish": "Nepal",
+      "nameRussian": "Непал",
+      "mccMnc": "42901",
+      "operator": "NTC"
+    },
+    {
+      "index": 110,
+      "id": 118,
+      "iso": "NE",
+      "nameEnglish": "Niger",
+      "nameRussian": "Нигер",
+      "mccMnc": "61402",
+      "operator": "Airtel"
+    },
+    {
+      "index": 111,
+      "id": 119,
+      "iso": "NG",
+      "nameEnglish": "Nigeria",
+      "nameRussian": "Нигерия",
+      "mccMnc": "62130",
+      "operator": "MTN"
+    },
+    {
+      "index": 112,
+      "id": 120,
+      "iso": "NL",
+      "nameEnglish": "Netherlands",
+      "nameRussian": "Нидерланды",
+      "mccMnc": "20404",
+      "operator": "Vodafone"
+    },
+    {
+      "index": 113,
+      "id": 121,
+      "iso": "NI",
+      "nameEnglish": "Nicaragua",
+      "nameRussian": "Никарагуа",
+      "mccMnc": "71021",
+      "operator": "Claro"
+    },
+    {
+      "index": 114,
+      "id": 122,
+      "iso": "NZ",
+      "nameEnglish": "New Zealand",
+      "nameRussian": "Новая Зеландия",
+      "mccMnc": "53001",
+      "operator": "One NZ"
+    },
+    {
+      "index": 115,
+      "id": 123,
+      "iso": "NC",
+      "nameEnglish": "New Caledonia",
+      "nameRussian": "Новая Каледония",
+      "mccMnc": "54601",
+      "operator": "Mobilis"
+    },
+    {
+      "index": 116,
+      "id": 124,
+      "iso": "NO",
+      "nameEnglish": "Norway",
+      "nameRussian": "Норвегия",
+      "mccMnc": "24201",
+      "operator": "Telenor"
+    },
+    {
+      "index": 117,
+      "id": 125,
+      "iso": "AE",
+      "nameEnglish": "United Arab Emirates",
+      "nameRussian": "Объединенные Арабские Эмираты",
+      "mccMnc": "42402",
+      "operator": "Etisalat"
+    },
+    {
+      "index": 118,
+      "id": 126,
+      "iso": "OM",
+      "nameEnglish": "Oman",
+      "nameRussian": "Оман",
+      "mccMnc": "42202",
+      "operator": "Omantel"
+    },
+    {
+      "index": 119,
+      "id": 127,
+      "iso": "PK",
+      "nameEnglish": "Pakistan",
+      "nameRussian": "Пакистан",
+      "mccMnc": "41001",
+      "operator": "Jazz"
+    },
+    {
+      "index": 120,
+      "id": 128,
+      "iso": "PW",
+      "nameEnglish": "Palau",
+      "nameRussian": "Палау",
+      "mccMnc": "55201",
+      "operator": "PNCC"
+    },
+    {
+      "index": 121,
+      "id": 129,
+      "iso": "PA",
+      "nameEnglish": "Panama",
+      "nameRussian": "Панама",
+      "mccMnc": "71401",
+      "operator": "Cable & Wireless"
+    },
+    {
+      "index": 122,
+      "id": 130,
+      "iso": "PG",
+      "nameEnglish": "Papua New Guinea",
+      "nameRussian": "Папуа-Новая Гвинея",
+      "mccMnc": "53701",
+      "operator": "Digicel"
+    },
+    {
+      "index": 123,
+      "id": 131,
+      "iso": "PY",
+      "nameEnglish": "Paraguay",
+      "nameRussian": "Парагвай",
+      "mccMnc": "74404",
+      "operator": "Tigo"
+    },
+    {
+      "index": 124,
+      "id": 132,
+      "iso": "PE",
+      "nameEnglish": "Peru",
+      "nameRussian": "Перу",
+      "mccMnc": "71610",
+      "operator": "Movistar"
+    },
+    {
+      "index": 125,
+      "id": 133,
+      "iso": "PL",
+      "nameEnglish": "Poland",
+      "nameRussian": "Польша",
+      "mccMnc": "26003",
+      "operator": "Orange"
+    },
+    {
+      "index": 126,
+      "id": 134,
+      "iso": "PT",
+      "nameEnglish": "Portugal",
+      "nameRussian": "Португалия",
+      "mccMnc": "26801",
+      "operator": "MEO"
+    },
+    {
+      "index": 127,
+      "id": 135,
+      "iso": "PR",
+      "nameEnglish": "Puerto Rico",
+      "nameRussian": "Пуэрто-Рико",
+      "mccMnc": "330110",
+      "operator": "Claro"
+    },
+    {
+      "index": 128,
+      "id": 136,
+      "iso": "CG",
+      "nameEnglish": "Republic of the Congo",
+      "nameRussian": "Республика Конго",
+      "mccMnc": "62910",
+      "operator": "MTN"
+    },
+    {
+      "index": 129,
+      "id": 137,
+      "iso": "RE",
+      "nameEnglish": "Reunion",
+      "nameRussian": "Реюньон",
+      "mccMnc": "64700",
+      "operator": "Orange"
+    },
+    {
+      "index": 130,
+      "id": 139,
+      "iso": "RW",
+      "nameEnglish": "Rwanda",
+      "nameRussian": "Руанда",
+      "mccMnc": "63510",
+      "operator": "MTN"
+    },
+    {
+      "index": 131,
+      "id": 140,
+      "iso": "RO",
+      "nameEnglish": "Romania",
+      "nameRussian": "Румыния",
+      "mccMnc": "22610",
+      "operator": "Orange"
+    },
+    {
+      "index": 132,
+      "id": 141,
+      "iso": "SV",
+      "nameEnglish": "El Salvador",
+      "nameRussian": "Эль-Сальвадор",
+      "mccMnc": "70603",
+      "operator": "Tigo"
+    },
+    {
+      "index": 133,
+      "id": 142,
+      "iso": "WS",
+      "nameEnglish": "Samoa",
+      "nameRussian": "Самоа",
+      "mccMnc": "54901",
+      "operator": "Digicel"
+    },
+    {
+      "index": 134,
+      "id": 143,
+      "iso": "SM",
+      "nameEnglish": "San Marino",
+      "nameRussian": "Сан-Марино",
+      "mccMnc": "29201",
+      "operator": "TMS"
+    },
+    {
+      "index": 135,
+      "id": 144,
+      "iso": "ST",
+      "nameEnglish": "Sao Tome and Principe",
+      "nameRussian": "Сан-Томе и Принсипи",
+      "mccMnc": "62601",
+      "operator": "CST"
+    },
+    {
+      "index": 136,
+      "id": 145,
+      "iso": "SA",
+      "nameEnglish": "Saudi Arabia",
+      "nameRussian": "Саудовская Аравия",
+      "mccMnc": "42001",
+      "operator": "STC"
+    },
+    {
+      "index": 137,
+      "id": 146,
+      "iso": "MK",
+      "nameEnglish": "North Macedonia",
+      "nameRussian": "Северная Македония",
+      "mccMnc": "29401",
+      "operator": "Makedonski Telekom"
+    },
+    {
+      "index": 138,
+      "id": 147,
+      "iso": "SC",
+      "nameEnglish": "Seychelles",
+      "nameRussian": "Сейшелы",
+      "mccMnc": "63301",
+      "operator": "Cable & Wireless"
+    },
+    {
+      "index": 139,
+      "id": 148,
+      "iso": "SN",
+      "nameEnglish": "Senegal",
+      "nameRussian": "Сенегал",
+      "mccMnc": "60801",
+      "operator": "Orange"
+    },
+    {
+      "index": 140,
+      "id": 149,
+      "iso": "VC",
+      "nameEnglish": "St. Vincent and the Grenadines",
+      "nameRussian": "Сент-Винсент и Гренадины",
+      "mccMnc": "360110",
+      "operator": "Flow"
+    },
+    {
+      "index": 141,
+      "id": 150,
+      "iso": "KN",
+      "nameEnglish": "Saint Kitts and Nevis",
+      "nameRussian": "Сент-Китс и Невис",
+      "mccMnc": "356110",
+      "operator": "Flow"
+    },
+    {
+      "index": 142,
+      "id": 151,
+      "iso": "LC",
+      "nameEnglish": "Saint Lucia",
+      "nameRussian": "Сент-Люсия",
+      "mccMnc": "358110",
+      "operator": "Flow"
+    },
+    {
+      "index": 143,
+      "id": 152,
+      "iso": "RS",
+      "nameEnglish": "Serbia",
+      "nameRussian": "Сербия",
+      "mccMnc": "22003",
+      "operator": "mts"
+    },
+    {
+      "index": 144,
+      "id": 153,
+      "iso": "SG",
+      "nameEnglish": "Singapore",
+      "nameRussian": "Сингапур",
+      "mccMnc": "52501",
+      "operator": "Singtel"
+    },
+    {
+      "index": 145,
+      "id": 154,
+      "iso": "SK",
+      "nameEnglish": "Slovakia",
+      "nameRussian": "Словакия",
+      "mccMnc": "23101",
+      "operator": "Orange"
+    },
+    {
+      "index": 146,
+      "id": 155,
+      "iso": "SI",
+      "nameEnglish": "Slovenia",
+      "nameRussian": "Словения",
+      "mccMnc": "29341",
+      "operator": "Telekom Slovenije"
+    },
+    {
+      "index": 147,
+      "id": 156,
+      "iso": "SB",
+      "nameEnglish": "Solomon Islands",
+      "nameRussian": "Соломоновы Острова",
+      "mccMnc": "54001",
+      "operator": "Our Telekom"
+    },
+    {
+      "index": 148,
+      "id": 158,
+      "iso": "SD",
+      "nameEnglish": "Sudan",
+      "nameRussian": "Судан",
+      "mccMnc": "63401",
+      "operator": "Zain"
+    },
+    {
+      "index": 149,
+      "id": 159,
+      "iso": "SR",
+      "nameEnglish": "Suriname",
+      "nameRussian": "Суринам",
+      "mccMnc": "74602",
+      "operator": "Telesur"
+    },
+    {
+      "index": 150,
+      "id": 160,
+      "iso": "US",
+      "nameEnglish": "United States",
+      "nameRussian": "США",
+      "mccMnc": "310260",
+      "operator": "T-Mobile"
+    },
+    {
+      "index": 151,
+      "id": 161,
+      "iso": "SL",
+      "nameEnglish": "Sierra Leone",
+      "nameRussian": "Сьерра-Леоне",
+      "mccMnc": "61901",
+      "operator": "Orange"
+    },
+    {
+      "index": 152,
+      "id": 162,
+      "iso": "TJ",
+      "nameEnglish": "Tajikistan",
+      "nameRussian": "Таджикистан",
+      "mccMnc": "43601",
+      "operator": "Tcell"
+    },
+    {
+      "index": 153,
+      "id": 163,
+      "iso": "TH",
+      "nameEnglish": "Thailand",
+      "nameRussian": "Таиланд",
+      "mccMnc": "52001",
+      "operator": "AIS"
+    },
+    {
+      "index": 154,
+      "id": 165,
+      "iso": "TZ",
+      "nameEnglish": "Tanzania",
+      "nameRussian": "Танзания",
+      "mccMnc": "64004",
+      "operator": "Vodacom"
+    },
+    {
+      "index": 155,
+      "id": 166,
+      "iso": "TG",
+      "nameEnglish": "Togo",
+      "nameRussian": "Того",
+      "mccMnc": "61501",
+      "operator": "Togocel"
+    },
+    {
+      "index": 156,
+      "id": 167,
+      "iso": "TO",
+      "nameEnglish": "Tonga",
+      "nameRussian": "Тонга",
+      "mccMnc": "53943",
+      "operator": "Digicel"
+    },
+    {
+      "index": 157,
+      "id": 168,
+      "iso": "TT",
+      "nameEnglish": "Trinidad and Tobago",
+      "nameRussian": "Тринидад и Тобаго",
+      "mccMnc": "374130",
+      "operator": "Digicel"
+    },
+    {
+      "index": 158,
+      "id": 169,
+      "iso": "TV",
+      "nameEnglish": "Tuvalu",
+      "nameRussian": "Тувалу",
+      "mccMnc": "55301",
+      "operator": "TTC"
+    },
+    {
+      "index": 159,
+      "id": 170,
+      "iso": "TN",
+      "nameEnglish": "Tunisia",
+      "nameRussian": "Тунис",
+      "mccMnc": "60502",
+      "operator": "Tunisie Telecom"
+    },
+    {
+      "index": 160,
+      "id": 172,
+      "iso": "TR",
+      "nameEnglish": "Turkey",
+      "nameRussian": "Турция",
+      "mccMnc": "28601",
+      "operator": "Turkcell"
+    },
+    {
+      "index": 161,
+      "id": 173,
+      "iso": "UG",
+      "nameEnglish": "Uganda",
+      "nameRussian": "Уганда",
+      "mccMnc": "64110",
+      "operator": "MTN"
+    },
+    {
+      "index": 162,
+      "id": 174,
+      "iso": "UZ",
+      "nameEnglish": "Uzbekistan",
+      "nameRussian": "Узбекистан",
+      "mccMnc": "43404",
+      "operator": "Beeline"
+    },
+    {
+      "index": 163,
+      "id": 175,
+      "iso": "UA",
+      "nameEnglish": "Ukraine",
+      "nameRussian": "Украина",
+      "mccMnc": "25503",
+      "operator": "Kyivstar"
+    },
+    {
+      "index": 164,
+      "id": 176,
+      "iso": "UY",
+      "nameEnglish": "Uruguay",
+      "nameRussian": "Уругвай",
+      "mccMnc": "74801",
+      "operator": "Antel"
+    },
+    {
+      "index": 165,
+      "id": 177,
+      "iso": "FJ",
+      "nameEnglish": "Fiji",
+      "nameRussian": "Фиджи",
+      "mccMnc": "54201",
+      "operator": "Vodafone"
+    },
+    {
+      "index": 166,
+      "id": 178,
+      "iso": "PH",
+      "nameEnglish": "Philippines",
+      "nameRussian": "Филиппины",
+      "mccMnc": "51502",
+      "operator": "Globe"
+    },
+    {
+      "index": 167,
+      "id": 179,
+      "iso": "FI",
+      "nameEnglish": "Finland",
+      "nameRussian": "Финляндия",
+      "mccMnc": "24405",
+      "operator": "Elisa"
+    },
+    {
+      "index": 168,
+      "id": 180,
+      "iso": "FR",
+      "nameEnglish": "France",
+      "nameRussian": "Франция",
+      "mccMnc": "20801",
+      "operator": "Orange"
+    },
+    {
+      "index": 169,
+      "id": 181,
+      "iso": "GF",
+      "nameEnglish": "French Guiana",
+      "nameRussian": "Французская Гвиана",
+      "mccMnc": "34001",
+      "operator": "Orange"
+    },
+    {
+      "index": 170,
+      "id": 182,
+      "iso": "PF",
+      "nameEnglish": "French Polynesia",
+      "nameRussian": "Французская Полинезия",
+      "mccMnc": "54720",
+      "operator": "Vini"
+    },
+    {
+      "index": 171,
+      "id": 183,
+      "iso": "HR",
+      "nameEnglish": "Croatia",
+      "nameRussian": "Хорватия",
+      "mccMnc": "21901",
+      "operator": "Hrvatski Telekom"
+    },
+    {
+      "index": 172,
+      "id": 184,
+      "iso": "CF",
+      "nameEnglish": "Central African Republic",
+      "nameRussian": "Центральноафриканская Республика",
+      "mccMnc": "62301",
+      "operator": "Telecel"
+    },
+    {
+      "index": 173,
+      "id": 185,
+      "iso": "TD",
+      "nameEnglish": "Chad",
+      "nameRussian": "Чад",
+      "mccMnc": "62201",
+      "operator": "Airtel"
+    },
+    {
+      "index": 174,
+      "id": 186,
+      "iso": "ME",
+      "nameEnglish": "Montenegro",
+      "nameRussian": "Черногория",
+      "mccMnc": "29703",
+      "operator": "m:tel"
+    },
+    {
+      "index": 175,
+      "id": 187,
+      "iso": "CZ",
+      "nameEnglish": "Czechia",
+      "nameRussian": "Чехия",
+      "mccMnc": "23001",
+      "operator": "T-Mobile"
+    },
+    {
+      "index": 176,
+      "id": 188,
+      "iso": "CL",
+      "nameEnglish": "Chile",
+      "nameRussian": "Чили",
+      "mccMnc": "73001",
+      "operator": "Entel"
+    },
+    {
+      "index": 177,
+      "id": 189,
+      "iso": "CH",
+      "nameEnglish": "Switzerland",
+      "nameRussian": "Швейцария",
+      "mccMnc": "22801",
+      "operator": "Swisscom"
+    },
+    {
+      "index": 178,
+      "id": 190,
+      "iso": "SE",
+      "nameEnglish": "Sweden",
+      "nameRussian": "Швеция",
+      "mccMnc": "24001",
+      "operator": "Telia"
+    },
+    {
+      "index": 179,
+      "id": 191,
+      "iso": "LK",
+      "nameEnglish": "Sri Lanka",
+      "nameRussian": "Шри-Ланка",
+      "mccMnc": "41301",
+      "operator": "Mobitel"
+    },
+    {
+      "index": 180,
+      "id": 192,
+      "iso": "EC",
+      "nameEnglish": "Ecuador",
+      "nameRussian": "Эквадор",
+      "mccMnc": "74001",
+      "operator": "Claro"
+    },
+    {
+      "index": 181,
+      "id": 193,
+      "iso": "GQ",
+      "nameEnglish": "Equatorial Guinea",
+      "nameRussian": "Экваториальная Гвинея",
+      "mccMnc": "62701",
+      "operator": "Getesa"
+    },
+    {
+      "index": 182,
+      "id": 194,
+      "iso": "ER",
+      "nameEnglish": "Eritrea",
+      "nameRussian": "Эритрея",
+      "mccMnc": "65701",
+      "operator": "EriTel"
+    },
+    {
+      "index": 183,
+      "id": 195,
+      "iso": "SZ",
+      "nameEnglish": "Eswatini",
+      "nameRussian": "Эсватини",
+      "mccMnc": "65310",
+      "operator": "MTN"
+    },
+    {
+      "index": 184,
+      "id": 196,
+      "iso": "EE",
+      "nameEnglish": "Estonia",
+      "nameRussian": "Эстония",
+      "mccMnc": "24801",
+      "operator": "Telia"
+    },
+    {
+      "index": 185,
+      "id": 197,
+      "iso": "ET",
+      "nameEnglish": "Ethiopia",
+      "nameRussian": "Эфиопия",
+      "mccMnc": "63601",
+      "operator": "Ethio Telecom"
+    },
+    {
+      "index": 186,
+      "id": 198,
+      "iso": "ZA",
+      "nameEnglish": "South Africa",
+      "nameRussian": "Южная Африка",
+      "mccMnc": "65501",
+      "operator": "Vodacom"
+    },
+    {
+      "index": 187,
+      "id": 199,
+      "iso": "KR",
+      "nameEnglish": "South Korea",
+      "nameRussian": "Южная Корея",
+      "mccMnc": "45005",
+      "operator": "SK Telecom"
+    },
+    {
+      "index": 188,
+      "id": 200,
+      "iso": "SS",
+      "nameEnglish": "South Sudan",
+      "nameRussian": "Южный Судан",
+      "mccMnc": "65902",
+      "operator": "MTN"
+    },
+    {
+      "index": 189,
+      "id": 201,
+      "iso": "JM",
+      "nameEnglish": "Jamaica",
+      "nameRussian": "Ямайка",
+      "mccMnc": "338050",
+      "operator": "Digicel"
+    },
+    {
+      "index": 190,
+      "id": 202,
+      "iso": "JP",
+      "nameEnglish": "Japan",
+      "nameRussian": "Япония",
+      "mccMnc": "44010",
+      "operator": "NTT docomo"
+    }
+  ]
+}

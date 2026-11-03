@@ -57,13 +57,18 @@ class ModBuildTests(unittest.TestCase):
                 values={a['name']:a['value'] for a in node['attributes']}
                 self.assertEqual(values['minSdkVersion'],26)
                 self.assertEqual(values['targetSdkVersion'],36)
-        for old,new in zip(before['nodes'],after['nodes']):
+        owned = {'app.weqrom.WeqromLauncherActivity','app.weqrom.WeqromSettingsActivity','app.weqrom.WeqromInitializer'}
+        retained = [n for n in after['nodes'] if not (n['name'] in ('activity','provider') and any(a['name']=='name' and a['value'] in owned for a in n['attributes']))]
+        self.assertEqual(len(before['nodes']),len(retained))
+        for old,new in zip(before['nodes'],retained):
             self.assertEqual(old['name'],new['name'])
             old_values={a['name']:a['value'] for a in old['attributes']}
             new_values={a['name']:a['value'] for a in new['attributes']}
             if old['launcher']:
                 self.assertEqual(new_values.get('label','Weqrom'),'Weqrom')
+                self.assertEqual(new_values.get('targetActivity'),'app.weqrom.WeqromLauncherActivity')
             for key in ('name','targetActivity','authorities','exported','enabled','process'):
+                if old['launcher'] and key=='targetActivity':continue
                 self.assertEqual(old_values.get(key),new_values.get(key))
 
 
