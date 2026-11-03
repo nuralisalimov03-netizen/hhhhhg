@@ -2,9 +2,14 @@
   "name": "Weqrom",
   "package": "com.zhiliaoapp.musically",
   "base_sha256": "9f34642dd5d62f96cc84bdf2a1e44f198f78fb5e813944ac1058714abef551bc",
-  "sha256": "f61daff09584dd2de1e09fafd32403ca5c9e54551b9945983145f32d654b6f4d",
-  "bytes": 379087023,
+  "sha256": "bae30279eedcd6bddbd22b4c2a3813c6b3f52390abd86e92cf631d97190a1927",
+  "bytes": 379099311,
   "modified_entries": [
+    "classes46.dex",
+    "classes52.dex",
+    "classes50.dex",
+    "assets/tty/bundled/classes.dex",
+    "assets/tty/bundled/manifest.json",
     "res/am/b.png",
     "res/an/b.png",
     "res/ao/b.png",
@@ -23,10 +28,108 @@
   "added_entries": [
     "assets/weqrom/NOTICE.txt"
   ],
+  "version": "47.4.3-weqrom.1.1",
+  "version_code": 2024704031,
+  "min_sdk": 26,
   "resource_literal_indices": [
     26685
   ],
-  "executables_unchanged": true,
+  "executables_unchanged": false,
+  "modified_executable_entries": [
+    "assets/tty/bundled/classes.dex",
+    "classes46.dex",
+    "classes50.dex",
+    "classes52.dex"
+  ],
+  "original_native_libraries_unchanged": true,
+  "modified_mod": {
+    "base_mod_sha256": "bde52db9f754198d414fe5520840f8880bae586e303eebeb6edf03790d9f51a2",
+    "mod_sha256": "86d8e6bd2eafd9f1a279f501e183f841d6f83c89eb06131939f5af85dcdecdc2",
+    "mod_bytes": 1050328,
+    "region": {
+      "class": "LZ/bc;",
+      "method": "<clinit>()V",
+      "fallback": "by"
+    },
+    "welcome": {
+      "welcome_entry": "LZ/dg;->a(Landroid/app/Activity;)V",
+      "settings_entry": "LZ/mi;->c([Ljava/lang/Object;)V",
+      "settings_path": "Profile → ☰ → Settings and privacy → Weqrom Settings",
+      "modified_smali": [
+        "Z/dg.smali",
+        "Z/mi.smali",
+        "Z/l7.smali"
+      ],
+      "ui_attribution_elsewhere_retained": true
+    },
+    "stable_api_version": 2026110301,
+    "loader": {
+      "classes46.dex": {
+        "original_stable_api": 1792428213,
+        "weqrom_stable_api": 2026110301,
+        "modified_dex": [
+          "classes46.dex"
+        ],
+        "modified_smali": [
+          "a/g.smali"
+        ],
+        "checks_preserved": [
+          "stable API comparison",
+          "variant comparison",
+          "SHA-256",
+          "remote signature",
+          "public key",
+          "crash fallback"
+        ],
+        "old_tiktok_you_ota_compatible": false,
+        "cache_files_manually_modified": false
+      },
+      "classes50.dex": {
+        "original_stable_api": 1792428213,
+        "weqrom_stable_api": 2026110301,
+        "modified_dex": [
+          "classes50.dex"
+        ],
+        "modified_smali": [
+          "c/f.smali"
+        ],
+        "checks_preserved": [
+          "stable API comparison",
+          "variant comparison",
+          "SHA-256",
+          "remote signature",
+          "public key",
+          "crash fallback"
+        ],
+        "old_tiktok_you_ota_compatible": false,
+        "cache_files_manually_modified": false
+      },
+      "classes52.dex": {
+        "original_stable_api": 1792428213,
+        "weqrom_stable_api": 2026110301,
+        "modified_dex": [
+          "classes52.dex"
+        ],
+        "modified_smali": [
+          "com/windukk/stable/DynamicUpdates.smali"
+        ],
+        "checks_preserved": [
+          "stable API comparison",
+          "variant comparison",
+          "SHA-256",
+          "remote signature",
+          "public key",
+          "crash fallback"
+        ],
+        "old_tiktok_you_ota_compatible": false,
+        "cache_files_manually_modified": false
+      }
+    },
+    "startup_hook": "Main.start immediately after ModSettings initialization",
+    "signature_verification_retained": true,
+    "remote_public_key_retained": true,
+    "android_runtime_tested": false
+  },
   "runtime_tested": false,
   "signature_verified": true,
   "source_attribution": "TikTok You 5.0 / TikTok47.4.3"

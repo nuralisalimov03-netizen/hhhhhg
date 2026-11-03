@@ -305,7 +305,9 @@ def package(source: Path, target: Path, destination: Path, archive: Path | None 
             '4. После проверки скачайте Weqrom.apk. Пароли, Python и Интернет для сборки не нужны.\n\n'
             'Файл остаётся на компьютере. Сборщик не выполняет код APK, а восстанавливает точные заранее подписанные байты.\n'
             'Сборка основана на предоставленном TikTok You 47.4.3. Безопасность, вход и работа региона не подтверждены.\n'
-            'Ключ подписи новый: для замены старого TikTok может потребоваться его удаление. Сначала сохраните локальные черновики.\n', encoding='utf-8')
+            'Weqrom 1.1 обновляет Weqrom 1.0 поверх без удаления. Для замены другого TikTok с иной подписью может потребоваться удаление старой сборки; сначала сохраните локальные черновики.\n'
+            'Настройки: Профиль → ☰ → Настройки и конфиденциальность → Настройки Weqrom.\n'
+            'Регион мода — данные SIM/оператора для клиента, а не страна аккаунта или IP. Android-выполнение пока не проверено.\n', encoding='utf-8')
         public_info = {'generator': GENERATOR, 'source': patch['source'], 'target': patch['target'],
                        **summary, 'file_sha256': {name: sha256(staged / name) for name in sorted(MEMBERS - {'build-info.json'})}}
         (staged / 'build-info.json').write_text(json.dumps(public_info, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')

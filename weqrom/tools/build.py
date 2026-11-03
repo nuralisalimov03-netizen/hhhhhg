@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Rebrand the user-provided APK while preserving original executable payloads.
+"""Build Weqrom from the pinned user-provided APK and checked mod UI hooks.
 
 No code is executed from the APK. Unchanged ZIP payloads retain their exact
 compressed bytes, making a small, exact offline delivery patch possible.
@@ -19,13 +19,15 @@ import sys
 from zipfile import ZipFile, ZipInfo, ZIP_DEFLATED
 
 try:
-    from .axml import rebrand_manifest, inspect_manifest
+    from .axml import rebrand_manifest, inspect_manifest, Manifest, NO_INDEX
 except ImportError:
-    from axml import rebrand_manifest, inspect_manifest
+    from axml import rebrand_manifest, inspect_manifest, Manifest, NO_INDEX
 
 PROJECT = Path(__file__).resolve().parents[1]
 BASE_SHA = '9f34642dd5d62f96cc84bdf2a1e44f198f78fb5e813944ac1058714abef551bc'
 BASE_CERT = '54ae4101cf1b18658c3b1cf0a49bea4d28a3b053a9622251dba92f74fc54dec7'
+RELEASE_VERSION = '47.4.3-weqrom.1.1'
+RELEASE_CODE = 2024704031
 PNG_ICONS = {'res/ap/a.png':56,'res/am/b.png':84,'res/an/b.png':112,
              'res/ao/b.png':168,'res/aq/a.png':224}
 XML_ICONS = ['res/ar/a.xml'] + [f'res/mipmap-anydpi-v26/ttmod_launcher_{name}.xml'
@@ -155,6 +157,22 @@ def png(size):
     result=io.BytesIO();image.resize((size,size),Image.Resampling.LANCZOS).save(result,'PNG');return result.getvalue()
 
 
+def release_manifest(data):
+    document = Manifest(rebrand_manifest(data, label='Weqrom'))
+    version = document.root.attr(document.pool, 'versionCode')
+    name = document.root.attr(document.pool, 'versionName')
+    sdk = next((n for n in document.nodes if document.pool.get(n.name) == 'uses-sdk' and n.depth == 1), None)
+    minimum = sdk.attr(document.pool, 'minSdkVersion') if sdk else None
+    if version is None or name is None or minimum is None or version.data != 2024704030:
+        raise ValueError('Pinned release manifest attributes differ')
+    version.raw, version.kind, version.data = NO_INDEX, 0x10, RELEASE_CODE
+    name.set_text(document.pool, RELEASE_VERSION)
+    # The original dynamically loaded mod already uses DEX038 (Android8).
+    # Declare that real floor instead of promising Android6 support.
+    minimum.raw, minimum.kind, minimum.data = NO_INDEX, 0x10, 26
+    return document.build()
+
+
 def checked(command,**kw):
     return subprocess.run([str(x) for x in command],check=True,**kw)
 
@@ -171,6 +189,11 @@ def main():
     verify=checked([sdk/'apksigner','verify','--min-sdk-version','24','--print-certs',source],capture_output=True,text=True)
     if BASE_CERT not in verify.stdout:raise SystemExit('Wrong source signing certificate')
     build=PROJECT/'build';dist=PROJECT/'dist';build.mkdir(exist_ok=True);dist.mkdir(exist_ok=True)
+    try:
+        from .mod_build import build_mod
+    except ImportError:
+        from mod_build import build_mod
+    mod_replacements, mod_report = build_mod(source, args.tools, build/'mod')
     icon_res=build/'icon-res/drawable';icon_res.mkdir(parents=True,exist_ok=True)
     (icon_res/'weqrom.xml').write_text(VECTOR)
     manifest=build/'AndroidManifest.xml'
@@ -179,15 +202,17 @@ def main():
     checked([sdk/'aapt','package','-f','-M',manifest,'-S',build/'icon-res','-I',android,'-F',icon_apk])
     with ZipFile(icon_apk) as z:vector=z.read('res/drawable/weqrom.xml')
     with ZipFile(source) as z:
-        replacements={'AndroidManifest.xml':rebrand_manifest(z.read('AndroidManifest.xml'),label='Weqrom')}
+        replacements={'AndroidManifest.xml':release_manifest(z.read('AndroidManifest.xml'))}
+        replacements.update(mod_replacements)
         replacements['resources.arsc'],indices=rename_resource_literal(z.read('resources.arsc'))
         for name,size in PNG_ICONS.items():replacements[name]=png(size)
         for name in XML_ICONS:replacements[name]=vector
         before=inspect_manifest(z.read('AndroidManifest.xml'));after=inspect_manifest(replacements['AndroidManifest.xml'])
         if before['package']!=after['package']:raise SystemExit('Replacement package unexpectedly changed')
-    notice=('Weqrom branding build 1.0. Based on user-provided TikTok You 5.0 / TikTok47.4.3.\n'
-            'Original executable/modification payloads are retained unchanged. New branding and signing key.\n'
-            'Not an official TikTok release. Runtime/login/region functionality has not been verified.\n'
+    notice=('Weqrom 1.1. Based on user-provided TikTok You 5.0 / TikTok47.4.3.\n'
+            'Original TikTok DEX/native libraries retained. Bundled mod UI/settings hooks modified.\n'
+            'New native greeting/settings, Belarus mod-region default, theme/accent controls.\n'
+            'Not an official TikTok release. Android runtime/login/server region not verified.\n'
             'Base SHA256: '+BASE_SHA+'\n').encode()
     unsigned=build/'unsigned.apk';repack(source,unsigned,replacements,{'assets/weqrom/NOTICE.txt':notice})
     aligned=build/'aligned.apk';checked([sdk/'zipalign','-P','16','-f','4',unsigned,aligned])
@@ -218,10 +243,14 @@ def main():
             if (actual.CRC,actual.file_size)!=(entry.CRC,entry.file_size):raise SystemExit('Untouched payload metadata changed: '+entry.filename)
         for entry in old.infolist():
             if entry.filename.endswith(('.dex','.so')):
+                if entry.filename in mod_replacements:continue
                 if hashlib.sha256(old.read(entry)).digest()!=hashlib.sha256(new.read(entry.filename)).digest():raise SystemExit('Executable payload changed: '+entry.filename)
     report={'name':'Weqrom','package':before['package'],'base_sha256':BASE_SHA,'sha256':sha(target),
             'bytes':target.stat().st_size,'modified_entries':changed,'added_entries':['assets/weqrom/NOTICE.txt'],
-            'resource_literal_indices':indices,'executables_unchanged':True,'runtime_tested':False,
+            'version':RELEASE_VERSION,'version_code':RELEASE_CODE,'min_sdk':26,
+            'resource_literal_indices':indices,'executables_unchanged':False,
+            'modified_executable_entries':[name for name in mod_replacements if name.endswith('.dex')],
+            'original_native_libraries_unchanged':True,'modified_mod':mod_report,'runtime_tested':False,
             'signature_verified':True,'source_attribution':'TikTok You 5.0 / TikTok47.4.3'}
     (dist/'build-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
     (dist/'SHA256SUMS.txt').write_text(report['sha256']+'  Weqrom.apk\n')
