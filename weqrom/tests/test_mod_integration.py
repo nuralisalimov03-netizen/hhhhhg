@@ -80,6 +80,11 @@ public class bc { public int b=1,r; public boolean H=true,q,F=true,E=true; publi
     'Z/f3.java': '''package Z;
 public class f3 { public static java.lang.ref.WeakReference f; }
 ''',
+    'app/weqrom/RequestRegion.java': '''package app.weqrom;
+public class RequestRegion { public static String selected="BY";
+ public static void initialize(android.content.Context context){}
+ public static void select(String iso){selected=iso;}
+}''',
     'app/weqrom/FeedTheme.java': '''package app.weqrom;
 public class FeedTheme { public static int calls;
  public static boolean fail;
@@ -125,6 +130,10 @@ public class BridgeHarness {
   check(!mod.getBoolean("auto_updates_enable",true)&&!mod.getBoolean("statistics_enable",true),"Migration defaults not persisted");
   check(!mod.getBoolean("startup_consent_accepted",true),"Legacy welcome gate not persisted");
   check(WeqromUi.backend.hasRegionHook()&&WeqromUi.backend.hasLikeColorHook(),"Actual hooks not advertised");
+  own.edit().putString("region","KZ").apply();
+  mod.edit().putString("selected_region_iso","kz").putInt("selected_region",2).apply();
+  ModIntegration.initialize(context);
+  check(settings.b==2&&"KZ".equals(RequestRegion.selected),"Pending stored region was overwritten by stale live cache");
   ModIntegration.setRegion(context,"us");settings.e(true);settings.m(true);
   int writes=settings.regionWrites;
   ModIntegration.setRegion(context,"US");
@@ -188,6 +197,7 @@ class ModIntegrationTests(unittest.TestCase):
     @unittest.skipUnless(shutil.which('java') and (shutil.which('javac') or ECJ.is_file()), 'Java compiler/runtime required for bridge behavior test')
     def test_actual_bridge_migration_and_checked_api_calls(self):
         bridge = Path(__file__).resolve().parents[1] / 'integration/src/app/weqrom/ModIntegration.java'
+        catalog = bridge.parents[4] / 'app/src/main/java/app/weqrom/RegionCatalog.java'
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             files = []
@@ -201,7 +211,7 @@ class ModIntegrationTests(unittest.TestCase):
                 compiler = ['javac', '-source', '8', '-target', '8', '-Xlint:-options']
             else:
                 compiler = ['java', '-jar', str(ECJ), '-8', '-proc:none', '-warn:none']
-            subprocess.run([*compiler, '-d', str(compiled), str(bridge), *files], check=True, capture_output=True, text=True)
+            subprocess.run([*compiler, '-d', str(compiled), str(bridge), str(catalog), *files], check=True, capture_output=True, text=True)
             result = subprocess.run(['java', '-cp', str(compiled), 'app.weqrom.BridgeHarness'], check=True, capture_output=True, text=True)
             self.assertIn('passed', result.stdout)
 

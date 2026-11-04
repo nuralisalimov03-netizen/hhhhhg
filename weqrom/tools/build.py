@@ -26,8 +26,8 @@ except ImportError:
 PROJECT = Path(__file__).resolve().parents[1]
 BASE_SHA = '9f34642dd5d62f96cc84bdf2a1e44f198f78fb5e813944ac1058714abef551bc'
 BASE_CERT = '54ae4101cf1b18658c3b1cf0a49bea4d28a3b053a9622251dba92f74fc54dec7'
-RELEASE_VERSION = '47.4.3-weqrom.1.3'
-RELEASE_CODE = 2024704033
+RELEASE_VERSION = '47.4.3-weqrom.1.4'
+RELEASE_CODE = 2024704034
 PNG_ICONS = {'res/ap/a.png':56,'res/am/b.png':84,'res/an/b.png':112,
              'res/ao/b.png':168,'res/aq/a.png':224}
 XML_ICONS = ['res/ar/a.xml'] + [f'res/mipmap-anydpi-v26/ttmod_launcher_{name}.xml'
@@ -213,9 +213,9 @@ def main():
         for name in XML_ICONS:replacements[name]=vector
         before=inspect_manifest(z.read('AndroidManifest.xml'));after=inspect_manifest(replacements['AndroidManifest.xml'])
         if before['package']!=after['package']:raise SystemExit('Replacement package unexpectedly changed')
-    notice=('Weqrom 1.3. Based on user-provided TikTok You 5.0 / TikTok47.4.3.\n'
-            'Original TikTok DEX/native libraries retained. Bundled mod UI/settings hooks modified.\n'
-            'New native greeting/settings, Belarus mod-region default, theme/accent controls.\n'
+    notice=('Weqrom 1.4. Based on user-provided TikTok You 5.0 / TikTok47.4.3.\n'
+            'Core request builder, bundled mod UI and loader hooks modified. Native libraries retained.\n'
+            'Native greeting/settings, Belarus client-request default, theme/accent controls.\n'
             'Not an official TikTok release. Android runtime/login/server region not verified.\n'
             'Base SHA256: '+BASE_SHA+'\n').encode()
     parent_dex = replacements.pop('classes57.dex')

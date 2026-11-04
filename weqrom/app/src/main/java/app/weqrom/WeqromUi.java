@@ -87,9 +87,11 @@ public final class WeqromUi {
 
     /** Call before loading region hooks. Existing user choices are preserved. */
     public static void initialize(Context context) {
+        RequestRegion.initialize(context);
         SharedPreferences p = preferences(context);
         SharedPreferences.Editor e = p.edit();
-        if (!p.contains("region")) e.putString("region", DEFAULT_REGION);
+        if (!p.contains("region") || RegionCatalog.find(p.getString("region", "")) == null)
+            e.putString("region", RequestRegion.country());
         if (!p.contains("theme")) e.putString("theme", "dark");
         if (!p.contains("like_color")) e.putInt("like_color", LIKE_COLORS[0]);
         if (!p.contains("language")) {
@@ -403,22 +405,21 @@ public final class WeqromUi {
             list.setOrientation(LinearLayout.VERTICAL);
             scroll.addView(list);
             body.addView(scroll, new LinearLayout.LayoutParams(-1, 0, 1f));
-            TextView build = text("Weqrom 1.3", 12, secondary, false);
+            TextView build = text("Weqrom 1.4", 12, secondary, false);
             list.addView(build);
             note(list, BootstrapStatus.failureSummary(activity));
-            if (integration == null) note(list, tr("Выбор сохранится на телефоне. Функции ленты доступны после успешного запуска модуля.", "Выбар захаваецца на тэлефоне. Функцыі стужкі даступныя пасля паспяховага запуску модуля.", "Choices stay on this phone. Feed features require the module to start successfully."));
+            if (integration == null) note(list, tr("Регион запросов применяется отдельно. Оформление ленты и функции основы ожидают запуска модуля.", "Рэгіён запытаў ужываецца асобна. Афармленне стужкі і функцыі асновы чакаюць запуску модуля.", "Request region works separately. Feed appearance and base features require the module to start."));
             addRow(list, tr("Отчёт о запуске", "Справаздача аб запуску", "Startup report"),
                 tr("Скопировать для проверки ошибки", "Скапіяваць для праверкі памылкі", "Copy to inspect an error"), new View.OnClickListener() {
                     public void onClick(View view) {
                         ClipboardManager clipboard = (ClipboardManager) activity.getSystemService(Context.CLIPBOARD_SERVICE);
-                        if (clipboard != null) clipboard.setPrimaryClip(ClipData.newPlainText("Weqrom startup", BootstrapStatus.dump(activity)));
+                        if (clipboard != null) clipboard.setPrimaryClip(ClipData.newPlainText("Weqrom startup", BootstrapStatus.dump(activity) + "\n\n" + RequestRegion.summary(activity)));
                         Toast.makeText(activity, tr("Отчёт скопирован", "Справаздача скапіявана", "Report copied"), Toast.LENGTH_SHORT).show();
                     }
                 });
             section(list, tr("РЕГИОН И ЯЗЫК", "РЭГІЁН І МОВА", "REGION & LANGUAGE"));
-            addRow(list, tr("Регион мода", "Рэгіён мода", "Mod region"), regionName(region(activity)), new View.OnClickListener() { public void onClick(View v) { regionPicker(); } });
-            note(list, regionHook() ? tr("Страна SIM и оператора, которую мод сообщает клиенту. Не переносит аккаунт и не меняет IP.", "Краіна SIM і аператара, якую мод паведамляе кліенту. Не пераносіць акаўнт і не мяняе IP.", "SIM and operator country reported to the client. Does not migrate your account or change your IP.")
-                : tr("Выбор сохранён. Смена региона в этом клиенте недоступна.", "Выбар захаваны. Змена рэгіёна ў гэтым кліенце недаступная.", "Choice saved. Region changes are unavailable in this client."));
+            addRow(list, tr("Регион запросов", "Рэгіён запытаў", "Request region"), regionName(region(activity)), new View.OnClickListener() { public void onClick(View v) { regionPicker(); } });
+            note(list, tr("Страна для region, carrier_region и op_region в общих параметрах клиента. Страна аккаунта и IP остаются отдельными.", "Краіна для region, carrier_region і op_region у агульных параметрах кліента. Краіна акаўнта і IP застаюцца асобнымі.", "Country for region, carrier_region and op_region in common client parameters. Account country and IP remain separate."));
             addRow(list, tr("Язык Weqrom", "Мова Weqrom", "Weqrom language"), languageName(), new View.OnClickListener() { public void onClick(View v) { languagePicker(); } });
             section(list, tr("ОФОРМЛЕНИЕ", "АФАРМЛЕННЕ", "APPEARANCE"));
             String theme = prefs.getString("theme", "dark");
@@ -536,6 +537,7 @@ public final class WeqromUi {
                     if (position < 0 || position >= results.size()) return;
                     RegionCatalog.Entry entry = results.get(position);
                     prefs.edit().putString("region", entry.iso).apply();
+                    RequestRegion.select(entry.iso);
                     activity.getSharedPreferences("ttmod_settings", Context.MODE_PRIVATE).edit()
                         .putInt("selected_region", entry.index).putString("selected_region_iso", entry.iso.toLowerCase(Locale.ROOT))
                         .putBoolean("region_spoof_enabled", true).apply();

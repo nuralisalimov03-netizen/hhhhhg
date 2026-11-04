@@ -47,6 +47,7 @@ public final class ModIntegration {
     /** Main.start calls this immediately after ac.a(Context), before SIM hooks. */
     public static synchronized void initialize(Context context) {
         ac.a(context);
+        RequestRegion.initialize(context);
         bc settings = ac.e();
         SharedPreferences mod = context.getSharedPreferences(MOD_PREFERENCES, Context.MODE_PRIVATE);
         if (mod.getInt(MIGRATION, 0) < SCHEMA) {
@@ -66,12 +67,19 @@ public final class ModIntegration {
         applySavedFeatures(context);
         WeqromUi.initialize(context);
         SharedPreferences own = WeqromUi.preferences(context);
+        String requested = own.getString("region", "");
+        String persisted = mod.getString("selected_region_iso", "");
+        // A selection made while the old native module was unavailable is
+        // already persisted in both stores; repair its stale live cache.
+        if (RegionCatalog.find(requested) != null && requested.equalsIgnoreCase(persisted)
+                && !requested.equalsIgnoreCase(selectedRegionIso())) settings.c(indexOf(requested));
         // The new welcome must also appear for users who accepted the old popup.
         if (!own.getBoolean("welcome_complete", false)) {
             settings.H = false;
             mod.edit().putBoolean("startup_consent_accepted", false).apply();
         }
         String selected = selectedRegionIso();
+        RequestRegion.select(selected);
         int color = settings.r == 0 ? DEFAULT_COLOR : settings.r;
         if (!selected.equals(own.getString("region", "")) || color != own.getInt("like_color", 0)) {
             own.edit().putString("region", selected).putInt("like_color", color).apply();
@@ -133,6 +141,7 @@ public final class ModIntegration {
         if (ac.e().b != index) ac.e().c(index);
         SharedPreferences own = WeqromUi.preferences(context);
         String normalized = ue.a[index].d.toUpperCase(Locale.ROOT);
+        RequestRegion.select(normalized);
         if (!normalized.equals(own.getString("region", ""))) {
             own.edit().putString("region", normalized).apply();
         }

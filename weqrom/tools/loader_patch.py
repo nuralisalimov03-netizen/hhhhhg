@@ -15,7 +15,7 @@ from pathlib import Path
 import re
 
 ORIGINAL_STABLE_API = 1792428213
-WEQROM_STABLE_API = 2026110303
+WEQROM_STABLE_API = 2026110401
 SURFACES = {
     "classes46.dex": (
         "a/g.smali", ".class public final La/g;",

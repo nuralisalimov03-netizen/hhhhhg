@@ -57,14 +57,15 @@ public class StartupContextHarness {
  static final class BootContext extends Context {
   Context application;
   final Memory memory=new Memory();
+  final Memory sourceMemory=new Memory();
   int storeCalls;
   boolean failStorage;
   public Context getApplicationContext(){return application;}
   public SharedPreferences getSharedPreferences(String name,int mode){
-   check("weqrom".equals(name)&&mode==0,"Wrong preference file or access mode");
+   check(("weqrom".equals(name)||"ttmod_settings".equals(name))&&mode==0,"Wrong preference file or access mode");
    storeCalls++;
    if(failStorage)throw new IllegalStateException("storage unavailable");
-   return memory.preferences;
+   return "weqrom".equals(name)?memory.preferences:sourceMemory.preferences;
   }
  }
  static void check(boolean condition,String reason){if(!condition)throw new AssertionError(reason);}

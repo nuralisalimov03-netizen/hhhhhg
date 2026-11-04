@@ -14,6 +14,7 @@ public final class WeqromInitializer extends ContentProvider {
     @Override public boolean onCreate() {
         try {
             Context context = getContext();
+            RequestRegion.initialize(context);
             Context application = context == null ? null : context.getApplicationContext();
             if (application instanceof Application) {
                 QuickSettingsEntry.register((Application) application);
