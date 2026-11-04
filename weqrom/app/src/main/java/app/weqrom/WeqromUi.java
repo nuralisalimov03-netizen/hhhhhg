@@ -372,7 +372,7 @@ public final class WeqromUi {
             LinearLayout.LayoutParams titleParams = new LinearLayout.LayoutParams(-1, -2);
             titleParams.topMargin = dp(25);
             center.addView(title, titleParams);
-            TextView region = text(tr("Регион мода: ", "Рэгіён мода: ", "Mod region: ") + regionName(region(activity)), 15, secondary, false);
+            TextView region = text(tr("Регион запросов: ", "Рэгіён запытаў: ", "Request region: ") + regionName(region(activity)), 15, secondary, false);
             region.setGravity(Gravity.CENTER);
             LinearLayout.LayoutParams regionParams = new LinearLayout.LayoutParams(-1, -2);
             regionParams.topMargin = dp(18);
@@ -405,7 +405,7 @@ public final class WeqromUi {
             list.setOrientation(LinearLayout.VERTICAL);
             scroll.addView(list);
             body.addView(scroll, new LinearLayout.LayoutParams(-1, 0, 1f));
-            TextView build = text("Weqrom 1.4", 12, secondary, false);
+            TextView build = text("Weqrom 1.5", 12, secondary, false);
             list.addView(build);
             note(list, BootstrapStatus.failureSummary(activity));
             if (integration == null) note(list, tr("Регион запросов применяется отдельно. Оформление ленты и функции основы ожидают запуска модуля.", "Рэгіён запытаў ужываецца асобна. Афармленне стужкі і функцыі асновы чакаюць запуску модуля.", "Request region works separately. Feed appearance and base features require the module to start."));
@@ -419,7 +419,7 @@ public final class WeqromUi {
                 });
             section(list, tr("РЕГИОН И ЯЗЫК", "РЭГІЁН І МОВА", "REGION & LANGUAGE"));
             addRow(list, tr("Регион запросов", "Рэгіён запытаў", "Request region"), regionName(region(activity)), new View.OnClickListener() { public void onClick(View v) { regionPicker(); } });
-            note(list, tr("Страна для region, carrier_region и op_region в общих параметрах клиента. Страна аккаунта и IP остаются отдельными.", "Краіна для region, carrier_region і op_region у агульных параметрах кліента. Краіна акаўнта і IP застаюцца асобнымі.", "Country for region, carrier_region and op_region in common client parameters. Account country and IP remain separate."));
+            note(list, tr("Страна и данные оператора для новых запросов. После смены обновите ленту. Доступность свежих видео определяет также TikTok.", "Краіна і даныя аператара для новых запытаў. Пасля змены абнавіце стужку. Даступнасць свежых відэа вызначае таксама TikTok.", "Country and carrier information for new requests. Refresh the feed after changing it. TikTok also determines whether fresh videos are available."));
             addRow(list, tr("Язык Weqrom", "Мова Weqrom", "Weqrom language"), languageName(), new View.OnClickListener() { public void onClick(View v) { languagePicker(); } });
             section(list, tr("ОФОРМЛЕНИЕ", "АФАРМЛЕННЕ", "APPEARANCE"));
             String theme = prefs.getString("theme", "dark");
@@ -542,6 +542,7 @@ public final class WeqromUi {
                         .putInt("selected_region", entry.index).putString("selected_region_iso", entry.iso.toLowerCase(Locale.ROOT))
                         .putBoolean("region_spoof_enabled", true).apply();
                     apply(); current.dismiss(); if (!closed) render();
+                    Toast.makeText(activity, tr("Регион сохранён. Обновите ленту свайпом вниз.", "Рэгіён захаваны. Абнавіце стужку свайпам уніз.", "Region saved. Pull down to refresh the feed."), Toast.LENGTH_LONG).show();
                 }
             });
             current.setOnDismissListener(new DialogInterface.OnDismissListener() { public void onDismiss(DialogInterface d) { if (pickerDialog == current) pickerDialog = null; } });

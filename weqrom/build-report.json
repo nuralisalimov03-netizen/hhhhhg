@@ -2,7 +2,7 @@
   "name": "Weqrom",
   "package": "com.zhiliaoapp.musically",
   "base_sha256": "9f34642dd5d62f96cc84bdf2a1e44f198f78fb5e813944ac1058714abef551bc",
-  "sha256": "2d72cde5d6f90021fd7a80a878c70325118943fab058693b2f9714b34c6ab533",
+  "sha256": "75cd22da5346b5010803283329854c22e2831f9925883334461e8b8bb0595b35",
   "bytes": 379119850,
   "modified_entries": [
     "classes46.dex",
@@ -30,8 +30,8 @@
     "assets/weqrom/NOTICE.txt",
     "classes57.dex"
   ],
-  "version": "47.4.3-weqrom.1.4",
-  "version_code": 2024704034,
+  "version": "47.4.3-weqrom.1.5",
+  "version_code": 2024704035,
   "min_sdk": 26,
   "resource_literal_indices": [
     26685
@@ -48,7 +48,7 @@
   "original_native_libraries_unchanged": true,
   "modified_mod": {
     "base_mod_sha256": "bde52db9f754198d414fe5520840f8880bae586e303eebeb6edf03790d9f51a2",
-    "mod_sha256": "c77854c55ec415bd6dc291f4367a6c93a01e11201430acf64bec68c0aa414a28",
+    "mod_sha256": "01e4c52b578c67846e21b8d61ebedf32f89522b075e877361f9a01ed794e8cfd",
     "mod_bytes": 1020920,
     "region": {
       "class": "LZ/bc;",
@@ -86,20 +86,47 @@
       "rewritten_keys": [
         "region",
         "carrier_region",
-        "op_region"
+        "op_region",
+        "sys_region",
+        "carrier_region_v2",
+        "mcc_mnc"
       ],
       "account_model_and_responses_unchanged": true,
       "original_control_flow_retained": true,
       "extra_registers": 0,
       "guide": "https://github.com/shebing8/tiktok-region-kit",
-      "result_method_ids": 65531,
-      "result_sha256": "69990a0085d61cf3d239f508392e502317a60bfd759154443177e080a9a21b51"
+      "result_method_ids": 65532,
+      "result_sha256": "f8d83ecf43abcaf7522d41d5273bcc6983da3fc92d43a33ae285bc4e20183c6a"
     },
-    "stable_api_version": 2026110401,
+    "request_region_urls": {
+      "source_dex": "classes2.dex",
+      "source_methods": [
+        {
+          "class": "LX/03kn;",
+          "method": "LIZ(Landroid/content/Context;Ljava/lang/StringBuilder;ZLX/03Jn;)Ljava/lang/String;",
+          "original_method_sha256": "a7ce3cf6f1925a75ec1e424108fae7dae39f647cb81eb04f91f29a79e633eb5d",
+          "builder_argument": "p2"
+        },
+        {
+          "class": "LX/03J2;",
+          "method": "LIZIZ(Ljava/lang/StringBuilder;ZLX/03Jn;)V",
+          "original_method_sha256": "026c770439e0aa08558a486aa8425b49eebfb4d5d6a2dbda62a67d729e2cf0e5",
+          "builder_argument": "p0"
+        }
+      ],
+      "callback": "RequestRegion.rewriteUrl(Ljava/lang/StringBuilder;)V",
+      "request_only": true,
+      "after_original_url_append": true,
+      "initial_guards_and_early_returns_unchanged": true,
+      "original_instructions_retained": true,
+      "extra_registers": 0,
+      "account_model_responses_and_transport_security_unchanged": true
+    },
+    "stable_api_version": 2026110402,
     "loader": {
       "classes46.dex": {
         "original_stable_api": 1792428213,
-        "weqrom_stable_api": 2026110401,
+        "weqrom_stable_api": 2026110402,
         "modified_dex": [
           "classes46.dex"
         ],
@@ -119,7 +146,7 @@
       },
       "classes50.dex": {
         "original_stable_api": 1792428213,
-        "weqrom_stable_api": 2026110401,
+        "weqrom_stable_api": 2026110402,
         "modified_dex": [
           "classes50.dex"
         ],
@@ -139,7 +166,7 @@
       },
       "classes52.dex": {
         "original_stable_api": 1792428213,
-        "weqrom_stable_api": 2026110401,
+        "weqrom_stable_api": 2026110402,
         "modified_dex": [
           "classes52.dex"
         ],

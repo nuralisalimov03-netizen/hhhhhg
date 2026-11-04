@@ -19,14 +19,14 @@ try:
     from .welcome_patch import patch_welcome_smali
     from .loader_patch import patch_loader_smali, WEQROM_STABLE_API
     from .diagnostic_patch import patch_main_text, patch_bootstrap_text
-    from .request_patch import patch_request_smali, patch_mod_region_selection, SOURCE_DEX_SHA256
+    from .request_patch import patch_request_smali, patch_mod_region_selection, patch_request_urls_smali, SOURCE_DEX_SHA256
 except ImportError:
     from setup_mod_tools import ensure_jar
     from region_patch import patch_region_smali
     from welcome_patch import patch_welcome_smali
     from loader_patch import patch_loader_smali, WEQROM_STABLE_API
     from diagnostic_patch import patch_main_text, patch_bootstrap_text
-    from request_patch import patch_request_smali, patch_mod_region_selection, SOURCE_DEX_SHA256
+    from request_patch import patch_request_smali, patch_mod_region_selection, patch_request_urls_smali, SOURCE_DEX_SHA256
 
 PROJECT = Path(__file__).resolve().parents[1]
 MOD_ENTRY = 'assets/tty/bundled/classes.dex'
@@ -182,6 +182,7 @@ def build_mod(source, tools, output):
     run('java', '-Xmx6g', '-XX:ActiveProcessorCount=2', '-cp', jar,
         'com.android.tools.smali.baksmali.Main', 'd', core_input, '-o', core_smali)
     request_report = patch_request_smali(core_smali)
+    request_urls_report = patch_request_urls_smali(core_smali)
     core_output = core_dir / 'classes.dex'
     run('java', '-Xmx6g', '-XX:ActiveProcessorCount=2', '-cp', jar,
         'com.android.tools.smali.smali.Main', 'a', '-a', '26', core_smali, '-o', core_output)
@@ -196,6 +197,7 @@ def build_mod(source, tools, output):
     audit = {'base_mod_sha256': MOD_SHA, 'mod_sha256': hashlib.sha256(payload).hexdigest(),
              'mod_bytes': len(payload), 'region': region, 'welcome': welcome,
              'source_region_selection': region_selection, 'request_region': request_report,
+             'request_region_urls': request_urls_report,
              'stable_api_version': WEQROM_STABLE_API, 'loader': loader_reports,
              'startup_hook': 'Main.start immediately after ModSettings initialization',
              'independent_ui_dex': 'classes57.dex',
