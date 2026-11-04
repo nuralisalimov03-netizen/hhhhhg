@@ -1,0 +1,65 @@
+{
+  "categories": {
+    "train": {
+      "advice": 174,
+      "arithmetic": 10240,
+      "boundary": 150,
+      "code_example": 1600,
+      "greeting": 54,
+      "html_js": 296,
+      "linear_equation": 3200,
+      "math_concept": 286
+    },
+    "validation": {
+      "advice": 11,
+      "arithmetic": 768,
+      "boundary": 11,
+      "code_example": 120,
+      "greeting": 8,
+      "html_js": 22,
+      "linear_equation": 240,
+      "math_concept": 20
+    }
+  },
+  "chat_format": "<|im_start|>user\\n{question}<|im_end|>\\n<|im_start|>assistant\\n{answer}<|im_end|>\\n",
+  "counts": {
+    "train": 16000,
+    "validation": 1200
+  },
+  "files": {
+    "train.jsonl": {
+      "bytes": 6898691,
+      "examples": 16000,
+      "sha256": "95b9cfec93a7443c097b1e079f30252269cbe6fbbe180433f20758f2adb044ca"
+    },
+    "validation.jsonl": {
+      "bytes": 562294,
+      "examples": 1200,
+      "sha256": "b4af22a3a24437c6c30e1ed00252d4f89e9ad6fe79f0c407f0f99b63b7729a71"
+    }
+  },
+  "limits": [
+    "Narrow synthetic teaching curriculum, not a general-purpose knowledge corpus",
+    "Shared answer patterns can be memorized; independent generated-answer evaluation is required",
+    "No image training and no current-news knowledge",
+    "No guarantee of arithmetic correctness or complete program generation by a trained model"
+  ],
+  "name": "weqrom-original-ru-curriculum-v1",
+  "provenance": {
+    "downloaded_datasets": [],
+    "external_model_api_inference": false,
+    "license": "CC0-1.0; the authors dedicate this original dataset and templates to the public domain",
+    "pretrained_tokenizer": false,
+    "source": "Original project templates authored with AI assistance and deterministic mathematical/code generators; no downloaded datasets or external model API inference",
+    "templates_authored_with_ai_assistance": true
+  },
+  "schema_version": 1,
+  "seed": 20261104,
+  "split_strategy": {
+    "arithmetic": "SHA-256(seed, sorted operand pair) assigns entire pairs; operation and reversed order cannot cross splits",
+    "code": "Held-out prompt formulations; code parameter combinations may overlap and are not claimed to test novel algorithms",
+    "concepts": "Known concepts with held-out prompt formulations; this tests wording transfer, not unseen factual knowledge",
+    "linear": "SHA-256(seed, coefficient, constant, solution) assigns entire equation triples",
+    "wording": "Separate training and validation question-template families"
+  }
+}

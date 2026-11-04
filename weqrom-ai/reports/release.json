@@ -1,0 +1,65 @@
+{
+  "name": "Weqrom AI",
+  "version": "1.0",
+  "package": "app.weqrom.ai",
+  "apk_sha256": "2055c4d96fdb128c4efae4ed1ce69f729dffe7304cf5c2744bc7635e9016e6ca",
+  "apk_bytes": 21005677,
+  "model": {
+    "architecture": "llama",
+    "bytes": 19264160,
+    "checkpoint_sha256": "87589815d1af9184d211e9fc6ab0bab3961addbe85686b98942c6cfad547cb9e",
+    "config": {
+      "context_length": 2048,
+      "dim": 256,
+      "hidden_dim": 768,
+      "n_heads": 4,
+      "n_kv_heads": 4,
+      "n_layers": 10,
+      "norm_eps": 1e-05,
+      "rope_theta": 10000.0,
+      "vocab_size": 4096
+    },
+    "llama_cpp_commit": "a7a98e0fffed794396b3fbad4dcdbbc184963645",
+    "name": "Weqrom Seed 10M",
+    "parameters": 9573632,
+    "precision": "F16 matrices / F32 norms",
+    "pretrained_tokenizer": false,
+    "pretrained_weights": false,
+    "schema_version": 1,
+    "sha256": "d964a32292451cc9a547468cae245e41e0317fbba30cd51015e3e4b778990b95",
+    "tokenizer_sha256": "3093ea4b3d57eca2c923d4f471d5235fba68ce3f267082311f8e1ff4dbed2b5d",
+    "trained_from_scratch": true,
+    "training_step": 2000,
+    "validation": {
+      "model_quality": "not_measured_by_exporter",
+      "native_inference": "not_checked_by_exporter"
+    }
+  },
+  "certificate_sha256": "ca025ede6ba9d462ecc05f152a7560d1502bfcff738ea6f7c862f3b19a7ccd3a",
+  "min_sdk": 26,
+  "abi": "arm64-v8a",
+  "internet_permission": false,
+  "all_permissions": [],
+  "checks": {
+    "corpus_tests_passed": 14,
+    "application_tests_passed": 22,
+    "java_prompt_boundaries_passed": true,
+    "native_tokenizer_logits_parity_passed": true,
+    "apk_v2_v3_signature_verified": true,
+    "zip_crc_verified": true,
+    "alignment_16k_verified": true,
+    "android_runtime_tested": false
+  },
+  "model_quality": {
+    "validation_sample_questions": 40,
+    "raw_numeric_correct": 0,
+    "raw_numeric_total": 10,
+    "familiar_topic_exact_matches": 23,
+    "familiar_topic_questions": 25,
+    "generated_code_parameters_reproduced": 0,
+    "generated_code_questions": 5,
+    "external_benchmark": false,
+    "validation_used_for_model_selection": true
+  },
+  "math_and_html_game_constructor_are_separate_algorithms": true
+}

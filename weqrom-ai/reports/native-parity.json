@@ -1,0 +1,41 @@
+{
+  "status": "passed",
+  "checkpoint_step": 2000,
+  "checkpoint_sha256": "87589815d1af9184d211e9fc6ab0bab3961addbe85686b98942c6cfad547cb9e",
+  "gguf_sha256": "d964a32292451cc9a547468cae245e41e0317fbba30cd51015e3e4b778990b95",
+  "tokenizer_sha256": "3093ea4b3d57eca2c923d4f471d5235fba68ce3f267082311f8e1ff4dbed2b5d",
+  "reference_rounding": "2-D weights F16 to F32; norms F32",
+  "tests": [
+    {
+      "prompt": 0,
+      "tokens": 13,
+      "token_ids_match": true,
+      "logits_compared": 4096,
+      "max_absolute_error": 0.0023980140686035156,
+      "mean_absolute_error": 0.0008362983353435993,
+      "native_argmax": 390,
+      "reference_argmax": 390
+    },
+    {
+      "prompt": 1,
+      "tokens": 33,
+      "token_ids_match": true,
+      "logits_compared": 4096,
+      "max_absolute_error": 0.0043114423751831055,
+      "mean_absolute_error": 0.0012047586496919394,
+      "native_argmax": 1690,
+      "reference_argmax": 1690
+    },
+    {
+      "prompt": 2,
+      "tokens": 54,
+      "token_ids_match": true,
+      "logits_compared": 4096,
+      "max_absolute_error": 0.0036382675170898438,
+      "mean_absolute_error": 0.0008349979179911315,
+      "native_argmax": 368,
+      "reference_argmax": 368
+    }
+  ],
+  "android_runtime_tested": false
+}

@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#090e0b">
+  <meta name="color-scheme" content="dark">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Weqrom AI</title>
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="math-tools.js"></script>
+  <script defer src="games.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">W</span><div><strong>Weqrom <span>AI</span></strong><p>Маленькая модель. Свой ритм.</p></div></div>
+      <button id="about-open" class="icon-button" aria-label="О модели и приложении" title="О приложении">i</button>
+    </header>
+
+    <div class="model-strip" aria-live="polite">
+      <span id="model-status" class="status-chip loading"><span class="status-light" aria-hidden="true"></span><span id="model-status-text">Загрузка модели…</span></span>
+      <span class="offline-mark">ОФЛАЙН</span>
+    </div>
+
+    <main>
+      <section id="panel-chat" class="panel chat-panel" aria-labelledby="tab-chat">
+        <div class="section-heading"><div><p class="eyebrow">ВАША ЛОКАЛЬНАЯ МОДЕЛЬ</p><h1>Поговорим?</h1></div><button id="clear-history" class="text-button">Очистить</button></div>
+        <p class="model-label">Weqrom Seed · обучена с нуля</p>
+        <p id="model-error" class="inline-error" role="alert" hidden></p>
+        <div id="chat-scroll" class="chat-scroll">
+          <div id="chat-empty" class="empty-chat">
+            <div class="seed-art" aria-hidden="true"><span>✳</span></div>
+            <h2>Начните с малого.</h2>
+            <p>Задайте короткий вопрос или попросите продолжить простую мысль.</p>
+            <div class="suggestions"><button data-prompt="Что ты умеешь?">Возможности модели</button><button data-prompt="Для чего нужен HTML?">Что такое HTML?</button></div>
+            <p class="quiet-note">Экспериментальная небольшая модель: ответы могут быть неточными или повторяться.</p>
+          </div>
+          <div id="messages" class="messages" aria-live="off"></div>
+        </div>
+        <div class="composer-card">
+          <label class="sr-only" for="chat-input">Сообщение для модели</label>
+          <textarea id="chat-input" rows="2" maxlength="1200" placeholder="Короткий вопрос для Weqrom…" enterkeyhint="send"></textarea>
+          <div class="composer-bottom"><span id="composer-hint">Модель готовится к работе</span><div><button id="stop-generation" class="stop-button" hidden>Остановить</button><button id="send-message" class="send-button" disabled aria-label="Отправить сообщение"><span aria-hidden="true">↑</span></button></div></div>
+        </div>
+        <p class="storage-note">История хранится на телефоне · до 20 сообщений</p>
+      </section>
+
+      <section id="panel-math" class="panel tool-panel" aria-labelledby="tab-math" hidden>
+        <p class="eyebrow">ТОЧНЫЙ ИНСТРУМЕНТ</p><h1>Посчитаем.</h1>
+        <p class="section-description">Вычисления выполняются отдельным офлайн-инструментом, без языковой модели.</p>
+        <div class="tool-card">
+          <label for="math-mode">Что сделать</label>
+          <select id="math-mode"><option value="calculate">Вычислить выражение</option><option value="equation">Решить уравнение</option><option value="derivative">Найти производную</option></select>
+          <div class="field-row"><div class="grow"><label for="math-input">Выражение</label><input id="math-input" autocomplete="off" spellcheck="false" maxlength="1000" placeholder="Например, (12 + 8) / 4"></div><div id="math-variable-field" class="small-field" hidden><label for="math-variable">Переменная</label><input id="math-variable" value="x" maxlength="1" autocomplete="off" spellcheck="false"></div></div>
+          <div id="math-examples" class="example-row"><button data-math="(12 + 8) / 4">(12 + 8) / 4</button><button data-math="sqrt(144)">√144</button><button data-math="2^10">2¹⁰</button></div>
+          <button id="math-run" class="primary-button full-width">Вычислить <span aria-hidden="true">↗</span></button>
+        </div>
+        <div id="math-result" class="result-card" aria-live="polite" hidden><span class="result-label">Офлайн-вычисление</span><p id="math-answer" class="math-answer"></p><p id="math-exact" class="math-exact" hidden></p><ol id="math-steps" hidden></ol><button id="math-copy" class="text-button">Копировать результат</button></div>
+        <p class="quiet-note">Проверяйте область определения и условия задачи. Инструмент решает поддерживаемые выражения и может отклонить сложный ввод.</p>
+      </section>
+
+      <section id="panel-games" class="panel tool-panel" aria-labelledby="tab-games" hidden>
+        <p class="eyebrow">СОБЕРИТЕ СВОЁ</p><h1>Игра за пару шагов.</h1>
+        <p class="section-description">Конструктор HTML-игр. Шаблон собирается на телефоне — это отдельный инструмент, а не ответ нейросети.</p>
+        <div class="tool-card">
+          <label for="game-title">Название игры</label><input id="game-title" maxlength="60" value="Мой неоновый мир" autocomplete="off">
+          <label for="game-genre">Основа</label><select id="game-genre"><option value="survival">Неоновый рубеж</option><option value="defense">Башни и волны</option><option value="platformer">Прыжок сквозь уровни</option></select>
+          <div class="field-row"><div class="grow"><label for="game-theme">Цвет</label><select id="game-theme"><option value="mint">Зелёный</option><option value="violet">Фиолетовый</option><option value="amber">Янтарный</option></select></div><div class="grow"><label for="game-difficulty">Сложность</label><select id="game-difficulty"><option value="easy">Легко</option><option value="normal" selected>Обычно</option><option value="hard">Сложно</option></select></div></div>
+          <button id="game-build" class="primary-button full-width">Собрать игру <span aria-hidden="true">✳</span></button>
+        </div>
+        <p id="game-error" class="inline-error" role="alert" hidden></p>
+        <div id="game-output" class="game-output" hidden><div class="output-heading"><span class="result-label">Конструктор HTML-игр</span><span id="game-code-size"></span></div><h2 id="game-output-title"></h2><p id="game-description" class="quiet-note"></p><div class="action-row"><button id="game-preview" class="primary-button">Запустить</button><button id="game-export" class="secondary-button">Сохранить HTML</button><button id="game-copy" class="secondary-button">Копировать</button></div><details class="code-details"><summary>Посмотреть и изменить код</summary><label class="sr-only" for="game-code">Полный HTML-код игры</label><textarea id="game-code" spellcheck="false" maxlength="200000" aria-describedby="game-code-help"></textarea><p id="game-code-help" class="quiet-note">Предпросмотр запускает текущий код в отдельном окне без доступа к чату и модели.</p></details></div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Разделы приложения"><button id="tab-chat" class="nav-tab selected" aria-controls="panel-chat" aria-selected="true"><span aria-hidden="true">◌</span>Чат</button><button id="tab-math" class="nav-tab" aria-controls="panel-math" aria-selected="false"><span aria-hidden="true">∑</span>Математика</button><button id="tab-games" class="nav-tab" aria-controls="panel-games" aria-selected="false"><span aria-hidden="true">◇</span>Игры</button></nav>
+  </div>
+
+  <div id="modal-backdrop" class="modal-backdrop" hidden><section id="modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><p class="eyebrow" id="modal-eyebrow">WEQROM AI</p><h2 id="modal-title"></h2><div id="modal-content"></div><div id="modal-actions" class="modal-actions"></div></section></div>
+  <div id="toast" class="toast" role="status" hidden></div>
+  <span id="announcer" class="sr-only" aria-live="polite"></span>
+</body>
+</html>

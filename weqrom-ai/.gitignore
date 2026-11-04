@@ -1,0 +1,9 @@
+build/
+dist/
+app/src/main/jniLibs/
+app/src/main/assets/model/*.gguf
+training/output/
+training/data/
+__pycache__/
+*.pyc
+node_modules/

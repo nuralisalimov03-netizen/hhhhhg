@@ -1,3 +1,13 @@
+# Weqrom AI 1.0 — собственная модель с нуля
+
+[**Скачать Weqrom AI APK — 21 МБ**](https://raw.githubusercontent.com/nuralisalimov03-netizen/hhhhhg/downloads/offline-games-v1/Weqrom-AI-1.0.apk) · [Инструкция и исходники](weqrom-ai/README.md) · [Карточка модели и реальные ограничения](weqrom-ai/MODEL_CARD.md)
+
+Отдельное приложение Android 8+ ARM64. Собственные веса Weqrom Seed 10M обучены со случайной инициализации; готовые веса Qwen или других моделей не использованы. Веса уже в APK, подготовка при первом запуске автоматическая, скачивание и сервер не нужны. В приложении нет разрешения на Интернет.
+
+Маленькая экспериментальная модель может отвечать неверно и не по теме. Точные вычисления выполняет отдельный офлайн-инструмент; три редактируемые HTML-игры — отдельный конструктор. Это не модель уровня ChatGPT и не обещание создания произвольных сложных игр нейросетью. [Подробные результаты](weqrom-ai/reports/release.json).
+
+---
+
 # Weqrom 1.5
 
 [**Скачать готовый Weqrom-1.5.apk — около 379 МБ**](https://github.com/nuralisalimov03-netizen/hhhhhg/raw/refs/heads/downloads/offline-games-v1/Weqrom-1.5.apk?download=1) · [Инструкция и проверки](weqrom/README.md)

@@ -1,0 +1,7 @@
+# Install torch from the official CPU index, not a CUDA wheel:
+# python3 -m pip install --index-url https://download.pytorch.org/whl/cpu torch==2.6.0+cpu
+sentencepiece==0.2.0
+protobuf==5.29.5
+# numpy and PyYAML are used by the pinned llama.cpp gguf-py exporter.
+numpy==2.3.5
+PyYAML==6.0.3

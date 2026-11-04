@@ -1,0 +1,11 @@
+{
+  "package": "nerdamer",
+  "version": "1.1.13",
+  "license": "MIT",
+  "source": "https://registry.npmjs.org/nerdamer/-/nerdamer-1.1.13.tgz",
+  "integrity": "sha512-kQGQYd42eQpKDOnU8ZnRKF47c+gK6jVC46eUchrABsovtFruHvsjyjBO32jck8QnpZE5z5R8HQw72hQX9Oq2MQ==",
+  "source_file": "package/all.min.js",
+  "bundled_sha256": "ba3b3a42762018b727f59c0c919517802fc0284839cc35ec5d6ef79848d68091",
+  "license_sha256": "3b6b6df4c616dfe86bafb8c5f9ff2e79605ef5e555a4687deeb533943f240458",
+  "license_note": "Nerdamer MIT and bundled decimal.js MIT notices; upstream BigInteger.js is Unlicense."
+}
