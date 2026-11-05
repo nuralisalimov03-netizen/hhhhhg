@@ -151,9 +151,11 @@ public final class MainActivity extends Activity {
             long epoch = OfflineAi.epoch();
             ENGINE_WORKER.execute(() -> {
                 try {
-                    String answer = cancelled.get() ? "" : OfflineAi.generate(formatted.prompt, formatted.maxTokens, epoch,
+                    OfflineAi.Generation answer = cancelled.get() ? new OfflineAi.Generation("", "cancelled") : OfflineAi.generate(formatted.prompt, formatted.maxTokens, epoch,
                         text -> emit(object("id", formatted.id, "type", "partial", "text", text)));
-                    emit(object("id", formatted.id, "type", "done", "text", answer, "cancelled", cancelled.get()));
+                    boolean stopped = cancelled.get() || answer.finishReason.equals("cancelled");
+                    emit(object("id", formatted.id, "type", "done", "text", answer.text, "cancelled", stopped,
+                        "finishReason", stopped ? "cancelled" : answer.finishReason));
                 } catch (Exception failure) { emit(object("id", formatted.id, "type", "error", "message", message(failure))); }
                 finally { busy.set(false); }
             });

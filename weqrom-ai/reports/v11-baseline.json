@@ -1,0 +1,3528 @@
+{
+  "schema_version": 1,
+  "benchmark": "weqrom-v2-frozen-raw-native-100",
+  "model_sha256": "d964a32292451cc9a547468cae245e41e0317fbba30cd51015e3e4b778990b95",
+  "runner_sha256": "f00464bba26808b28677a68c8e7a6b031d172c2aa866ca44359a2669f15126c7",
+  "data_sha256": "573849f41748c95d75e5ab17c9f468f3cc2ca3b174c79884b514b03e12099cc7",
+  "scorer_sha256": "755211344bf5a220de6d4160005dd04cc656fdfa46ee62b78dc677eb337a920b",
+  "model_path": "app/src/main/assets/model/weqrom-seed-f16.gguf",
+  "runner_path": "/workspace/.chits-tools/weqrom-v11-benchmark-run",
+  "generation": {
+    "max_tokens": 128,
+    "case_timeout_seconds": 10,
+    "sampling": "native greedy",
+    "format": "ChatML without system; complete supplied history"
+  },
+  "runtime_seconds": 6.636922928999411,
+  "cases": 100,
+  "runtime_errors": 0,
+  "by_category": {
+    "copy": {
+      "total": 20,
+      "evaluated": 20,
+      "passed": 0,
+      "runtime_errors": 0
+    },
+    "math_concept": {
+      "total": 3,
+      "evaluated": 3,
+      "passed": 2,
+      "runtime_errors": 0
+    },
+    "code_example": {
+      "total": 20,
+      "evaluated": 20,
+      "passed": 0,
+      "runtime_errors": 0
+    },
+    "greeting": {
+      "total": 3,
+      "evaluated": 3,
+      "passed": 3,
+      "runtime_errors": 0
+    },
+    "multiturn": {
+      "total": 10,
+      "evaluated": 10,
+      "passed": 0,
+      "runtime_errors": 0
+    },
+    "arithmetic": {
+      "total": 20,
+      "evaluated": 20,
+      "passed": 1,
+      "runtime_errors": 0
+    },
+    "html_js": {
+      "total": 9,
+      "evaluated": 9,
+      "passed": 5,
+      "runtime_errors": 0
+    },
+    "linear_equation": {
+      "total": 10,
+      "evaluated": 10,
+      "passed": 1,
+      "runtime_errors": 0
+    },
+    "boundary": {
+      "total": 3,
+      "evaluated": 3,
+      "passed": 3,
+      "runtime_errors": 0
+    },
+    "advice": {
+      "total": 2,
+      "evaluated": 2,
+      "passed": 2,
+      "runtime_errors": 0
+    }
+  },
+  "by_metric": {
+    "exact_terminal_payload": {
+      "evaluated": 30,
+      "passed": 0
+    },
+    "known_reference_whitespace_match": {
+      "evaluated": 20,
+      "passed": 15
+    },
+    "code_slots_satisfied": {
+      "evaluated": 20,
+      "passed": 0
+    },
+    "stated_numeric_answer": {
+      "evaluated": 30,
+      "passed": 2
+    }
+  },
+  "limits": [
+    "Runtime failures are not graded as model-answer mistakes; compare successful-case denominators and runtime errors separately.",
+    "Code score checks only the declared counter/card/function subset and requested slots, not arbitrary program correctness.",
+    "Facts test known answers under held-out wording, not new factual knowledge.",
+    "This final sample has no division cases and does not establish general reasoning ability."
+  ],
+  "answers": [
+    {
+      "id": "weqrom-v2-e7ae7e9d48f3a41c4fde",
+      "category": "copy",
+      "task": {
+        "field": "number",
+        "kind": "copy",
+        "split_key": "[\"copy\", \"number\", \"-158\"]",
+        "value": "-158"
+      },
+      "messages": [
+        {
+          "content": "Без изменения символов выведи следующую запись: -158",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n-158",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "caf0d22b3288608b940a77ca286cc7c64f0367fca7d49f7fd191154804442cae",
+      "raw_stdout": "Вот короткий блок:\n```html\n<section style=\"color:white;padding:26px\"><h2>Мой проект 56</h2><p>Мой текст.</p></section>\n```\nЦвет задаёт color, внутренний отступ — padding.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.0810949069855269,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "exact_terminal_payload",
+        "passed": false,
+        "expected": "-158"
+      }
+    },
+    {
+      "id": "weqrom-v2-b2e3b3c74ff92714d9af",
+      "category": "math_concept",
+      "task": {
+        "kind": "authored",
+        "known_concept_rewording": true,
+        "split_key": "facts-wording:test:area:1:3",
+        "topic": "area"
+      },
+      "messages": [
+        {
+          "content": "Проверим знакомую тему: Как найти площадь прямоугольника? Напиши понятно.",
+          "role": "user"
+        },
+        {
+          "content": "Умножь длину на ширину: S = a × b. У прямоугольника 3 на 5 площадь равна 15 квадратным единицам.",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "3918ec747b5ab3d13b51970a36d50fd6924902f38970d1006487e3ac77d92915",
+      "raw_stdout": "Умножь длину на ширину: S = a × b. У прямоугольника 3 на 5 площадь равна 15 квадратным единицам.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.04658620001282543,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "known_reference_whitespace_match",
+        "passed": true
+      }
+    },
+    {
+      "id": "weqrom-v2-569e0a9f8b749a36529a",
+      "category": "code_example",
+      "task": {
+        "kind": "code",
+        "slots": {
+          "increment": 8,
+          "input": 25,
+          "name": "add57"
+        },
+        "split_key": "[\"code\", \"function\", {\"increment\": 8, \"input\": 25, \"name\": \"add57\"}]",
+        "topic": "function"
+      },
+      "messages": [
+        {
+          "content": "Новый заказ на пример кода: JS-функция add57(x), прибавляющая 8; покажи вызов с аргументом 25. Используй указанные значения.",
+          "role": "user"
+        },
+        {
+          "content": "```javascript\nfunction add57(x){return x+8;}\nconsole.log(add57(25));\n```",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "82894524f9b9d6f3478d0e85751b1ba25bbb9be8fd8fb379478fe33e5128b658",
+      "raw_stdout": "Пожалуйста! Если остался вопрос, напиши, какой шаг нужно объяснить.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.0459692339936737,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "code_slots_satisfied",
+        "passed": false,
+        "supported_subset": "function"
+      }
+    },
+    {
+      "id": "weqrom-v2-eb36b040a26cd2a56c9c",
+      "category": "code_example",
+      "task": {
+        "kind": "code",
+        "slots": {
+          "initial": 32,
+          "step": 7
+        },
+        "split_key": "[\"code\", \"counter\", {\"initial\": 32, \"step\": 7}]",
+        "topic": "counter"
+      },
+      "messages": [
+        {
+          "content": "Новый заказ на пример кода: счётчик: начальное число 32, прибавление при клике 7. Используй указанные значения.",
+          "role": "user"
+        },
+        {
+          "content": "```html\n<button id=\"b\">32</button>\n<script>\nlet n=32;\nconst b=document.getElementById('b');\nb.onclick=()=>{n+=7;b.textContent=n;};\n</script>\n```",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "e7c080350a46c71a3495aa36062b248a3ded88ddb4e941e9ed9495cec93282e4",
+      "raw_stdout": "Пожалуйста! Если остался вопрос, напиши, какой шаг нужно объяснить.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.04695096498471685,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "code_slots_satisfied",
+        "passed": false,
+        "supported_subset": "counter"
+      }
+    },
+    {
+      "id": "weqrom-v2-164040369933c9096f92",
+      "category": "code_example",
+      "task": {
+        "kind": "code",
+        "slots": {
+          "color": "white",
+          "padding": 24,
+          "title": "Профиль 85"
+        },
+        "split_key": "[\"code\", \"card\", {\"color\": \"white\", \"padding\": 24, \"title\": \"Профиль 85\"}]",
+        "topic": "card"
+      },
+      "messages": [
+        {
+          "content": "Составь фрагмент, соблюдая все параметры: HTML-карточка: заголовок «Профиль 85», цвет white, внутренний отступ 24px.",
+          "role": "user"
+        },
+        {
+          "content": "```html\n<section style=\"color:white;padding:24px\"><h2>Профиль 85</h2></section>\n```",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "eabf476e5ce5852b460df287cc0866ac10bb3eefc91634ed7558e0d7892d27d3",
+      "raw_stdout": "Вот короткий блок:\n```html\n<section style=\"color:white;padding:26px\"><h2>Результат 85</h2><p>Мой текст.</p></section>\n```\nЦвет задаёт color, внутренний отступ — padding.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.07340475299861282,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "code_slots_satisfied",
+        "passed": false,
+        "supported_subset": "card"
+      }
+    },
+    {
+      "id": "weqrom-v2-6c0303ae75a9db5c2db8",
+      "category": "copy",
+      "task": {
+        "field": "number",
+        "kind": "copy",
+        "split_key": "[\"copy\", \"number\", \"225\"]",
+        "value": "225"
+      },
+      "messages": [
+        {
+          "content": "Какой текст находится после двоеточия в «поле: 225»?",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n225",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "62b7e4d3fb830ad4c16fde4186448928e1fe44386b76ee5118efe51cfe93f4f4",
+      "raw_stdout": "Пожалуйста! Если остался вопрос, напиши, какой шаг нужно объяснить.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.04483325299224816,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "exact_terminal_payload",
+        "passed": false,
+        "expected": "225"
+      }
+    },
+    {
+      "id": "weqrom-v2-cbd2a8d823fa148a7999",
+      "category": "copy",
+      "task": {
+        "field": "identifier",
+        "kind": "copy",
+        "split_key": "[\"copy\", \"identifier\", \"player22\"]",
+        "value": "player22"
+      },
+      "messages": [
+        {
+          "content": "Какой текст находится после двоеточия в «поле: player22»?",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\nplayer22",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "476af855b9e4f430c7a5b2f1f8ef14f1eb054a01860a9be9067e0bef1b087570",
+      "raw_stdout": "Вот короткий блок:\n```html\n<section style=\"color:white;padding:26px\"><h2>Мой проект 20</h2><p>Мой текст.</p></section>\n```\nЦвет задаёт color, внутренний отступ — padding.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.0818880200095009,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "exact_terminal_payload",
+        "passed": false,
+        "expected": "player22"
+      }
+    },
+    {
+      "id": "weqrom-v2-b5af3861e794707d8bf6",
+      "category": "greeting",
+      "task": {
+        "kind": "authored",
+        "known_concept_rewording": true,
+        "split_key": "facts-wording:test:bye:0:0",
+        "topic": "bye"
+      },
+      "messages": [
+        {
+          "content": "Новая формулировка вопроса: До встречи! Ответь просто.",
+          "role": "user"
+        },
+        {
+          "content": "До встречи! Сохрани важные заметки, чтобы потом было удобно продолжить.",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "48ff7f6f98ea15d0c8560af4bee9daed521938069d7dcf309069a975f2ee7286",
+      "raw_stdout": "До встречи! Сохрани важные заметки, чтобы потом было удобно продолжить.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.04610198599402793,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "known_reference_whitespace_match",
+        "passed": true
+      }
+    },
+    {
+      "id": "weqrom-v2-3eab073e2227e97f2a12",
+      "category": "multiturn",
+      "task": {
+        "kind": "multiturn",
+        "split_key": "[\"multiturn\", \"Дима\", \"487\"]",
+        "target": "487"
+      },
+      "messages": [
+        {
+          "content": "Я Дима. Моё число 487. Запомни его в этом диалоге.",
+          "role": "user"
+        },
+        {
+          "content": "Твоё число:\n487",
+          "role": "assistant"
+        },
+        {
+          "content": "Верни только число, которое я сообщил раньше.",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n487",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "873a738ade0cb3cf18369af1093b2aa474af433b36562e0e0916f0cd23463f8f",
+      "raw_stdout": "```javascript\nfunction nextValue78(x) { return x + 6; }\nconsole.log(nextValue78(40)); // 48\n```\nФункция принимает число и возвращает его сумму с 6.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.07111622698721476,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "exact_terminal_payload",
+        "passed": false,
+        "expected": "487"
+      }
+    },
+    {
+      "id": "weqrom-v2-cd36b5f82fbc6b5c4f72",
+      "category": "multiturn",
+      "task": {
+        "kind": "multiturn",
+        "split_key": "[\"multiturn\", \"Вера\", \"690\"]",
+        "target": "690"
+      },
+      "messages": [
+        {
+          "content": "Я Вера. Моё число 690. Запомни его в этом диалоге.",
+          "role": "user"
+        },
+        {
+          "content": "Твоё число:\n690",
+          "role": "assistant"
+        },
+        {
+          "content": "Верни только число, которое я сообщил раньше.",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n690",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "e67c24c0c735d212069f647e5579330bef2a33277c671285b4a9963964b1a285",
+      "raw_stdout": "```javascript\nfunction nextValue78(x) { return x + 6; }\nconsole.log(nextValue78(40)); // 48\n```\nФункция принимает число и возвращает его сумму с 6.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.08426390198292211,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "exact_terminal_payload",
+        "passed": false,
+        "expected": "690"
+      }
+    },
+    {
+      "id": "weqrom-v2-f9cfb71c159f13972657",
+      "category": "arithmetic",
+      "task": {
+        "kind": "arithmetic",
+        "operands": [
+          9,
+          7
+        ],
+        "operation": "add",
+        "result": 16,
+        "seen_operand_pair_in_v1_train": false,
+        "split_key": "arithmetic:[7, 9]"
+      },
+      "messages": [
+        {
+          "content": "Запиши итог вычисления 9 + 7.",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n16",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "723dbe31fe17aae1bbe31718f4e840499379ddc34a9e57b741d014fd1a62ce73",
+      "raw_stdout": "Сложим числа: 100 + 7 = 106. Ответ: 106.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.042646652000257745,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "stated_numeric_answer",
+        "passed": false,
+        "expected": 16,
+        "stated": 106.0
+      }
+    },
+    {
+      "id": "weqrom-v2-4647e041a55da49a805c",
+      "category": "code_example",
+      "task": {
+        "kind": "code",
+        "slots": {
+          "increment": 5,
+          "input": 39,
+          "name": "increase175"
+        },
+        "split_key": "[\"code\", \"function\", {\"increment\": 5, \"input\": 39, \"name\": \"increase175\"}]",
+        "topic": "function"
+      },
+      "messages": [
+        {
+          "content": "Составь фрагмент, соблюдая все параметры: JS-функция increase175(x), прибавляющая 5; покажи вызов с аргументом 39.",
+          "role": "user"
+        },
+        {
+          "content": "```javascript\nfunction increase175(x){return x+5;}\nconsole.log(increase175(39));\n```",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "51b72ecd77d06d9213f520ae9038303ab9ce259451dc902baff6f157fe8f344e",
+      "raw_stdout": "Нет, ответы создаются на устройстве без доступа к интернету. Я не могу проверить новости или открыть сайт.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.06375139902229421,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "code_slots_satisfied",
+        "passed": false,
+        "supported_subset": "function"
+      }
+    },
+    {
+      "id": "weqrom-v2-e0492523b04463f851b5",
+      "category": "html_js",
+      "task": {
+        "kind": "authored",
+        "known_concept_rewording": true,
+        "split_key": "facts-wording:test:javascript:0:0",
+        "topic": "javascript"
+      },
+      "messages": [
+        {
+          "content": "Новая формулировка вопроса: Для чего нужен JavaScript? Ответь просто.",
+          "role": "user"
+        },
+        {
+          "content": "JavaScript добавляет поведение странице: реагирует на нажатия и меняет содержимое. Сам HTML описывает структуру.",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "ceb7d0f7db0db25ee2f6790afb8e5ca1091f234dee78bb8fc4bfbae94490e508",
+      "raw_stdout": "JavaScript добавляет поведение странице: реагирует на нажатия и меняет содержимое. Сам HTML описывает структуру.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.045779926993418485,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "known_reference_whitespace_match",
+        "passed": true
+      }
+    },
+    {
+      "id": "weqrom-v2-88a458d1aa9deef4bf1a",
+      "category": "arithmetic",
+      "task": {
+        "kind": "arithmetic",
+        "operands": [
+          0,
+          0
+        ],
+        "operation": "subtract",
+        "result": 0,
+        "seen_operand_pair_in_v1_train": false,
+        "split_key": "arithmetic:[0, 0]"
+      },
+      "messages": [
+        {
+          "content": "Запиши итог вычисления 0 - 0.",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n0",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "89be6baa69ada0af3bdcf3cd944e571d47d855c449f124af3843d2f87b44c3ce",
+      "raw_stdout": "Пожалуйста! Если остался вопрос, напиши, какой шаг нужно объяснить.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.03777143100160174,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "stated_numeric_answer",
+        "passed": false,
+        "expected": 0,
+        "stated": null
+      }
+    },
+    {
+      "id": "weqrom-v2-b52458535e018d178d70",
+      "category": "linear_equation",
+      "task": {
+        "kind": "linear",
+        "operands": [
+          4,
+          13,
+          4
+        ],
+        "result": 4,
+        "rhs": 29,
+        "split_key": "[\"linear\", 4, 13, 4]"
+      },
+      "messages": [
+        {
+          "content": "Какое x подходит к равенству 4x + 13 = 29?",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\nx = 4",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "fe14f46477f17ccaa5d9ef5f97b36779cc5f4596494c883ea80ff1083d7e881d",
+      "raw_stdout": "Вычтем 13 из обеих частей: 4x = 29 - 13 = 16. Делим на 4: x = 5. Проверка: 4 × (5) + 13 = 29. Ответ: x = 5.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.05776273098308593,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "stated_numeric_answer",
+        "passed": false,
+        "expected": 4,
+        "stated": 5.0
+      }
+    },
+    {
+      "id": "weqrom-v2-5a4cdbeeab0dc85af285",
+      "category": "html_js",
+      "task": {
+        "kind": "authored",
+        "known_concept_rewording": true,
+        "split_key": "facts-wording:test:paragraph:0:4",
+        "topic": "paragraph"
+      },
+      "messages": [
+        {
+          "content": "Новая формулировка вопроса: Как добавить абзац в HTML? Объясни в двух предложениях.",
+          "role": "user"
+        },
+        {
+          "content": "Помести текст между тегами p: <p>Это мой абзац.</p>.",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "7d5911b71d533d0fc6a001d7a16eb2b9b7e086d415628a574be30b3aac70fa52",
+      "raw_stdout": "Доброе утро! Чем помочь: простым примером, объяснением или небольшим фрагментом кода?\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.04544792301021516,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "known_reference_whitespace_match",
+        "passed": false
+      }
+    },
+    {
+      "id": "weqrom-v2-6c916a4fa7128525b6fa",
+      "category": "code_example",
+      "task": {
+        "kind": "code",
+        "slots": {
+          "increment": 7,
+          "input": 30,
+          "name": "increase155"
+        },
+        "split_key": "[\"code\", \"function\", {\"increment\": 7, \"input\": 30, \"name\": \"increase155\"}]",
+        "topic": "function"
+      },
+      "messages": [
+        {
+          "content": "Новый заказ на пример кода: JS-функция increase155(x), прибавляющая 7; покажи вызов с аргументом 30. Используй указанные значения.",
+          "role": "user"
+        },
+        {
+          "content": "```javascript\nfunction increase155(x){return x+7;}\nconsole.log(increase155(30));\n```",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "5cf8ac57406049e36fb17987cb0a94291bdc9cda006e65f7cd667f719061c2b8",
+      "raw_stdout": "Пожалуйста! Если остался вопрос, напиши, какой шаг нужно объяснить.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.04575609599123709,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "code_slots_satisfied",
+        "passed": false,
+        "supported_subset": "function"
+      }
+    },
+    {
+      "id": "weqrom-v2-e68bac44f09c9a0a317b",
+      "category": "arithmetic",
+      "task": {
+        "kind": "arithmetic",
+        "operands": [
+          11,
+          16
+        ],
+        "operation": "subtract",
+        "result": -5,
+        "seen_operand_pair_in_v1_train": false,
+        "split_key": "arithmetic:[11, 16]"
+      },
+      "messages": [
+        {
+          "content": "Запиши итог вычисления 11 - 16.",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n-5",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "1e8bb5ef2d0a448e1c752878be7958f8b9c7b186dc6b019f1f036a75bc5e4d57",
+      "raw_stdout": "Вычтем 16 из обеих частей: 9x = 34 - 16 = 24. Делим на 9: x = 3. Проверка: 9 × (3) + 16 = 34. Ответ: x = 3.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.05945339202298783,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "stated_numeric_answer",
+        "passed": false,
+        "expected": -5,
+        "stated": 3.0
+      }
+    },
+    {
+      "id": "weqrom-v2-b71fae43f7b6cb8209a8",
+      "category": "boundary",
+      "task": {
+        "kind": "authored",
+        "known_concept_rewording": true,
+        "split_key": "facts-wording:test:phone:1:2",
+        "topic": "phone"
+      },
+      "messages": [
+        {
+          "content": "Проверим знакомую тему: Можешь управлять моим телефоном? Поясни основную мысль.",
+          "role": "user"
+        },
+        {
+          "content": "Нет, я не управляю телефоном. Могу дать текстовую подсказку, а действия в настройках выполняешь ты.",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "1dff6dec32d23be32cd18c6efee728d3e039d30bcdd0a59a3190e116ed001a0b",
+      "raw_stdout": "Нет, я не управляю телефоном. Могу дать текстовую подсказку, а действия в настройках выполняешь ты.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.04875854498823173,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "known_reference_whitespace_match",
+        "passed": true
+      }
+    },
+    {
+      "id": "weqrom-v2-17999d2c5eabe64eae89",
+      "category": "multiturn",
+      "task": {
+        "kind": "multiturn",
+        "split_key": "[\"multiturn\", \"Вера\", \"766\"]",
+        "target": "766"
+      },
+      "messages": [
+        {
+          "content": "Я Вера. Моё число 766. Запомни его в этом диалоге.",
+          "role": "user"
+        },
+        {
+          "content": "Твоё число:\n766",
+          "role": "assistant"
+        },
+        {
+          "content": "Верни только число, которое я сообщил раньше.",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n766",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "f854734d18f344c6488a9f97053e6fd466994fc64c8a254c3a45572817d35743",
+      "raw_stdout": "```javascript\nfunction nextValue78(x) { return x + 6; }\nconsole.log(nextValue78(40)); // 48\n```\nФункция принимает число и возвращает его сумму с 6.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.08357819297816604,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "exact_terminal_payload",
+        "passed": false,
+        "expected": "766"
+      }
+    },
+    {
+      "id": "weqrom-v2-77fea46297647cbbdbf6",
+      "category": "arithmetic",
+      "task": {
+        "kind": "arithmetic",
+        "operands": [
+          0,
+          0
+        ],
+        "operation": "add",
+        "result": 0,
+        "seen_operand_pair_in_v1_train": false,
+        "split_key": "arithmetic:[0, 0]"
+      },
+      "messages": [
+        {
+          "content": "Проверь новый пример 0 + 0: какой ответ?",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n0",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "eb52da176f16545142dd5c989b8afce046ec7d25f7e71bbf99927a2d9500f710",
+      "raw_stdout": "Пожалуйста! Если остался вопрос, напиши, какой шаг нужно объяснить.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.04150764501537196,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "stated_numeric_answer",
+        "passed": false,
+        "expected": 0,
+        "stated": null
+      }
+    },
+    {
+      "id": "weqrom-v2-05015a7c0bb6b519a888",
+      "category": "advice",
+      "task": {
+        "kind": "authored",
+        "known_concept_rewording": true,
+        "split_key": "facts-wording:test:plan:1:2",
+        "topic": "plan"
+      },
+      "messages": [
+        {
+          "content": "Проверим знакомую тему: Как начать большую задачу? Поясни основную мысль.",
+          "role": "user"
+        },
+        {
+          "content": "Запиши цель и разбей работу на маленькие шаги. Выбери один шаг, который можно выполнить сейчас, и начни с него.",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "43e8a08afdfd1662316d46ee5d3240808690877f0d1880c50bb08787c9c35331",
+      "raw_stdout": "Запиши цель и разбей работу на маленькие шаги. Выбери один шаг, который можно выполнить сейчас, и начни с него.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.06301505898591131,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "known_reference_whitespace_match",
+        "passed": true
+      }
+    },
+    {
+      "id": "weqrom-v2-6b6697fb2294d1073183",
+      "category": "copy",
+      "task": {
+        "field": "number",
+        "kind": "copy",
+        "split_key": "[\"copy\", \"number\", \"566\"]",
+        "value": "566"
+      },
+      "messages": [
+        {
+          "content": "Какой текст находится после двоеточия в «поле: 566»?",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n566",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "015c1e213ab5d653545c4f8b570ce40b049e0619687982865fda60906294dc64",
+      "raw_stdout": "Вот короткий блок:\n```html\n<section style=\"color:white;padding:27px\"><h2>Мой проект 66</h2><p>Мой текст.</p></section>\n```\nЦвет задаёт color, внутренний отступ — padding.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.10548976800055243,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "exact_terminal_payload",
+        "passed": false,
+        "expected": "566"
+      }
+    },
+    {
+      "id": "weqrom-v2-2bdef1c632d03ef58456",
+      "category": "code_example",
+      "task": {
+        "kind": "code",
+        "slots": {
+          "color": "orange",
+          "padding": 8,
+          "title": "Проект 175"
+        },
+        "split_key": "[\"code\", \"card\", {\"color\": \"orange\", \"padding\": 8, \"title\": \"Проект 175\"}]",
+        "topic": "card"
+      },
+      "messages": [
+        {
+          "content": "Новый заказ на пример кода: HTML-карточка: заголовок «Проект 175», цвет orange, внутренний отступ 8px. Используй указанные значения.",
+          "role": "user"
+        },
+        {
+          "content": "```html\n<section style=\"color:orange;padding:8px\"><h2>Проект 175</h2></section>\n```",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "2b5678411268f641192198031d1fe0a4a380cd69a9ae64aca7a2ea5d36da3992",
+      "raw_stdout": "Вот короткий блок:\n```html\n<section style=\"color:white;padding:26px\"><h2>Мой проект 8</h2><p>Мой текст.</p></section>\n```\nЦвет задаёт color, внутренний отступ — padding.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.08260171397705562,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "code_slots_satisfied",
+        "passed": false,
+        "supported_subset": "card"
+      }
+    },
+    {
+      "id": "weqrom-v2-63437cc01c6193f45e81",
+      "category": "linear_equation",
+      "task": {
+        "kind": "linear",
+        "operands": [
+          5,
+          8,
+          6
+        ],
+        "result": 6,
+        "rhs": 38,
+        "split_key": "[\"linear\", 5, 8, 6]"
+      },
+      "messages": [
+        {
+          "content": "Какое x подходит к равенству 5x + 8 = 38?",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\nx = 6",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "4f2b7f54f41d58c1b4cf1c57c229d0dab3e66ee331283c9bb4a9a0399929a40c",
+      "raw_stdout": "Вычтем 8 из обеих частей: 5x = 38 - 8 = 30. Делим на 5: x = 6. Проверка: 5 × (6) + 8 = 38. Ответ: x = 6.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.0697142540011555,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "stated_numeric_answer",
+        "passed": true,
+        "expected": 6,
+        "stated": 6.0
+      }
+    },
+    {
+      "id": "weqrom-v2-7dd2422219370872c5e7",
+      "category": "linear_equation",
+      "task": {
+        "kind": "linear",
+        "operands": [
+          9,
+          20,
+          6
+        ],
+        "result": 6,
+        "rhs": 74,
+        "split_key": "[\"linear\", 9, 20, 6]"
+      },
+      "messages": [
+        {
+          "content": "Какое x подходит к равенству 9x + 20 = 74?",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\nx = 6",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "fe0381f3858cec35736d12fa8d8241c035f2f601ed7267a3419dc071da401c18",
+      "raw_stdout": "Вычтем 20 из обеих частей: 9x = 74 - 20 = 48. Делим на 9: x = 7. Проверка: 9 × (7) + 20 = 74. Ответ: x = 7.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.06186127700493671,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "stated_numeric_answer",
+        "passed": false,
+        "expected": 6,
+        "stated": 7.0
+      }
+    },
+    {
+      "id": "weqrom-v2-3a996c517c8c7c236b15",
+      "category": "linear_equation",
+      "task": {
+        "kind": "linear",
+        "operands": [
+          3,
+          11,
+          19
+        ],
+        "result": 19,
+        "rhs": 68,
+        "split_key": "[\"linear\", 3, 11, 19]"
+      },
+      "messages": [
+        {
+          "content": "Какое x подходит к равенству 3x + 11 = 68?",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\nx = 19",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "f68ab98a46196b7dc6337eef39c31ba40d435ccc7e6efde2034ad94a93f424e6",
+      "raw_stdout": "Вычтем 11 из обеих частей: 3x = 68 - 11 = 48. Делим на 3: x = 16. Проверка: 3 × (16) + 11 = 68. Ответ: x = 16.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.06940477198804729,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "stated_numeric_answer",
+        "passed": false,
+        "expected": 19,
+        "stated": 16.0
+      }
+    },
+    {
+      "id": "weqrom-v2-d6187a1dce5284afd424",
+      "category": "arithmetic",
+      "task": {
+        "kind": "arithmetic",
+        "operands": [
+          6,
+          7
+        ],
+        "operation": "multiply",
+        "result": 42,
+        "seen_operand_pair_in_v1_train": false,
+        "split_key": "arithmetic:[6, 7]"
+      },
+      "messages": [
+        {
+          "content": "Проверь новый пример 6 × 7: какой ответ?",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n42",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "95eb6b58cc928d1d99073f9ec2ee6550c0573f4c7e49dc1d82f8c094724769bd",
+      "raw_stdout": "Раздели материал на небольшие части. После чтения попробуй объяснить тему своими словами и решить несколько новых примеров.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.048573553998721763,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "stated_numeric_answer",
+        "passed": false,
+        "expected": 42,
+        "stated": null
+      }
+    },
+    {
+      "id": "weqrom-v2-777154e181876ad9de57",
+      "category": "copy",
+      "task": {
+        "field": "number",
+        "kind": "copy",
+        "split_key": "[\"copy\", \"number\", \"546\"]",
+        "value": "546"
+      },
+      "messages": [
+        {
+          "content": "Какой текст находится после двоеточия в «поле: 546»?",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n546",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "15575eee363ef2f03fdf31cabee05e582fdd5f5a32da6f6e09844c03a1e045c7",
+      "raw_stdout": "Вот короткий блок:\n```html\n<section style=\"color:white;padding:27px\"><h2>Мой проект 56</h2><p>Мой текст.</p></section>\n```\nЦвет задаёт color, внутренний отступ — padding.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.07281141800922342,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "exact_terminal_payload",
+        "passed": false,
+        "expected": "546"
+      }
+    },
+    {
+      "id": "weqrom-v2-688dfd0c0066e5ac90c3",
+      "category": "boundary",
+      "task": {
+        "kind": "authored",
+        "known_concept_rewording": true,
+        "split_key": "facts-wording:test:internet:0:0",
+        "topic": "internet"
+      },
+      "messages": [
+        {
+          "content": "Новая формулировка вопроса: У тебя есть доступ к интернету? Ответь просто.",
+          "role": "user"
+        },
+        {
+          "content": "Нет, ответы создаются на устройстве без доступа к интернету. Я не могу проверить новости или открыть сайт.",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "86ac8d078e222ecfd60b71e4910cd29fe86c77ac9c06ad180e49c05a94f0b22c",
+      "raw_stdout": "Нет, ответы создаются на устройстве без доступа к интернету. Я не могу проверить новости или открыть сайт.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.05180352399474941,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "known_reference_whitespace_match",
+        "passed": true
+      }
+    },
+    {
+      "id": "weqrom-v2-995b0a827abd685472c5",
+      "category": "code_example",
+      "task": {
+        "kind": "code",
+        "slots": {
+          "color": "green",
+          "padding": 5,
+          "title": "Профиль 195"
+        },
+        "split_key": "[\"code\", \"card\", {\"color\": \"green\", \"padding\": 5, \"title\": \"Профиль 195\"}]",
+        "topic": "card"
+      },
+      "messages": [
+        {
+          "content": "Новый заказ на пример кода: HTML-карточка: заголовок «Профиль 195», цвет green, внутренний отступ 5px. Используй указанные значения.",
+          "role": "user"
+        },
+        {
+          "content": "```html\n<section style=\"color:green;padding:5px\"><h2>Профиль 195</h2></section>\n```",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "4250287e22c6eec47741c623ea9241b8dc4e7f5127b97505dbbdbb7ff88ad9be",
+      "raw_stdout": "Вот короткий блок:\n```html\n<section style=\"color:white;padding:26px\"><h2>Мой проект 5</h2><p>Мой текст.</p></section>\n```\nЦвет задаёт color, внутренний отступ — padding.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.12271668398170732,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "code_slots_satisfied",
+        "passed": false,
+        "supported_subset": "card"
+      }
+    },
+    {
+      "id": "weqrom-v2-f187bfb264efb1511d58",
+      "category": "multiturn",
+      "task": {
+        "kind": "multiturn",
+        "split_key": "[\"multiturn\", \"Вера\", \"438\"]",
+        "target": "438"
+      },
+      "messages": [
+        {
+          "content": "Я Вера. Моё число 438. Запомни его в этом диалоге.",
+          "role": "user"
+        },
+        {
+          "content": "Твоё число:\n438",
+          "role": "assistant"
+        },
+        {
+          "content": "Верни только число, которое я сообщил раньше.",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n438",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "f9569e29dccef71b7b73d7a6649927b363706eccf2f4a0958437c4fd9106ba30",
+      "raw_stdout": "```javascript\nfunction nextValue78(x) { return x + 6; }\nconsole.log(nextValue78(40)); // 48\n```\nФункция принимает число и возвращает его сумму с 6.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.09559255099156871,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "exact_terminal_payload",
+        "passed": false,
+        "expected": "438"
+      }
+    },
+    {
+      "id": "weqrom-v2-51e88a6e4f581ceb582e",
+      "category": "code_example",
+      "task": {
+        "kind": "code",
+        "slots": {
+          "increment": 5,
+          "input": 24,
+          "name": "add192"
+        },
+        "split_key": "[\"code\", \"function\", {\"increment\": 5, \"input\": 24, \"name\": \"add192\"}]",
+        "topic": "function"
+      },
+      "messages": [
+        {
+          "content": "Составь фрагмент, соблюдая все параметры: JS-функция add192(x), прибавляющая 5; покажи вызов с аргументом 24.",
+          "role": "user"
+        },
+        {
+          "content": "```javascript\nfunction add192(x){return x+5;}\nconsole.log(add192(24));\n```",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "ad2c3e56a0f9f04f0bfeea70f8490a25da9ebed7f2a4974c7a90f7871c9f3c16",
+      "raw_stdout": "```javascript\nfunction increase78(x) { return x + 6; }\nconsole.log(increase78(42)); // 48\n```\nФункция принимает число и возвращает его сумму с 6.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.08155266899848357,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "code_slots_satisfied",
+        "passed": false,
+        "supported_subset": "function"
+      }
+    },
+    {
+      "id": "weqrom-v2-05f7efbf61158f476367",
+      "category": "code_example",
+      "task": {
+        "kind": "code",
+        "slots": {
+          "color": "orange",
+          "padding": 24,
+          "title": "Заметки 6"
+        },
+        "split_key": "[\"code\", \"card\", {\"color\": \"orange\", \"padding\": 24, \"title\": \"Заметки 6\"}]",
+        "topic": "card"
+      },
+      "messages": [
+        {
+          "content": "Составь фрагмент, соблюдая все параметры: HTML-карточка: заголовок «Заметки 6», цвет orange, внутренний отступ 24px.",
+          "role": "user"
+        },
+        {
+          "content": "```html\n<section style=\"color:orange;padding:24px\"><h2>Заметки 6</h2></section>\n```",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "0d91fab1fd82a0e4c42b012649063b433618814ca98d1d2b5447d27475242a7f",
+      "raw_stdout": "Вот короткий блок:\n```html\n<section style=\"color:white;padding:26px\"><h2>Результат 56</h2><p>Мой текст.</p></section>\n```\nЦвет задаёт color, внутренний отступ — padding.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.13319355100975372,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "code_slots_satisfied",
+        "passed": false,
+        "supported_subset": "card"
+      }
+    },
+    {
+      "id": "weqrom-v2-fe1ff874185431dde98a",
+      "category": "arithmetic",
+      "task": {
+        "kind": "arithmetic",
+        "operands": [
+          2,
+          7
+        ],
+        "operation": "subtract",
+        "result": -5,
+        "seen_operand_pair_in_v1_train": false,
+        "split_key": "arithmetic:[2, 7]"
+      },
+      "messages": [
+        {
+          "content": "Запиши итог вычисления 2 - 7.",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n-5",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "18356571da1ccb2577b502f724cc16b2d7e5461468c8fcedee6009692fe9e070",
+      "raw_stdout": "Число 7 больше 2 на 55, поэтому 2 - 7 = -55. Ответ: -55.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.0492893900081981,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "stated_numeric_answer",
+        "passed": false,
+        "expected": -5,
+        "stated": -55.0
+      }
+    },
+    {
+      "id": "weqrom-v2-330c4a542943df655b35",
+      "category": "code_example",
+      "task": {
+        "kind": "code",
+        "slots": {
+          "color": "orange",
+          "padding": 26,
+          "title": "Заметки 235"
+        },
+        "split_key": "[\"code\", \"card\", {\"color\": \"orange\", \"padding\": 26, \"title\": \"Заметки 235\"}]",
+        "topic": "card"
+      },
+      "messages": [
+        {
+          "content": "Составь фрагмент, соблюдая все параметры: HTML-карточка: заголовок «Заметки 235», цвет orange, внутренний отступ 26px.",
+          "role": "user"
+        },
+        {
+          "content": "```html\n<section style=\"color:orange;padding:26px\"><h2>Заметки 235</h2></section>\n```",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "c6b395ed972c2ba0b6007b48c4d19b83b98ba3a1ede961fd2d703ec40b7d0b8e",
+      "raw_stdout": "Вот короткий блок:\n```html\n<section style=\"color:white;padding:26px\"><h2>Мой проект 59</h2><p>Мой текст.</p></section>\n```\nЦвет задаёт color, внутренний отступ — padding.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.09037572500528768,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "code_slots_satisfied",
+        "passed": false,
+        "supported_subset": "card"
+      }
+    },
+    {
+      "id": "weqrom-v2-f296bece5693165348bf",
+      "category": "boundary",
+      "task": {
+        "kind": "authored",
+        "known_concept_rewording": true,
+        "split_key": "facts-wording:test:identity:1:3",
+        "topic": "identity"
+      },
+      "messages": [
+        {
+          "content": "Проверим знакомую тему: Кто ты? Напиши понятно.",
+          "role": "user"
+        },
+        {
+          "content": "Я Weqrom AI — небольшой экспериментальный офлайн-помощник, обученный с нуля на ограниченном авторском наборе примеров. Могу ошибаться и пока умею немного.",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "5acca8035a871c17f8d545299de9eea91d178fe25deaa97054853cff7316417d",
+      "raw_stdout": "Я Weqrom AI — небольшой экспериментальный офлайн-помощник, обученный с нуля на ограниченном авторском наборе примеров. Могу ошибаться и пока умею немного.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.08568433299660683,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "known_reference_whitespace_match",
+        "passed": true
+      }
+    },
+    {
+      "id": "weqrom-v2-30df49bbd30bb0af5bea",
+      "category": "arithmetic",
+      "task": {
+        "kind": "arithmetic",
+        "operands": [
+          8,
+          8
+        ],
+        "operation": "add",
+        "result": 16,
+        "seen_operand_pair_in_v1_train": false,
+        "split_key": "arithmetic:[8, 8]"
+      },
+      "messages": [
+        {
+          "content": "Проверь новый пример 8 + 8: какой ответ?",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n16",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "05eddcd9758b39c5ad1b53ac1e1fd96cd2fd2ce44bf945df745336be1f8c4e51",
+      "raw_stdout": "Доброе утро! Чем помочь: простым примером, объяснением или небольшим фрагментом кода?\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.05354430101579055,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "stated_numeric_answer",
+        "passed": false,
+        "expected": 16,
+        "stated": null
+      }
+    },
+    {
+      "id": "weqrom-v2-862cf3f6634fd4775e3e",
+      "category": "copy",
+      "task": {
+        "field": "number",
+        "kind": "copy",
+        "split_key": "[\"copy\", \"number\", \"113\"]",
+        "value": "113"
+      },
+      "messages": [
+        {
+          "content": "Какой текст находится после двоеточия в «поле: 113»?",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n113",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "95321e720936b7a174fbaac6f6b7b2bd2e93420b25d268e34a7e84525a2f0e5a",
+      "raw_stdout": "Вот короткий блок:\n```html\n<section style=\"color:white;padding:46px\"><h2>Мой проект 99</h2><p>Мой текст.</p></section>\n```\nЦвет задаёт color, внутренний отступ — padding.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.1154613689868711,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "exact_terminal_payload",
+        "passed": false,
+        "expected": "113"
+      }
+    },
+    {
+      "id": "weqrom-v2-951606f4929235ace751",
+      "category": "html_js",
+      "task": {
+        "kind": "authored",
+        "known_concept_rewording": true,
+        "split_key": "facts-wording:test:javascript:1:4",
+        "topic": "javascript"
+      },
+      "messages": [
+        {
+          "content": "Проверим знакомую тему: Для чего нужен JavaScript? Объясни в двух предложениях.",
+          "role": "user"
+        },
+        {
+          "content": "JavaScript добавляет поведение странице: реагирует на нажатия и меняет содержимое. Сам HTML описывает структуру.",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "34f2c4e2ae02b288c8062e4aea3cd6b268997c3dbee217e4ae90c789eec3befa",
+      "raw_stdout": "Доброе утро! Чем помочь: простым примером, объяснением или небольшим фрагментом кода?\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.05352269500144757,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "known_reference_whitespace_match",
+        "passed": false
+      }
+    },
+    {
+      "id": "weqrom-v2-70dd8e01120bcf5966b6",
+      "category": "arithmetic",
+      "task": {
+        "kind": "arithmetic",
+        "operands": [
+          13,
+          2
+        ],
+        "operation": "subtract",
+        "result": 11,
+        "seen_operand_pair_in_v1_train": false,
+        "split_key": "arithmetic:[2, 13]"
+      },
+      "messages": [
+        {
+          "content": "Проверь новый пример 13 - 2: какой ответ?",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n11",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "0ec9f3b29365b44da80bbc423b4d72757bcf074a21ad445d00e1a431799b3413",
+      "raw_stdout": "Число 139 больше 110 на 48, поэтому 110 - 139 = -48. Ответ: -48.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.04264656797749922,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "stated_numeric_answer",
+        "passed": false,
+        "expected": 11,
+        "stated": -48.0
+      }
+    },
+    {
+      "id": "weqrom-v2-1a0051479da7572dfd39",
+      "category": "arithmetic",
+      "task": {
+        "kind": "arithmetic",
+        "operands": [
+          19,
+          19
+        ],
+        "operation": "subtract",
+        "result": 0,
+        "seen_operand_pair_in_v1_train": false,
+        "split_key": "arithmetic:[19, 19]"
+      },
+      "messages": [
+        {
+          "content": "Запиши итог вычисления 19 - 19.",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n0",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "f7e479f233f4fb93d1780f79ec813812405590c33ee6759c0f1fe1660298df81",
+      "raw_stdout": "Вычтем 19 из обеих частей: 9x = 34 - 19 = 16. Делим на 9: x = 3. Проверка: 9 × (3) + 19 = 34. Ответ: x = 3.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.10678691198700108,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "stated_numeric_answer",
+        "passed": false,
+        "expected": 0,
+        "stated": 3.0
+      }
+    },
+    {
+      "id": "weqrom-v2-ae0bd2f1aa173fa6ecb9",
+      "category": "greeting",
+      "task": {
+        "kind": "authored",
+        "known_concept_rewording": true,
+        "split_key": "facts-wording:test:morning:1:2",
+        "topic": "morning"
+      },
+      "messages": [
+        {
+          "content": "Проверим знакомую тему: Доброе утро! Поясни основную мысль.",
+          "role": "user"
+        },
+        {
+          "content": "Доброе утро! Чем помочь: простым примером, объяснением или небольшим фрагментом кода?",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "649da4e88654dfb24332447f1cc77cce7bb2aa6bd771bcd9709501579ce3ec94",
+      "raw_stdout": "Доброе утро! Чем помочь: простым примером, объяснением или небольшим фрагментом кода?\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.04089659798773937,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "known_reference_whitespace_match",
+        "passed": true
+      }
+    },
+    {
+      "id": "weqrom-v2-7f435b6fd38e33918659",
+      "category": "greeting",
+      "task": {
+        "kind": "authored",
+        "known_concept_rewording": true,
+        "split_key": "facts-wording:test:bye:1:1",
+        "topic": "bye"
+      },
+      "messages": [
+        {
+          "content": "Проверим знакомую тему: До встречи! Достаточно короткого ответа.",
+          "role": "user"
+        },
+        {
+          "content": "До встречи! Сохрани важные заметки, чтобы потом было удобно продолжить.",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "5892283973fe8b93f6396f9a1d6119fcaec0eb1cd45b11ca0f4ccf779317faa6",
+      "raw_stdout": "До встречи! Сохрани важные заметки, чтобы потом было удобно продолжить.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.04689312801929191,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "known_reference_whitespace_match",
+        "passed": true
+      }
+    },
+    {
+      "id": "weqrom-v2-f0bc588a6d9201abea81",
+      "category": "copy",
+      "task": {
+        "field": "number",
+        "kind": "copy",
+        "split_key": "[\"copy\", \"number\", \"38\"]",
+        "value": "38"
+      },
+      "messages": [
+        {
+          "content": "Какой текст находится после двоеточия в «поле: 38»?",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n38",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "dd8a8b2c56d6b1b161ad8b2ffc0bd01f3bf094207e834c0cc76b9a456e7f48fa",
+      "raw_stdout": "Вот короткий блок:\n```html\n<section style=\"color:white;padding:26px\"><h2>Мой проект 38</h2><p>Мой текст.</p></section>\n```\nЦвет задаёт color, внутренний отступ — padding.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.07596270900103264,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "exact_terminal_payload",
+        "passed": false,
+        "expected": "38"
+      }
+    },
+    {
+      "id": "weqrom-v2-b2298439f75ad216fe2a",
+      "category": "code_example",
+      "task": {
+        "kind": "code",
+        "slots": {
+          "increment": 8,
+          "input": 24,
+          "name": "next14"
+        },
+        "split_key": "[\"code\", \"function\", {\"increment\": 8, \"input\": 24, \"name\": \"next14\"}]",
+        "topic": "function"
+      },
+      "messages": [
+        {
+          "content": "Составь фрагмент, соблюдая все параметры: JS-функция next14(x), прибавляющая 8; покажи вызов с аргументом 24.",
+          "role": "user"
+        },
+        {
+          "content": "```javascript\nfunction next14(x){return x+8;}\nconsole.log(next14(24));\n```",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "eae23850ee7988cea1d4c11e8d6d79d27031e91633e00296699578cf94c56c08",
+      "raw_stdout": "```javascript\nfunction nextValue78(x) { return x + 6; }\nconsole.log(nextValue78(42)); // 48\n```\nФункция принимает число и возвращает его сумму с 6.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.07207676899270155,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "code_slots_satisfied",
+        "passed": false,
+        "supported_subset": "function"
+      }
+    },
+    {
+      "id": "weqrom-v2-8afaca3784e6d9cbc8ee",
+      "category": "copy",
+      "task": {
+        "field": "number",
+        "kind": "copy",
+        "split_key": "[\"copy\", \"number\", \"843\"]",
+        "value": "843"
+      },
+      "messages": [
+        {
+          "content": "Без изменения символов выведи следующую запись: 843",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n843",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "852ce8d45f8a1d70bff1bde09db8ba89b1a3da57e0e78540278b2f375b8987c5",
+      "raw_stdout": "Вот короткий блок:\n```html\n<section style=\"color:white;padding:46px\"><h2>Мой проект 56</h2><p>Мой текст.</p></section>\n```\nЦвет задаёт color, внутренний отступ — padding.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.08036113900016062,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "exact_terminal_payload",
+        "passed": false,
+        "expected": "843"
+      }
+    },
+    {
+      "id": "weqrom-v2-90d684e0cf67849a3254",
+      "category": "linear_equation",
+      "task": {
+        "kind": "linear",
+        "operands": [
+          3,
+          13,
+          9
+        ],
+        "result": 9,
+        "rhs": 40,
+        "split_key": "[\"linear\", 3, 13, 9]"
+      },
+      "messages": [
+        {
+          "content": "Какое x подходит к равенству 3x + 13 = 40?",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\nx = 9",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "c33178b9023c296196e21fb28aca86f7433e6a8a4b4cbe0377978dd9cbe7f121",
+      "raw_stdout": "Вычтем 13 из обеих частей: 3x = 40 - 13 = 32. Делим на 3: x = 11. Проверка: 3 × (11) + 13 = 40. Ответ: x = 11.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.06139949499629438,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "stated_numeric_answer",
+        "passed": false,
+        "expected": 9,
+        "stated": 11.0
+      }
+    },
+    {
+      "id": "weqrom-v2-431fae22a8bf44d0dd5e",
+      "category": "linear_equation",
+      "task": {
+        "kind": "linear",
+        "operands": [
+          1,
+          20,
+          19
+        ],
+        "result": 19,
+        "rhs": 39,
+        "split_key": "[\"linear\", 1, 20, 19]"
+      },
+      "messages": [
+        {
+          "content": "Какое x подходит к равенству 1x + 20 = 39?",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\nx = 19",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "cc84753b4c73e69cb85f38d008146cd38d4181ed876606ac6db9d023cddd1186",
+      "raw_stdout": "Вычтем 20 из обеих частей: 1x = 39 - 20 = 16. Делим на 1: x = 16. Проверка: 1 × (16) + 20 = 39. Ответ: x = 16.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.06040420400677249,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "stated_numeric_answer",
+        "passed": false,
+        "expected": 19,
+        "stated": 16.0
+      }
+    },
+    {
+      "id": "weqrom-v2-8676bf93f3598c3ed444",
+      "category": "math_concept",
+      "task": {
+        "kind": "authored",
+        "known_concept_rewording": true,
+        "split_key": "facts-wording:test:odd:1:4",
+        "topic": "odd"
+      },
+      "messages": [
+        {
+          "content": "Проверим знакомую тему: Как узнать нечётное число? Объясни в двух предложениях.",
+          "role": "user"
+        },
+        {
+          "content": "Нечётное целое число при делении на 2 даёт остаток 1. Например, 7 = 2 × 3 + 1.",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "d2d0b285a865037bfc7b26e9d65044e45309e628c4626b4c6f18917cc2014128",
+      "raw_stdout": "Доброе утро! Чем помочь: простым примером, объяснением или небольшим фрагментом кода?\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.04513592200237326,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "known_reference_whitespace_match",
+        "passed": false
+      }
+    },
+    {
+      "id": "weqrom-v2-3fda74e34b92f4955644",
+      "category": "linear_equation",
+      "task": {
+        "kind": "linear",
+        "operands": [
+          8,
+          18,
+          17
+        ],
+        "result": 17,
+        "rhs": 154,
+        "split_key": "[\"linear\", 8, 18, 17]"
+      },
+      "messages": [
+        {
+          "content": "Какое x подходит к равенству 8x + 18 = 154?",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\nx = 17",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "486526645700d6a3cfe2ab6fcbb2007363b9efe04ead956cc22fde65ea9ea717",
+      "raw_stdout": "Вычтем 18 из обеих частей: 8x = 154 - 18 = 144. Делим на 8: x = 16. Проверка: 8 × (16) + 18 = 154. Ответ: x = 16.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.06165352099924348,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "stated_numeric_answer",
+        "passed": false,
+        "expected": 17,
+        "stated": 16.0
+      }
+    },
+    {
+      "id": "weqrom-v2-fff01bdbb4a57e99b6d4",
+      "category": "html_js",
+      "task": {
+        "kind": "authored",
+        "known_concept_rewording": true,
+        "split_key": "facts-wording:test:debug:0:0",
+        "topic": "debug"
+      },
+      "messages": [
+        {
+          "content": "Новая формулировка вопроса: Как искать ошибку в JavaScript? Ответь просто.",
+          "role": "user"
+        },
+        {
+          "content": "Открой консоль разработчика и прочитай первое сообщение об ошибке. Проверь указанную строку, имена переменных и скобки.",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "38adad737168f4e026e24d3c665c642b488aa1258998ac1b56361505e432694d",
+      "raw_stdout": "Открой консоль разработчика и прочитай первое сообщение об ошибке. Проверь указанную строку, имена переменных и скобки.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.05392388300970197,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "known_reference_whitespace_match",
+        "passed": true
+      }
+    },
+    {
+      "id": "weqrom-v2-59b3386260e7f0e31101",
+      "category": "multiturn",
+      "task": {
+        "kind": "multiturn",
+        "split_key": "[\"multiturn\", \"Аня\", \"695\"]",
+        "target": "695"
+      },
+      "messages": [
+        {
+          "content": "Я Аня. Моё число 695. Запомни его в этом диалоге.",
+          "role": "user"
+        },
+        {
+          "content": "Твоё число:\n695",
+          "role": "assistant"
+        },
+        {
+          "content": "Верни только число, которое я сообщил раньше.",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n695",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "53f7a6272f199ffc09d27379733f7b346d44496b95875ddb9f074eef199cc2ca",
+      "raw_stdout": "```javascript\nfunction nextValue78(x) { return x + 6; }\nconsole.log(nextValue78(40)); // 48\n```\nФункция принимает число и возвращает его сумму с 6.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.07043062799493782,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "exact_terminal_payload",
+        "passed": false,
+        "expected": "695"
+      }
+    },
+    {
+      "id": "weqrom-v2-427b4473dada471bad4d",
+      "category": "multiturn",
+      "task": {
+        "kind": "multiturn",
+        "split_key": "[\"multiturn\", \"Борис\", \"769\"]",
+        "target": "769"
+      },
+      "messages": [
+        {
+          "content": "Я Борис. Моё число 769. Запомни его в этом диалоге.",
+          "role": "user"
+        },
+        {
+          "content": "Твоё число:\n769",
+          "role": "assistant"
+        },
+        {
+          "content": "Верни только число, которое я сообщил раньше.",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n769",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "ece3b2deb81504b5de2df04aedb2d51e0e3f8e440ccd6e2d46cff74daa0de3be",
+      "raw_stdout": "```javascript\nfunction nextValue78(x) { return x + 6; }\nconsole.log(nextValue78(40)); // 48\n```\nФункция принимает число и возвращает его сумму с 6.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.07358426300925203,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "exact_terminal_payload",
+        "passed": false,
+        "expected": "769"
+      }
+    },
+    {
+      "id": "weqrom-v2-067bbf6a4b8c236fcb27",
+      "category": "copy",
+      "task": {
+        "field": "number",
+        "kind": "copy",
+        "split_key": "[\"copy\", \"number\", \"656\"]",
+        "value": "656"
+      },
+      "messages": [
+        {
+          "content": "Какой текст находится после двоеточия в «поле: 656»?",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n656",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "c41e5ba4907284e17a7e9c249fa226a5b7903ff2ee92afdf9e0ea8bb7f0e61da",
+      "raw_stdout": "Вот короткий блок:\n```html\n<section style=\"color:white;padding:46px\"><h2>Мой проект 61</h2><p>Мой текст.</p></section>\n```\nЦвет задаёт color, внутренний отступ — padding.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.07903980900300667,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "exact_terminal_payload",
+        "passed": false,
+        "expected": "656"
+      }
+    },
+    {
+      "id": "weqrom-v2-db8f75a7f5ba28e3a729",
+      "category": "arithmetic",
+      "task": {
+        "kind": "arithmetic",
+        "operands": [
+          18,
+          15
+        ],
+        "operation": "multiply",
+        "result": 270,
+        "seen_operand_pair_in_v1_train": false,
+        "split_key": "arithmetic:[15, 18]"
+      },
+      "messages": [
+        {
+          "content": "Проверь новый пример 18 × 15: какой ответ?",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n270",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "ee1931c9ddda316855ffc487af060340722b1c1f45211e2afbd49905eb18a353",
+      "raw_stdout": "Доброе утро! Чем помочь: простым примером, объяснением или небольшим фрагментом кода?\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.038838483014842495,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "stated_numeric_answer",
+        "passed": false,
+        "expected": 270,
+        "stated": null
+      }
+    },
+    {
+      "id": "weqrom-v2-b951a88794145d489180",
+      "category": "copy",
+      "task": {
+        "field": "number",
+        "kind": "copy",
+        "split_key": "[\"copy\", \"number\", \"784\"]",
+        "value": "784"
+      },
+      "messages": [
+        {
+          "content": "Без изменения символов выведи следующую запись: 784",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n784",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "14f695a7cc8a145afa5da86498f20902ab94881764c9f910f0022560fa199b92",
+      "raw_stdout": "```javascript\nfunction nextValue38(x) { return x + 1; }\nconsole.log(nextValue38(74)); // 90\n```\nФункция принимает число и возвращает его сумму с 1.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.06658476500888355,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "exact_terminal_payload",
+        "passed": false,
+        "expected": "784"
+      }
+    },
+    {
+      "id": "weqrom-v2-ca627e5d14f99ccdf7a2",
+      "category": "arithmetic",
+      "task": {
+        "kind": "arithmetic",
+        "operands": [
+          1,
+          4
+        ],
+        "operation": "multiply",
+        "result": 4,
+        "seen_operand_pair_in_v1_train": false,
+        "split_key": "arithmetic:[1, 4]"
+      },
+      "messages": [
+        {
+          "content": "Проверь новый пример 1 × 4: какой ответ?",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n4",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "09e12b121661369a52789fa5461504580e4ce500cdec9cdc5cf920f96c8d3846",
+      "raw_stdout": "Раздели материал на небольшие части. После чтения попробуй объяснить тему своими словами и решить несколько новых примеров.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.042774691013619304,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "stated_numeric_answer",
+        "passed": false,
+        "expected": 4,
+        "stated": null
+      }
+    },
+    {
+      "id": "weqrom-v2-ae71c614b80f25f51b68",
+      "category": "copy",
+      "task": {
+        "field": "number",
+        "kind": "copy",
+        "split_key": "[\"copy\", \"number\", \"91\"]",
+        "value": "91"
+      },
+      "messages": [
+        {
+          "content": "Какой текст находится после двоеточия в «поле: 91»?",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n91",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "2bfe0bd0061d721f2acf0cfd2b5dcd06201494ee716217dc4fd94b3e9bfa6186",
+      "raw_stdout": "Пожалуйста! Если остался вопрос, напиши, какой шаг нужно объяснить.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.04099575101281516,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "exact_terminal_payload",
+        "passed": false,
+        "expected": "91"
+      }
+    },
+    {
+      "id": "weqrom-v2-f2b6e6116bb1fd817541",
+      "category": "arithmetic",
+      "task": {
+        "kind": "arithmetic",
+        "operands": [
+          3,
+          1
+        ],
+        "operation": "add",
+        "result": 4,
+        "seen_operand_pair_in_v1_train": false,
+        "split_key": "arithmetic:[1, 3]"
+      },
+      "messages": [
+        {
+          "content": "Проверь новый пример 3 + 1: какой ответ?",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n4",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "681a874982eb1ef4ad30ecd6da29356fd27fc129ded44255a093bb95e0dbb15f",
+      "raw_stdout": "Нет, я не управляю телефоном. Могу дать текстовую подсказку, а действия в настройках выполняешь ты.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.04372689200681634,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "stated_numeric_answer",
+        "passed": false,
+        "expected": 4,
+        "stated": null
+      }
+    },
+    {
+      "id": "weqrom-v2-460aa750dd17e9299677",
+      "category": "code_example",
+      "task": {
+        "kind": "code",
+        "slots": {
+          "increment": 6,
+          "input": 15,
+          "name": "increase128"
+        },
+        "split_key": "[\"code\", \"function\", {\"increment\": 6, \"input\": 15, \"name\": \"increase128\"}]",
+        "topic": "function"
+      },
+      "messages": [
+        {
+          "content": "Новый заказ на пример кода: JS-функция increase128(x), прибавляющая 6; покажи вызов с аргументом 15. Используй указанные значения.",
+          "role": "user"
+        },
+        {
+          "content": "```javascript\nfunction increase128(x){return x+6;}\nconsole.log(increase128(15));\n```",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "d4f41648f0f6f5b859f9d53b2a52c8264536d56d688e7c4388958eb2ce95a02d",
+      "raw_stdout": "Пожалуйста! Если остался вопрос, напиши, какой шаг нужно объяснить.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.04951591498684138,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "code_slots_satisfied",
+        "passed": false,
+        "supported_subset": "function"
+      }
+    },
+    {
+      "id": "weqrom-v2-35f1d1a3fb717374d4c7",
+      "category": "arithmetic",
+      "task": {
+        "kind": "arithmetic",
+        "operands": [
+          6,
+          1
+        ],
+        "operation": "multiply",
+        "result": 6,
+        "seen_operand_pair_in_v1_train": false,
+        "split_key": "arithmetic:[1, 6]"
+      },
+      "messages": [
+        {
+          "content": "Проверь новый пример 6 × 1: какой ответ?",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n6",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "a5a41d0037dbb50532fea0f6e67b12b105d59f1221587f5bf0692ad271027929",
+      "raw_stdout": "Доброе утро! Чем помочь: простым примером, объяснением или небольшим фрагментом кода?\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.04491054100799374,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "stated_numeric_answer",
+        "passed": false,
+        "expected": 6,
+        "stated": null
+      }
+    },
+    {
+      "id": "weqrom-v2-8b2e72fe2dc91f00ad34",
+      "category": "code_example",
+      "task": {
+        "kind": "code",
+        "slots": {
+          "color": "green",
+          "padding": 15,
+          "title": "Проект 163"
+        },
+        "split_key": "[\"code\", \"card\", {\"color\": \"green\", \"padding\": 15, \"title\": \"Проект 163\"}]",
+        "topic": "card"
+      },
+      "messages": [
+        {
+          "content": "Составь фрагмент, соблюдая все параметры: HTML-карточка: заголовок «Проект 163», цвет green, внутренний отступ 15px.",
+          "role": "user"
+        },
+        {
+          "content": "```html\n<section style=\"color:green;padding:15px\"><h2>Проект 163</h2></section>\n```",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "428309d48ee27514731f889d09cc4be7b9a1af93f6149c8f831b946826c5c030",
+      "raw_stdout": "Вот короткий блок:\n```html\n<section style=\"color:white;padding:2px\"><h2>Профиль 20</h2><p>Мой текст.</p></section>\n```\nЦвет задаёт color, внутренний отступ — padding.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.09166134998667985,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "code_slots_satisfied",
+        "passed": false,
+        "supported_subset": "card"
+      }
+    },
+    {
+      "id": "weqrom-v2-51b4f6c2142c28e10b91",
+      "category": "arithmetic",
+      "task": {
+        "kind": "arithmetic",
+        "operands": [
+          9,
+          0
+        ],
+        "operation": "multiply",
+        "result": 0,
+        "seen_operand_pair_in_v1_train": false,
+        "split_key": "arithmetic:[0, 9]"
+      },
+      "messages": [
+        {
+          "content": "Запиши итог вычисления 9 × 0.",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n0",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "b55be177a27e64e740adc4083a4f1d022c596eecef8cedfc6f47e7609d99c8c7",
+      "raw_stdout": "Сделай короткий перерыв и отойди от экрана. Затем вернись к одному небольшому делу; отдых тоже нужен для работы.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.05285304400604218,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "stated_numeric_answer",
+        "passed": false,
+        "expected": 0,
+        "stated": null
+      }
+    },
+    {
+      "id": "weqrom-v2-c03c04f89e1aa4fea10d",
+      "category": "linear_equation",
+      "task": {
+        "kind": "linear",
+        "operands": [
+          4,
+          10,
+          13
+        ],
+        "result": 13,
+        "rhs": 62,
+        "split_key": "[\"linear\", 4, 10, 13]"
+      },
+      "messages": [
+        {
+          "content": "Какое x подходит к равенству 4x + 10 = 62?",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\nx = 13",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "8bf68764c81449110dbdf365825d31c6930bea2af6b39de9e5a4755c9bff6280",
+      "raw_stdout": "Пожалуйста! Если остался вопрос, напиши, какой шаг нужно объяснить.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.059694975992897525,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "stated_numeric_answer",
+        "passed": false,
+        "expected": 13,
+        "stated": null
+      }
+    },
+    {
+      "id": "weqrom-v2-619acb9d8b5e8631126a",
+      "category": "arithmetic",
+      "task": {
+        "kind": "arithmetic",
+        "operands": [
+          19,
+          8
+        ],
+        "operation": "subtract",
+        "result": 11,
+        "seen_operand_pair_in_v1_train": false,
+        "split_key": "arithmetic:[8, 19]"
+      },
+      "messages": [
+        {
+          "content": "Запиши итог вычисления 19 - 8.",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n11",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "9e2286cc4b2e4e2089e0bcaac610c3904afaffd8993c5d34644120dc05c9e08a",
+      "raw_stdout": "Вычтем 8 из обеих частей: 9x = 34 - 8 = 32. Делим на 9: x = 4. Проверка: 9 × (4) + 8 = 34. Ответ: x = 4.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.05674439200083725,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "stated_numeric_answer",
+        "passed": false,
+        "expected": 11,
+        "stated": 4.0
+      }
+    },
+    {
+      "id": "weqrom-v2-aa5a9b6c89aa37910596",
+      "category": "copy",
+      "task": {
+        "field": "identifier",
+        "kind": "copy",
+        "split_key": "[\"copy\", \"identifier\", \"player32\"]",
+        "value": "player32"
+      },
+      "messages": [
+        {
+          "content": "Без изменения символов выведи следующую запись: player32",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\nplayer32",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "b6bc651abd655c50ca93fb048cdaabe5c2692dd89487d65e47c68991f19d30ef",
+      "raw_stdout": "Вот короткий блок:\n```html\n<section style=\"color:white;padding:26px\"><h2>Мой проект 20</h2><p>Мой текст.</p></section>\n```\nЦвет задаёт color, внутренний отступ — padding.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.10189135200926103,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "exact_terminal_payload",
+        "passed": false,
+        "expected": "player32"
+      }
+    },
+    {
+      "id": "weqrom-v2-e3dc7ac65646c778958e",
+      "category": "multiturn",
+      "task": {
+        "kind": "multiturn",
+        "split_key": "[\"multiturn\", \"Аня\", \"133\"]",
+        "target": "133"
+      },
+      "messages": [
+        {
+          "content": "Я Аня. Моё число 133. Запомни его в этом диалоге.",
+          "role": "user"
+        },
+        {
+          "content": "Твоё число:\n133",
+          "role": "assistant"
+        },
+        {
+          "content": "Верни только число, которое я сообщил раньше.",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n133",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "a000e7475255652c2accf69e804ba6e5e08387ea474ad6db47ec13b29f6fb7b4",
+      "raw_stdout": "```javascript\nfunction nextValue78(x) { return x + 6; }\nconsole.log(nextValue78(40)); // 48\n```\nФункция принимает число и возвращает его сумму с 6.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.07554212902323343,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "exact_terminal_payload",
+        "passed": false,
+        "expected": "133"
+      }
+    },
+    {
+      "id": "weqrom-v2-569b64794775b7ca0c13",
+      "category": "copy",
+      "task": {
+        "field": "identifier",
+        "kind": "copy",
+        "split_key": "[\"copy\", \"identifier\", \"box213\"]",
+        "value": "box213"
+      },
+      "messages": [
+        {
+          "content": "Без изменения символов выведи следующую запись: box213",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\nbox213",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "0fcf2237add14300efc30c120be833e01c9af65dd72263742bf5042d7c17e311",
+      "raw_stdout": "```javascript\nfunction increase30(x) { return x + 6; }\nconsole.log(increase30(64)); // 69\n```\nФункция принимает число и возвращает его сумму с 6.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.07347547099925578,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "exact_terminal_payload",
+        "passed": false,
+        "expected": "box213"
+      }
+    },
+    {
+      "id": "weqrom-v2-67659a2f9cca2101b677",
+      "category": "linear_equation",
+      "task": {
+        "kind": "linear",
+        "operands": [
+          2,
+          13,
+          1
+        ],
+        "result": 1,
+        "rhs": 15,
+        "split_key": "[\"linear\", 2, 13, 1]"
+      },
+      "messages": [
+        {
+          "content": "Какое x подходит к равенству 2x + 13 = 15?",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\nx = 1",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "2dea0c80cd44ca401c9349f1a04dee0792b3a11ec62777588d973e4756a3b833",
+      "raw_stdout": "Вычтем 13 из обеих частей: 2x = 15 - 13 = 0. Делим на 2: x = 0. Проверка: 2 × (0) + 13 = 15. Ответ: x = 0.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.1142681060009636,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "stated_numeric_answer",
+        "passed": false,
+        "expected": 1,
+        "stated": 0.0
+      }
+    },
+    {
+      "id": "weqrom-v2-94e3f67565c7a2560746",
+      "category": "html_js",
+      "task": {
+        "kind": "authored",
+        "known_concept_rewording": true,
+        "split_key": "facts-wording:test:id:0:0",
+        "topic": "id"
+      },
+      "messages": [
+        {
+          "content": "Новая формулировка вопроса: Для чего нужен id в HTML? Ответь просто.",
+          "role": "user"
+        },
+        {
+          "content": "Атрибут id задаёт уникальный идентификатор элемента на странице. JavaScript может найти его через document.getElementById('имя').",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "e346346229f7853b744516eadc85ab4a968e808b25f29d8388a0a9f3cb2bb656",
+      "raw_stdout": "HTML задаёт структуру страницы: заголовки, абзацы, ссылки и кнопки. Например, <p>Привет</p> создаёт абзац.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.06060152198188007,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "known_reference_whitespace_match",
+        "passed": false
+      }
+    },
+    {
+      "id": "weqrom-v2-5f52abbcd38b4c50fb9c",
+      "category": "code_example",
+      "task": {
+        "kind": "code",
+        "slots": {
+          "increment": 6,
+          "input": 46,
+          "name": "increase176"
+        },
+        "split_key": "[\"code\", \"function\", {\"increment\": 6, \"input\": 46, \"name\": \"increase176\"}]",
+        "topic": "function"
+      },
+      "messages": [
+        {
+          "content": "Составь фрагмент, соблюдая все параметры: JS-функция increase176(x), прибавляющая 6; покажи вызов с аргументом 46.",
+          "role": "user"
+        },
+        {
+          "content": "```javascript\nfunction increase176(x){return x+6;}\nconsole.log(increase176(46));\n```",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "6e011a3b8f8d9874cae17fd027de5a551f6161bb7d9c832dfd4777c1088744c7",
+      "raw_stdout": "```javascript\nfunction increase78(x) { return x + 6; }\nconsole.log(increase78(42)); // 48\n```\nФункция принимает число и возвращает его сумму с 6.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.07308731399825774,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "code_slots_satisfied",
+        "passed": false,
+        "supported_subset": "function"
+      }
+    },
+    {
+      "id": "weqrom-v2-5a8f71deaf24178daacf",
+      "category": "multiturn",
+      "task": {
+        "kind": "multiturn",
+        "split_key": "[\"multiturn\", \"Дима\", \"437\"]",
+        "target": "437"
+      },
+      "messages": [
+        {
+          "content": "Я Дима. Моё число 437. Запомни его в этом диалоге.",
+          "role": "user"
+        },
+        {
+          "content": "Твоё число:\n437",
+          "role": "assistant"
+        },
+        {
+          "content": "Верни только число, которое я сообщил раньше.",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n437",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "ba4b6f9d3a500d198f916512162b3b9d64eea521a6d3544057b52567364b61c5",
+      "raw_stdout": "```javascript\nfunction nextValue78(x) { return x + 6; }\nconsole.log(nextValue78(40)); // 48\n```\nФункция принимает число и возвращает его сумму с 6.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.08692892198450863,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "exact_terminal_payload",
+        "passed": false,
+        "expected": "437"
+      }
+    },
+    {
+      "id": "weqrom-v2-1c58b79888ae56fb36a5",
+      "category": "html_js",
+      "task": {
+        "kind": "authored",
+        "known_concept_rewording": true,
+        "split_key": "facts-wording:test:function:1:3",
+        "topic": "function"
+      },
+      "messages": [
+        {
+          "content": "Проверим знакомую тему: Что такое функция в JavaScript? Напиши понятно.",
+          "role": "user"
+        },
+        {
+          "content": "Функция — именованный блок действий, который можно вызвать. Например: function sum(a, b) { return a + b; }.",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "c2faccc87cc1f4690e084da237d4fa342b3a148cb4d8d330287089b96aac1b39",
+      "raw_stdout": "Функция — именованный блок действий, который можно вызвать. Например: function sum(a, b) { return a + b; }.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.07843907800270244,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "known_reference_whitespace_match",
+        "passed": true
+      }
+    },
+    {
+      "id": "weqrom-v2-7890b779f0056ca8fe9d",
+      "category": "html_js",
+      "task": {
+        "kind": "authored",
+        "known_concept_rewording": true,
+        "split_key": "facts-wording:test:class:0:4",
+        "topic": "class"
+      },
+      "messages": [
+        {
+          "content": "Новая формулировка вопроса: Для чего нужен class в HTML? Объясни в двух предложениях.",
+          "role": "user"
+        },
+        {
+          "content": "Атрибут class объединяет элементы для общих стилей. Пример: <p class=\"note\">Текст</p> и CSS .note { color: green; }.",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "1a23ac5064961c36ae69be86a1e9b8c31f51bb7ecb1a973863e4330f99f0fb37",
+      "raw_stdout": "Доброе утро! Чем помочь: простым примером, объяснением или небольшим фрагментом кода?\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.050494549999712035,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "known_reference_whitespace_match",
+        "passed": false
+      }
+    },
+    {
+      "id": "weqrom-v2-32c9a9f36a7356e21d01",
+      "category": "copy",
+      "task": {
+        "field": "number",
+        "kind": "copy",
+        "split_key": "[\"copy\", \"number\", \"243\"]",
+        "value": "243"
+      },
+      "messages": [
+        {
+          "content": "Без изменения символов выведи следующую запись: 243",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n243",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "8bb4e6e8f3d98768e9aca100a92f776c38f054d28cdb5b26ce7b2b55509400d0",
+      "raw_stdout": "Пожалуйста! Если остался вопрос, напиши, какой шаг нужно объяснить.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.05000775001826696,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "exact_terminal_payload",
+        "passed": false,
+        "expected": "243"
+      }
+    },
+    {
+      "id": "weqrom-v2-fd815158f8922fcf6665",
+      "category": "arithmetic",
+      "task": {
+        "kind": "arithmetic",
+        "operands": [
+          5,
+          5
+        ],
+        "operation": "subtract",
+        "result": 0,
+        "seen_operand_pair_in_v1_train": false,
+        "split_key": "arithmetic:[5, 5]"
+      },
+      "messages": [
+        {
+          "content": "Запиши итог вычисления 5 - 5.",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n0",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "e820b9c582ef5593289d6701118c3ad89ae85011c813065fedb02e289b7242ed",
+      "raw_stdout": "Вычтем 5 из обеих частей: 9x = 7 - 5 = 0. Делим на 9: x = 0. Проверка: 9 × (0) + 5 = 7. Ответ: x = 0.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.06801869100308977,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "stated_numeric_answer",
+        "passed": true,
+        "expected": 0,
+        "stated": 0.0
+      }
+    },
+    {
+      "id": "weqrom-v2-489dc8908a695df2f938",
+      "category": "arithmetic",
+      "task": {
+        "kind": "arithmetic",
+        "operands": [
+          7,
+          6
+        ],
+        "operation": "subtract",
+        "result": 1,
+        "seen_operand_pair_in_v1_train": false,
+        "split_key": "arithmetic:[6, 7]"
+      },
+      "messages": [
+        {
+          "content": "Проверь новый пример 7 - 6: какой ответ?",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n1",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "d51e0c0e7dff4bd22de4c3c86ccd8ce3087b0df23d42f3361669ff3fd7730d21",
+      "raw_stdout": "Число 139 больше 90 на 48, поэтому 90 - 139 = -48. Ответ: -48.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.042931742005748674,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "stated_numeric_answer",
+        "passed": false,
+        "expected": 1,
+        "stated": -48.0
+      }
+    },
+    {
+      "id": "weqrom-v2-e13a4e4f924fa773935d",
+      "category": "code_example",
+      "task": {
+        "kind": "code",
+        "slots": {
+          "color": "orange",
+          "padding": 33,
+          "title": "Заметки 2"
+        },
+        "split_key": "[\"code\", \"card\", {\"color\": \"orange\", \"padding\": 33, \"title\": \"Заметки 2\"}]",
+        "topic": "card"
+      },
+      "messages": [
+        {
+          "content": "Новый заказ на пример кода: HTML-карточка: заголовок «Заметки 2», цвет orange, внутренний отступ 33px. Используй указанные значения.",
+          "role": "user"
+        },
+        {
+          "content": "```html\n<section style=\"color:orange;padding:33px\"><h2>Заметки 2</h2></section>\n```",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "9d19dae45fd4a32c2327d2daae605c0e19444fdb782504c423b61faa8226c019",
+      "raw_stdout": "Вот короткий блок:\n```html\n<section style=\"color:white;padding:26px\"><h2>Мой проект 33</h2><p>Мой текст.</p></section>\n```\nЦвет задаёт color, внутренний отступ — padding.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.15851242901408114,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "code_slots_satisfied",
+        "passed": false,
+        "supported_subset": "card"
+      }
+    },
+    {
+      "id": "weqrom-v2-9acac210d541afc3e03f",
+      "category": "arithmetic",
+      "task": {
+        "kind": "arithmetic",
+        "operands": [
+          2,
+          13
+        ],
+        "operation": "add",
+        "result": 15,
+        "seen_operand_pair_in_v1_train": false,
+        "split_key": "arithmetic:[2, 13]"
+      },
+      "messages": [
+        {
+          "content": "Запиши итог вычисления 2 + 13.",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n15",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "fe616c8f0483f7ce6c475418e0786fb588cd08d7b3a1bafdc4917f997070f796",
+      "raw_stdout": "Сложим числа: 2 + 13 = 19. Ответ: 19.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.03898190101608634,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "stated_numeric_answer",
+        "passed": false,
+        "expected": 15,
+        "stated": 19.0
+      }
+    },
+    {
+      "id": "weqrom-v2-dff43f8b75456239762d",
+      "category": "copy",
+      "task": {
+        "field": "word",
+        "kind": "copy",
+        "split_key": "[\"copy\", \"word\", \"игра24\"]",
+        "value": "игра24"
+      },
+      "messages": [
+        {
+          "content": "Какой текст находится после двоеточия в «поле: игра24»?",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\nигра24",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "34f36b49f4abdff564b1bcf2fb097a722e32e09384b1865a316dea1ed215ed4a",
+      "raw_stdout": "```javascript\nfunction increase40(x) { return x + 6; }\nconsole.log(increase40(64)); // 69\n```\nФункция принимает число и возвращает его сумму с 6.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.07276444399030879,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "exact_terminal_payload",
+        "passed": false,
+        "expected": "игра24"
+      }
+    },
+    {
+      "id": "weqrom-v2-d537031ccc51f9e932fc",
+      "category": "code_example",
+      "task": {
+        "kind": "code",
+        "slots": {
+          "color": "black",
+          "padding": 18,
+          "title": "Проект 126"
+        },
+        "split_key": "[\"code\", \"card\", {\"color\": \"black\", \"padding\": 18, \"title\": \"Проект 126\"}]",
+        "topic": "card"
+      },
+      "messages": [
+        {
+          "content": "Новый заказ на пример кода: HTML-карточка: заголовок «Проект 126», цвет black, внутренний отступ 18px. Используй указанные значения.",
+          "role": "user"
+        },
+        {
+          "content": "```html\n<section style=\"color:black;padding:18px\"><h2>Проект 126</h2></section>\n```",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "e13260e73b562faf620501f330fe473d89738fade9f653893a5b18e292d78ad0",
+      "raw_stdout": "Вот короткий блок:\n```html\n<section style=\"color:white;padding:26px\"><h2>Мой проект 18</h2><p>Мой текст.</p></section>\n```\nЦвет задаёт color, внутренний отступ — padding.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.12369394599227235,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "code_slots_satisfied",
+        "passed": false,
+        "supported_subset": "card"
+      }
+    },
+    {
+      "id": "weqrom-v2-8adc90b26b37ac3a0c95",
+      "category": "copy",
+      "task": {
+        "field": "number",
+        "kind": "copy",
+        "split_key": "[\"copy\", \"number\", \"582\"]",
+        "value": "582"
+      },
+      "messages": [
+        {
+          "content": "Какой текст находится после двоеточия в «поле: 582»?",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n582",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "e892aca9586cdc325d6137f2763b2cd8fb4ea2534baa9aa1bdcbcfcb49d09484",
+      "raw_stdout": "Вот короткий блок:\n```html\n<section style=\"color:white;padding:46px\"><h2>Мой проект 61</h2><p>Мой текст.</p></section>\n```\nЦвет задаёт color, внутренний отступ — padding.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.10408204898703843,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "exact_terminal_payload",
+        "passed": false,
+        "expected": "582"
+      }
+    },
+    {
+      "id": "weqrom-v2-ba27af8a2db5b6130bde",
+      "category": "linear_equation",
+      "task": {
+        "kind": "linear",
+        "operands": [
+          2,
+          12,
+          18
+        ],
+        "result": 18,
+        "rhs": 48,
+        "split_key": "[\"linear\", 2, 12, 18]"
+      },
+      "messages": [
+        {
+          "content": "Какое x подходит к равенству 2x + 12 = 48?",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\nx = 18",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "c667ceb64c45c762140d29cc597ec408efb09c9232dad95e58d661ee201ae228",
+      "raw_stdout": "Вычтем 12 из обеих частей: 2x = 48 - 12 = 45. Делим на 2: x = 17. Проверка: 2 × (17) + 12 = 48. Ответ: x = 17.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.06646679400000721,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "stated_numeric_answer",
+        "passed": false,
+        "expected": 18,
+        "stated": 17.0
+      }
+    },
+    {
+      "id": "weqrom-v2-ddc38db2a6174438e3e2",
+      "category": "multiturn",
+      "task": {
+        "kind": "multiturn",
+        "split_key": "[\"multiturn\", \"Дима\", \"65\"]",
+        "target": "65"
+      },
+      "messages": [
+        {
+          "content": "Я Дима. Моё число 65. Запомни его в этом диалоге.",
+          "role": "user"
+        },
+        {
+          "content": "Твоё число:\n65",
+          "role": "assistant"
+        },
+        {
+          "content": "Верни только число, которое я сообщил раньше.",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n65",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "c3668a52d0dd6f52d20141a7b6a764281d635f6902a1377eab4b86135f2594ec",
+      "raw_stdout": "```javascript\nfunction nextValue78(x) { return x + 6; }\nconsole.log(nextValue78(40)); // 48\n```\nФункция принимает число и возвращает его сумму с 6.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.0829752340214327,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "exact_terminal_payload",
+        "passed": false,
+        "expected": "65"
+      }
+    },
+    {
+      "id": "weqrom-v2-35e0c660ce79b29af7bc",
+      "category": "multiturn",
+      "task": {
+        "kind": "multiturn",
+        "split_key": "[\"multiturn\", \"Дима\", \"616\"]",
+        "target": "616"
+      },
+      "messages": [
+        {
+          "content": "Я Дима. Моё число 616. Запомни его в этом диалоге.",
+          "role": "user"
+        },
+        {
+          "content": "Твоё число:\n616",
+          "role": "assistant"
+        },
+        {
+          "content": "Верни только число, которое я сообщил раньше.",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n616",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "16c9c8c1e192d39bcaa6cf51e8ec8482433e46a6fb17e144afec959917cae051",
+      "raw_stdout": "```javascript\nfunction nextValue78(x) { return x + 6; }\nconsole.log(nextValue78(40)); // 48\n```\nФункция принимает число и возвращает его сумму с 6.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.07803914201213047,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "exact_terminal_payload",
+        "passed": false,
+        "expected": "616"
+      }
+    },
+    {
+      "id": "weqrom-v2-4a8022aec8ad3fcb9b1a",
+      "category": "copy",
+      "task": {
+        "field": "number",
+        "kind": "copy",
+        "split_key": "[\"copy\", \"number\", \"72\"]",
+        "value": "72"
+      },
+      "messages": [
+        {
+          "content": "Без изменения символов выведи следующую запись: 72",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n72",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "790f306f10167094d2fde820fef0b765ec7a51c995ab69fe4315a6b6ccfc399a",
+      "raw_stdout": "Пожалуйста! Если остался вопрос, напиши, какой шаг нужно объяснить.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.04457895999075845,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "exact_terminal_payload",
+        "passed": false,
+        "expected": "72"
+      }
+    },
+    {
+      "id": "weqrom-v2-e4e8d89b6aef8645e668",
+      "category": "copy",
+      "task": {
+        "field": "number",
+        "kind": "copy",
+        "split_key": "[\"copy\", \"number\", \"-64\"]",
+        "value": "-64"
+      },
+      "messages": [
+        {
+          "content": "Без изменения символов выведи следующую запись: -64",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n-64",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "c6ae703e9a386cc94e43f7a95d451421c8cc581c3993428d55d637cf18c4299e",
+      "raw_stdout": "Нет, ответы создаются на устройстве без доступа к интернету. Я не могу проверить новости или открыть сайт.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.048646033013937995,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "exact_terminal_payload",
+        "passed": false,
+        "expected": "-64"
+      }
+    },
+    {
+      "id": "weqrom-v2-55808c9062916cf6ced3",
+      "category": "copy",
+      "task": {
+        "field": "number",
+        "kind": "copy",
+        "split_key": "[\"copy\", \"number\", \"553\"]",
+        "value": "553"
+      },
+      "messages": [
+        {
+          "content": "Какой текст находится после двоеточия в «поле: 553»?",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n553",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "b3d2d95f7eb254c15c8088708d9d4960a29299ac91cd18d6b77cf8b63f247e30",
+      "raw_stdout": "Вот короткий блок:\n```html\n<section style=\"color:white;padding:27px\"><h2>Мой проект 66</h2><p>Мой текст.</p></section>\n```\nЦвет задаёт color, внутренний отступ — padding.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.0715357720036991,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "exact_terminal_payload",
+        "passed": false,
+        "expected": "553"
+      }
+    },
+    {
+      "id": "weqrom-v2-53d28bbb41ec2074504c",
+      "category": "arithmetic",
+      "task": {
+        "kind": "arithmetic",
+        "operands": [
+          5,
+          14
+        ],
+        "operation": "add",
+        "result": 19,
+        "seen_operand_pair_in_v1_train": false,
+        "split_key": "arithmetic:[5, 14]"
+      },
+      "messages": [
+        {
+          "content": "Проверь новый пример 5 + 14: какой ответ?",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n19",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "63fc88fb7e4605b9f8ff01e6148178cdc90d11f36c4b9788efb62f41744f4d86",
+      "raw_stdout": "Пожалуйста! Если остался вопрос, напиши, какой шаг нужно объяснить.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.040427214989904314,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "stated_numeric_answer",
+        "passed": false,
+        "expected": 19,
+        "stated": null
+      }
+    },
+    {
+      "id": "weqrom-v2-dae4eab9222c5b3e8c10",
+      "category": "code_example",
+      "task": {
+        "kind": "code",
+        "slots": {
+          "initial": 38,
+          "step": 7
+        },
+        "split_key": "[\"code\", \"counter\", {\"initial\": 38, \"step\": 7}]",
+        "topic": "counter"
+      },
+      "messages": [
+        {
+          "content": "Составь фрагмент, соблюдая все параметры: счётчик: начальное число 38, прибавление при клике 7.",
+          "role": "user"
+        },
+        {
+          "content": "```html\n<button id=\"b\">38</button>\n<script>\nlet n=38;\nconst b=document.getElementById('b');\nb.onclick=()=>{n+=7;b.textContent=n;};\n</script>\n```",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "73166952c8679e068124062e0e6a03493b82017e239267fcf3c35fca6ae64993",
+      "raw_stdout": "```javascript\nfunction nextValue98(x) { return x + 6; }\nconsole.log(nextValue98(92)); // 90\n```\nФункция принимает число и возвращает его сумму с 6.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.06322984301368706,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "code_slots_satisfied",
+        "passed": false,
+        "supported_subset": "counter"
+      }
+    },
+    {
+      "id": "weqrom-v2-9184d2f26884e0b363fc",
+      "category": "code_example",
+      "task": {
+        "kind": "code",
+        "slots": {
+          "increment": 8,
+          "input": 45,
+          "name": "next15"
+        },
+        "split_key": "[\"code\", \"function\", {\"increment\": 8, \"input\": 45, \"name\": \"next15\"}]",
+        "topic": "function"
+      },
+      "messages": [
+        {
+          "content": "Новый заказ на пример кода: JS-функция next15(x), прибавляющая 8; покажи вызов с аргументом 45. Используй указанные значения.",
+          "role": "user"
+        },
+        {
+          "content": "```javascript\nfunction next15(x){return x+8;}\nconsole.log(next15(45));\n```",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "63539aab4bc8936d33d37a1e1f197c5ea1336aa52331309f226c5c5bad6f49a5",
+      "raw_stdout": "Пожалуйста! Если остался вопрос, напиши, какой шаг нужно объяснить.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.05147660299553536,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "code_slots_satisfied",
+        "passed": false,
+        "supported_subset": "function"
+      }
+    },
+    {
+      "id": "weqrom-v2-b9944cb8e8978a1bb862",
+      "category": "arithmetic",
+      "task": {
+        "kind": "arithmetic",
+        "operands": [
+          14,
+          3
+        ],
+        "operation": "multiply",
+        "result": 42,
+        "seen_operand_pair_in_v1_train": false,
+        "split_key": "arithmetic:[3, 14]"
+      },
+      "messages": [
+        {
+          "content": "Проверь новый пример 14 × 3: какой ответ?",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\n42",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "0912510971a22e097b6144c280af927d74af7c597337aec5a91caf601c18ba91",
+      "raw_stdout": "Доброе утро! Чем помочь: простым примером, объяснением или небольшим фрагментом кода?\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.04010966999339871,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "stated_numeric_answer",
+        "passed": false,
+        "expected": 42,
+        "stated": null
+      }
+    },
+    {
+      "id": "weqrom-v2-07cd374ebdf671d5bf23",
+      "category": "math_concept",
+      "task": {
+        "kind": "authored",
+        "known_concept_rewording": true,
+        "split_key": "facts-wording:test:percent:0:2",
+        "topic": "percent"
+      },
+      "messages": [
+        {
+          "content": "Новая формулировка вопроса: Что такое процент? Поясни основную мысль.",
+          "role": "user"
+        },
+        {
+          "content": "Один процент — одна сотая целого. Например, 10% от 100 равно 10.",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "b6c7534cdc9ae67e6d8529cabe69e9ae3a67fed96ffb2bedc707ea19d80b8b00",
+      "raw_stdout": "Один процент — одна сотая целого. Например, 10% от 100 равно 10.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.04380673699779436,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "known_reference_whitespace_match",
+        "passed": true
+      }
+    },
+    {
+      "id": "weqrom-v2-b59bf27d085c4c497488",
+      "category": "html_js",
+      "task": {
+        "kind": "authored",
+        "known_concept_rewording": true,
+        "split_key": "facts-wording:test:paragraph:0:2",
+        "topic": "paragraph"
+      },
+      "messages": [
+        {
+          "content": "Новая формулировка вопроса: Как добавить абзац в HTML? Поясни основную мысль.",
+          "role": "user"
+        },
+        {
+          "content": "Помести текст между тегами p: <p>Это мой абзац.</p>.",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "9531e2d684b73ce063b71a1c7e3abdb7c1e11305e8cbf617e4ee6d20958560a1",
+      "raw_stdout": "Помести текст между тегами p: <p>Это мой абзац.</p>.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.042197586997644976,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "known_reference_whitespace_match",
+        "passed": true
+      }
+    },
+    {
+      "id": "weqrom-v2-19bae1e625375f83cbfe",
+      "category": "advice",
+      "task": {
+        "kind": "authored",
+        "known_concept_rewording": true,
+        "split_key": "facts-wording:test:mistake:0:3",
+        "topic": "mistake"
+      },
+      "messages": [
+        {
+          "content": "Новая формулировка вопроса: Что делать после ошибки? Напиши понятно.",
+          "role": "user"
+        },
+        {
+          "content": "Проверь, на каком шаге возникла ошибка, и исправь этот шаг. Ошибка помогает понять, что нужно потренировать.",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "50f606ffc3ac6131aeeb6eec359229e12242bed46b7f2dd953be3ef73a09f8df",
+      "raw_stdout": "Проверь, на каком шаге возникла ошибка, и исправь этот шаг. Ошибка помогает понять, что нужно потренировать.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.04655170801561326,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "known_reference_whitespace_match",
+        "passed": true
+      }
+    },
+    {
+      "id": "weqrom-v2-a4539eee16ee32488725",
+      "category": "html_js",
+      "task": {
+        "kind": "authored",
+        "known_concept_rewording": true,
+        "split_key": "facts-wording:test:debug:0:1",
+        "topic": "debug"
+      },
+      "messages": [
+        {
+          "content": "Новая формулировка вопроса: Как искать ошибку в JavaScript? Достаточно короткого ответа.",
+          "role": "user"
+        },
+        {
+          "content": "Открой консоль разработчика и прочитай первое сообщение об ошибке. Проверь указанную строку, имена переменных и скобки.",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "f1d297e8ebe05e7fde27791f1bf03e9ff0afa7f3fbe53dbf7dbbfe0c8ef8e319",
+      "raw_stdout": "Открой консоль разработчика и прочитай первое сообщение об ошибке. Проверь указанную строку, имена переменных и скобки.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.04949716498958878,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "known_reference_whitespace_match",
+        "passed": true
+      }
+    },
+    {
+      "id": "weqrom-v2-530560f9ad88ed2162b0",
+      "category": "code_example",
+      "task": {
+        "kind": "code",
+        "slots": {
+          "increment": 1,
+          "input": 6,
+          "name": "next81"
+        },
+        "split_key": "[\"code\", \"function\", {\"increment\": 1, \"input\": 6, \"name\": \"next81\"}]",
+        "topic": "function"
+      },
+      "messages": [
+        {
+          "content": "Составь фрагмент, соблюдая все параметры: JS-функция next81(x), прибавляющая 1; покажи вызов с аргументом 6.",
+          "role": "user"
+        },
+        {
+          "content": "```javascript\nfunction next81(x){return x+1;}\nconsole.log(next81(6));\n```",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "21c81601adec318c5e6deafaafd546f528318e8451b8e4dd688fc23c65228b4b",
+      "raw_stdout": "Пожалуйста! Если остался вопрос, напиши, какой шаг нужно объяснить.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.04936676099896431,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "code_slots_satisfied",
+        "passed": false,
+        "supported_subset": "function"
+      }
+    },
+    {
+      "id": "weqrom-v2-c725eebc430cd991aa38",
+      "category": "code_example",
+      "task": {
+        "kind": "code",
+        "slots": {
+          "color": "red",
+          "padding": 4,
+          "title": "Профиль 263"
+        },
+        "split_key": "[\"code\", \"card\", {\"color\": \"red\", \"padding\": 4, \"title\": \"Профиль 263\"}]",
+        "topic": "card"
+      },
+      "messages": [
+        {
+          "content": "Новый заказ на пример кода: HTML-карточка: заголовок «Профиль 263», цвет red, внутренний отступ 4px. Используй указанные значения.",
+          "role": "user"
+        },
+        {
+          "content": "```html\n<section style=\"color:red;padding:4px\"><h2>Профиль 263</h2></section>\n```",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "8656dc65d80a967d211e59ce4cd38d88a0997434438b1c3aaa6edceb35d2542e",
+      "raw_stdout": "Вот короткий блок:\n```html\n<section style=\"color:white;padding:26px\"><h2>Мой проект 4</h2><p>Мой текст.</p></section>\n```\nЦвет задаёт color, внутренний отступ — padding.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.07319182198261842,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "code_slots_satisfied",
+        "passed": false,
+        "supported_subset": "card"
+      }
+    },
+    {
+      "id": "weqrom-v2-76bbfb811d417b82f030",
+      "category": "copy",
+      "task": {
+        "field": "identifier",
+        "kind": "copy",
+        "split_key": "[\"copy\", \"identifier\", \"button221\"]",
+        "value": "button221"
+      },
+      "messages": [
+        {
+          "content": "Без изменения символов выведи следующую запись: button221",
+          "role": "user"
+        },
+        {
+          "content": "Ответ:\nbutton221",
+          "role": "assistant"
+        }
+      ],
+      "prompt_sha256": "e10c95c6bed24328b52bf45522e3a5b2057fba4192ac39110f8b95880359a944",
+      "raw_stdout": "Функция — именованный блок действий, который можно вызвать. Например: function sum(a, b) { return a + b; }.\n",
+      "raw_stderr": "finishReason=eos\n",
+      "runtime_seconds": 0.0553917879879009,
+      "returncode": 0,
+      "runtime_error": null,
+      "grade": {
+        "metric": "exact_terminal_payload",
+        "passed": false,
+        "expected": "button221"
+      }
+    }
+  ],
+  "scorer_revisions": [
+    {
+      "previous_scorer_sha256": "fbf036ac9b49e475d42caea8be7d4dfb9a40db9d621ed998c6ad2fbddd0ae759",
+      "method": "Regraded the same preserved native raw outputs after rejecting invalid final numeric expressions and invalid JS identifier bindings",
+      "changed_case_grades": 0,
+      "raw_outputs_runtime_signature_sha256": "e6df875cbd7feb0927873734db2597221e61cef97b4f1d483addb9f470ce851f"
+    },
+    {
+      "previous_scorer_sha256": "1a98ab403dfe23cce8ec647dcb9e869bb85f51af0dbdec6d3dfd185ef05786dd",
+      "method": "Regraded identical raw outputs after rejecting JavaScript automatic-semicolon-insertion return newline",
+      "changed_case_grades": 0
+    }
+  ]
+}

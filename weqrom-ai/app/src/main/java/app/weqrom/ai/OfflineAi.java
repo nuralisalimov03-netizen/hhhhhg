@@ -7,6 +7,11 @@ import java.nio.charset.StandardCharsets;
 /** Text-only CPU inference. Loading and generation belong on a worker thread. */
 public final class OfflineAi {
     public interface Listener { void onPartial(String cumulative); }
+    public static final class Generation {
+        public final String text;
+        public final String finishReason;
+        Generation(String text, String finishReason) { this.text = text; this.finishReason = finishReason; }
+    }
     private static final boolean SUPPORTED;
     private static String loadedPath;
     private static long loadedSize, loadedModified;
@@ -35,11 +40,14 @@ public final class OfflineAi {
     }
     public static long epoch() { return SUPPORTED ? nativeEpoch() : 0; }
     public static void cancel() { if (SUPPORTED) nativeCancel(); }
-    public static synchronized String generate(String prompt, int maxTokens, long epoch, Listener listener) {
+    public static synchronized Generation generate(String prompt, int maxTokens, long epoch, Listener listener) {
         if (loadedPath == null) throw new IllegalStateException("Модель ещё не готова.");
         byte[] response = nativeGenerate(prompt.getBytes(StandardCharsets.UTF_8), Math.max(16, Math.min(512, maxTokens)),
             listener == null ? null : new StreamAdapter(listener), epoch);
-        return response == null ? "" : new String(response, StandardCharsets.UTF_8);
+        int reason = nativeFinishReason();
+        if (reason < 0 || reason > 2) throw new IllegalStateException("Не удалось определить причину остановки модели.");
+        return new Generation(response == null ? "" : new String(response, StandardCharsets.UTF_8),
+            reason == 0 ? "eos" : reason == 1 ? "length" : "cancelled");
     }
     public static synchronized void release() {
         if (SUPPORTED) nativeRelease();
@@ -53,6 +61,7 @@ public final class OfflineAi {
     }
     private static native boolean nativeLoad(String path);
     private static native byte[] nativeGenerate(byte[] prompt, int maxTokens, StreamAdapter listener, long epoch);
+    private static native int nativeFinishReason();
     private static native long nativeEpoch();
     private static native void nativeCancel();
     private static native void nativeRelease();

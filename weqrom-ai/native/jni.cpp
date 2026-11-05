@@ -59,6 +59,12 @@ Java_app_weqrom_ai_OfflineAi_nativeGenerate(JNIEnv * env, jclass, jbyteArray pro
     } catch (const std::exception & failure) { error(env, failure.what()); return nullptr; }
 }
 
+extern "C" JNIEXPORT jint JNICALL
+Java_app_weqrom_ai_OfflineAi_nativeFinishReason(JNIEnv *, jclass) {
+    std::lock_guard<std::mutex> lock(engine_mutex);
+    return static_cast<jint>(engine.finish_reason());
+}
+
 extern "C" JNIEXPORT jlong JNICALL
 Java_app_weqrom_ai_OfflineAi_nativeEpoch(JNIEnv *, jclass) { return static_cast<jlong>(engine.epoch()); }
 

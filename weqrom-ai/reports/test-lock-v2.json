@@ -1,0 +1,6 @@
+{
+  "purpose": "Frozen before continuation training; never train on this file",
+  "sha256": "573849f41748c95d75e5ab17c9f468f3cc2ca3b174c79884b514b03e12099cc7",
+  "bytes": 50560,
+  "examples": 100
+}

@@ -37,6 +37,7 @@ function number(source){
   return shift>=0?rational(BigInt(digits)*10n**BigInt(shift)):rational(BigInt(digits),10n**BigInt(-shift));
 }
 function parse(expression,mode,variable){
+  if(/[²³](?=\s*(?:[0-9²³]|\.\d))/.test(expression))fail('После ² или ³ нужен знак операции. Многозначные степени вводите через ^.');
   const source=expression.replace(/[×·]/g,'*').replace(/÷/g,'/').replace(/[−–]/g,'-').replace(/π/g,'pi').replace(/²/g,'^2').replace(/³/g,'^3').replace(/(\d),(?=\d)/g,'$1.');
   const tokens=[];let cursor=0;
   while(cursor<source.length){
@@ -44,7 +45,10 @@ function parse(expression,mode,variable){
     if(space){cursor+=space[0].length;continue;}
     const numeric=/^(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?/.exec(rest);
     const name=/^[A-Za-z_][A-Za-z_0-9]*/.exec(rest);
-    if(numeric){tokens.push({type:'number',value:numeric[0]});cursor+=numeric[0].length;}
+    if(numeric){
+      if(tokens.length&&tokens[tokens.length-1].type==='number')fail('Между числами нужен знак операции. Не разделяйте разряды пробелами.');
+      tokens.push({type:'number',value:numeric[0]});cursor+=numeric[0].length;
+    }
     else if(name){tokens.push({type:'name',value:name[0]});cursor+=name[0].length;}
     else if('+-*/^()='.includes(rest[0])){tokens.push({type:rest[0],value:rest[0]});cursor++;}
     else fail('Недопустимый символ в математическом выражении.');
@@ -106,6 +110,11 @@ function validate(ast){
   if(ast.op==='^'){
     const exponent=exact(ast.right);
     if(exponent.d!==1n || abs(exponent.n)>BigInt(MAX_POWER))fail('Степень должна быть целой от −64 до 64.');
+    if(exponent.n===0n&&hasVariable(ast.left)){
+      let nonzeroConstant=false;
+      try{const base=polynomial(ast.left);nonzeroConstant=base.c.length===1&&base.c[0].n!==0n;}catch(_){ }
+      if(!nonzeroConstant)fail('Нулевая степень выражения с переменной может дать 0^0. Уточните область определения.');
+    }
   }
   if(numericOnly(ast))exact(ast); // Bound arithmetic and reject zero divisors before CAS.
 }
@@ -145,6 +154,7 @@ function polynomial(ast){
   if(b.variable)fail('Показатель степени в уравнении должен быть постоянным числом.');
   const exponent=b.c[0];
   if(exponent.d!==1n||abs(exponent.n)>BigInt(MAX_POWER))fail('Степень должна быть целой от −64 до 64.');
+  if(exponent.n===0n&&a.c.length!==1)fail('Нулевая степень выражения с переменной может дать 0^0. Уточните область определения.');
   if(exponent.n<0n){
     if(a.variable)fail('Переменная в знаменателе или отрицательной степени не поддерживается.');
     return {c:[power(a.c[0],exponent)],variable};

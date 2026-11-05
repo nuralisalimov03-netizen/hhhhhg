@@ -89,6 +89,7 @@ std::string Engine::generate(const std::string & prompt, int max_tokens, uint64_
                              TextStream::Callback callback) {
     if (!context_) throw std::runtime_error("Модель ещё не готова.");
     cancellation_.begin(epoch);
+    finish_reason_ = FinishReason::Cancelled;
     if (cancelled()) return {};
     max_tokens = std::clamp(max_tokens, 1, 512);
     auto tokens = tokenize(prompt);
@@ -108,10 +109,14 @@ std::string Engine::generate(const std::string & prompt, int max_tokens, uint64_
     if (!sampler) throw std::runtime_error("Не удалось создать генератор токенов.");
     TextStream stream(std::move(callback));
     auto vocab = llama_model_get_vocab(model_);
+    finish_reason_ = FinishReason::Length;
     for (int index = 0; index < max_tokens; ++index) {
         if (cancelled()) break;
         llama_token token = llama_sampler_sample(sampler.get(), context_, -1);
-        if (llama_vocab_is_eog(vocab, token)) break;
+        if (llama_vocab_is_eog(vocab, token)) {
+            finish_reason_ = FinishReason::Eos;
+            break;
+        }
         std::vector<char> piece(128);
         int length = llama_token_to_piece(vocab, token, piece.data(), static_cast<int>(piece.size()), 0, false);
         if (length < 0) {
@@ -126,6 +131,8 @@ std::string Engine::generate(const std::string & prompt, int max_tokens, uint64_
         if (cancelled()) break;
         if (status != 0) throw std::runtime_error("Ошибка локальной генерации ответа.");
     }
-    return stream.finish();
+    auto answer = stream.finish();
+    if (cancelled()) finish_reason_ = FinishReason::Cancelled;
+    return answer;
 }
 }

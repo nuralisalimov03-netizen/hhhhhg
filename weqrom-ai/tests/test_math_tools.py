@@ -71,6 +71,29 @@ class MathToolsTests(unittest.TestCase):
         self.assertIn('ноль',self.calculate('1/0')['error'])
         self.assertIn('степени не выше 2',self.calculate('x^3=1','equation')['error'])
 
+    def test_zero_exponent_does_not_lose_variable_base_domain(self):
+        # x=1 is not a solution of (x-1)^0=x: its base becomes zero there.
+        for expression in ['x^0=1','(x-1)^0=x','(x-1)^0=1']:
+            with self.subTest(expression=expression):
+                self.assertIn('область определения',self.calculate(expression,'equation')['error'])
+        self.assertIn('область определения',self.calculate('x^0','derivative')['error'])
+        self.assertIn('любое значение',self.calculate('(x-x+1)^0=1','equation')['text'])
+        self.assertEqual(self.calculate('(x-x+1)^0','derivative')['text'],'0')
+        self.assertEqual(self.calculate('2^0')['text'],'1')
+        self.assertIn('не определён',self.calculate('(x-x)^0=1','equation')['error'])
+
+    def test_invalid_adjacent_numbers_and_superscript_suffix_are_rejected(self):
+        for expression in ['1.2.3','1..2','1,2,3','1 000+5','2^3 4']:
+            with self.subTest(expression=expression):
+                self.assertIn('Между числами',self.calculate(expression)['error'])
+        for expression in ['2²3','2³4','2²³','2² 3','2².3']:
+            with self.subTest(expression=expression):
+                self.assertIn('знак операции',self.calculate(expression)['error'])
+        for expression,expected in [('2(3+4)','14'),('(2)3','6'),('2²+3','7'),('(2²)3','12')]:
+            with self.subTest(expression=expression):
+                self.assertEqual(self.calculate(expression)['text'],expected)
+        self.assertEqual(self.calculate('2x=6','equation')['text'],'x = 3')
+
     def test_rejects_code_unknown_functions_and_costly_input_before_cas(self):
         for expression in ['window.alert(1)','constructor(1)','factorial(1000000)','1;alert(1)','x=1']:
             with self.subTest(expression=expression):self.assertIn('error',self.calculate(expression))

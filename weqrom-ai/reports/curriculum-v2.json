@@ -1,0 +1,168 @@
+{
+  "categories": {
+    "test": {
+      "advice": 2,
+      "arithmetic": 20,
+      "boundary": 3,
+      "code_example": 20,
+      "copy": 20,
+      "greeting": 3,
+      "html_js": 9,
+      "linear_equation": 10,
+      "math_concept": 3,
+      "multiturn": 10
+    },
+    "train": {
+      "advice": 580,
+      "arithmetic": 4000,
+      "boundary": 477,
+      "code_example": 4000,
+      "copy": 3200,
+      "greeting": 195,
+      "html_js": 972,
+      "linear_equation": 480,
+      "math_concept": 976,
+      "multiturn": 1120
+    },
+    "validation": {
+      "advice": 32,
+      "arithmetic": 200,
+      "boundary": 36,
+      "code_example": 200,
+      "copy": 200,
+      "greeting": 13,
+      "html_js": 57,
+      "linear_equation": 100,
+      "math_concept": 62,
+      "multiturn": 100
+    }
+  },
+  "counts": {
+    "test": 100,
+    "train": 16000,
+    "validation": 1000
+  },
+  "files": {
+    "test.jsonl": {
+      "bytes": 50560,
+      "examples": 100,
+      "sha256": "573849f41748c95d75e5ab17c9f468f3cc2ca3b174c79884b514b03e12099cc7"
+    },
+    "train.jsonl": {
+      "bytes": 7841605,
+      "examples": 16000,
+      "sha256": "29a7ab323245db89dac2b5419f53020a6bf9fe39b281096bd2628e9bffc01328"
+    },
+    "validation.jsonl": {
+      "bytes": 504804,
+      "examples": 1000,
+      "sha256": "b04e83a11c884b4e6befabeeb5ea876ceec87c5d95c96f70b234cebe65c2e1de"
+    }
+  },
+  "limits": [
+    "Synthetic narrow curriculum; not evidence of general reasoning or complex program synthesis",
+    "Assistant outputs require independent exact/functional evaluation; loss alone is insufficient"
+  ],
+  "name": "weqrom-grounded-curriculum-v2",
+  "provenance": {
+    "downloaded_datasets": [],
+    "external_model_api_inference": false,
+    "pretrained_tokenizer": false,
+    "templates_authored_with_ai_assistance": true,
+    "v1_train_sha256": "95b9cfec93a7443c097b1e079f30252269cbe6fbbe180433f20758f2adb044ca",
+    "v1_validation_sha256": "b4af22a3a24437c6c30e1ed00252d4f89e9ad6fe79f0c407f0f99b63b7729a71"
+  },
+  "schema_version": 2,
+  "seed": 20261105,
+  "small_final_operand_pairs": [
+    [
+      0,
+      0
+    ],
+    [
+      0,
+      9
+    ],
+    [
+      1,
+      3
+    ],
+    [
+      1,
+      4
+    ],
+    [
+      1,
+      6
+    ],
+    [
+      2,
+      7
+    ],
+    [
+      2,
+      13
+    ],
+    [
+      3,
+      14
+    ],
+    [
+      5,
+      5
+    ],
+    [
+      5,
+      14
+    ],
+    [
+      6,
+      7
+    ],
+    [
+      7,
+      9
+    ],
+    [
+      8,
+      8
+    ],
+    [
+      8,
+      19
+    ],
+    [
+      11,
+      16
+    ],
+    [
+      12,
+      19
+    ],
+    [
+      13,
+      18
+    ],
+    [
+      15,
+      17
+    ],
+    [
+      15,
+      18
+    ],
+    [
+      19,
+      19
+    ]
+  ],
+  "split_policy": [
+    "Whole canonical arithmetic pairs and code/copy/multiturn parameter tuples partition before generation",
+    "All final arithmetic operand pairs are absent from V1 training",
+    "V1 validation arithmetic pairs and exact prompts excluded from V2 training",
+    "V1 validation linear-equation parameter triples excluded from V2 training",
+    "Separate question wording families for all three splits",
+    "Facts are known concepts with new wording, not new factual knowledge",
+    "Final test is frozen before training; never used for tokenizer or checkpoint selection"
+  ]
+}

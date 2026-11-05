@@ -1,1 +1,2 @@
 2055c4d96fdb128c4efae4ed1ce69f729dffe7304cf5c2744bc7635e9016e6ca  Weqrom-AI-1.0.apk
+7f1e3063fedb6725b4ea0b321557aebb440a7f0978bbb10e7dc8a607abc52cfc  Weqrom-AI-1.1.apk

@@ -22,6 +22,12 @@
   var modalReturnFocus = null;
   var gameFilename = 'weqrom-game.html';
   var mathRunId = 0;
+  var contextNotice = document.createElement('p');
+  contextNotice.id = 'context-notice';
+  contextNotice.className = 'quiet-note';
+  contextNotice.setAttribute('role', 'status');
+  contextNotice.hidden = true;
+  byId('model-error').parentNode.insertBefore(contextNotice, byId('model-error'));
 
   function nativeBridge() { return window.WeqromNative || null; }
   function decode(value) {
@@ -43,6 +49,7 @@
       return {id: message.id, role: message.role, text: message.text.slice(0, MAX_TEXT),
         status: message.status === 'generating' || message.status === 'stopping' ? 'interrupted' : message.status,
         error: limitedText(message.error, 500), source: message.source === 'math' ? 'math' : 'model',
+        finishReason: ['eos', 'length', 'cancelled'].indexOf(message.finishReason) >= 0 ? message.finishReason : '',
         steps: Array.isArray(message.steps) ? message.steps.slice(0, 12).map(function (step) { return String(step).slice(0, 1000); }) : []};
     });
     try { localStorage.setItem(HISTORY_KEY, JSON.stringify(saved)); }
@@ -59,6 +66,7 @@
         return {id: typeof item.id === 'string' ? item.id.slice(0, 100) : id('stored'), role: item.role,
           text: item.text.slice(0, MAX_TEXT), status: item.role === 'user' ? 'complete' : status,
           error: limitedText(item.error, 500), source: item.source === 'math' ? 'math' : 'model',
+          finishReason: ['eos', 'length', 'cancelled'].indexOf(item.finishReason) >= 0 ? item.finishReason : '',
           steps: Array.isArray(item.steps) ? item.steps.slice(0, 12).map(function (step) { return String(step).slice(0, 1000); }) : []};
       });
     } catch (error) { return []; }
@@ -69,19 +77,34 @@
   function contextMessages() {
     // At most six user/assistant turns. A short context fits the small native
     // model; stored history and inference context are deliberately separate.
-    var current = history[history.length - 1];
+    // Reserve the row for the new assistant answer so notice counts correspond
+    // to the bounded history the user will actually see after sending.
+    var retained = history.slice(-(MAX_MESSAGES - 1));
+    var current = retained[retained.length - 1];
     var answer = [{role: 'user', content: current.text}];
     var remaining = CONTEXT_CHARACTERS - current.text.length;
-    var turns = 1;
-    for (var i = history.length - 2; i > 0 && turns < 6; i -= 1) {
-      var assistant = history[i]; var user = history[i - 1];
+    var pairs = [];
+    for (var i = retained.length - 2; i > 0; i -= 1) {
+      var assistant = retained[i]; var user = retained[i - 1];
       // Cancelled/failed replies do not leave orphan user turns in ChatML.
-      if (assistant.role !== 'assistant' || assistant.status !== 'complete' || !assistant.text.trim() || user.role !== 'user') continue;
-      var question = user.text.slice(0, 400); var reply = assistant.text.slice(0, 400);
+      if (assistant.role !== 'assistant' || assistant.status !== 'complete' || !assistant.text.trim() || user.role !== 'user' || !user.text.trim()) continue;
+      pairs.push({user: user.text, assistant: assistant.text}); i -= 1;
+    }
+    var included = 0;
+    for (var pair = 0; pair < pairs.length && included < 5; pair += 1) {
+      var question = pairs[pair].user; var reply = pairs[pair].assistant;
       if (question.length + reply.length > remaining) break;
       answer.unshift({role: 'assistant', content: reply});
       answer.unshift({role: 'user', content: question});
-      remaining -= question.length + reply.length; turns += 1; i -= 1;
+      remaining -= question.length + reply.length; included += 1;
+    }
+    contextNotice.hidden = included === pairs.length;
+    if (!contextNotice.hidden) {
+      var latestCode = pairs.length && (pairs[0].assistant.indexOf(FENCE) >= 0 || /<\/?(?:html|script|style)\b|<!doctype\s+html/i.test(pairs[0].assistant));
+      contextNotice.textContent = included === 0
+        ? (latestCode ? 'Предыдущий код не передан модели: он не помещается в короткий контекст. Полный код остаётся в истории и доступен для сохранения.'
+          : 'В этот ответ передан только новый вопрос: предыдущий диалог не помещается в короткий контекст. Остальные сообщения доступны в сохранённой истории.')
+        : 'Для ответа переданы последние полные пары сообщений: ' + included + ' из ' + pairs.length + '. Остальные сохранённые сообщения не переданы модели.';
     }
     return answer;
   }
@@ -183,7 +206,7 @@
     if (message.role === 'assistant') {
       var footer = document.createElement('div'); footer.className = 'message-footer';
       var status = document.createElement('span');
-      status.textContent = message.status === 'cancelled' ? 'Ответ остановлен' : message.status === 'interrupted' ? 'Ответ прерван при закрытии приложения' : message.status === 'error' ? 'Не удалось завершить ответ' : '';
+      status.textContent = message.status === 'cancelled' ? 'Ответ остановлен' : message.status === 'interrupted' ? 'Ответ прерван при закрытии приложения' : message.status === 'error' ? 'Не удалось завершить ответ' : message.finishReason === 'length' ? 'Достигнут лимит длины; ответ может быть незавершён' : '';
       footer.appendChild(status);
       if (message.text) {
         var copy = makeButton('Копировать', function () { copyText(message.text); });
@@ -249,6 +272,7 @@
   function finalize(event) {
     if (!active || event.id !== active.id) return;
     var current = active;
+    if (['eos', 'length', 'cancelled'].indexOf(event.finishReason) >= 0) current.message.finishReason = event.finishReason;
     if (typeof event.text === 'string' && !(event.cancelled && !event.text && current.message.text)) current.message.text = event.text.slice(0, MAX_TEXT);
     if (event.type === 'error') {
       current.message.status = 'error';
@@ -260,7 +284,7 @@
     active = null;
     if (renderFrame !== null) { window.cancelAnimationFrame(renderFrame); renderFrame = null; }
     trimHistory(); saveHistory(); renderMessages(); scrollToMessage();
-    announce(current.message.status === 'cancelled' ? 'Ответ остановлен' : current.message.status === 'error' ? current.message.error : 'Ответ готов');
+    announce(current.message.status === 'cancelled' ? 'Ответ остановлен' : current.message.status === 'error' ? current.message.error : current.message.finishReason === 'length' ? 'Достигнут лимит длины ответа' : 'Ответ готов');
   }
   function handleEvent(raw) {
     var event;
@@ -330,6 +354,7 @@
     return {mode: mode, expression: expression, variable: variable};
   }
   function sendMath(text, request) {
+    contextNotice.hidden = true;
     var requestId = id('math');
     history.push({id: id('user'), role: 'user', text: text.slice(0, 1200), status: 'complete'});
     var answer = {id: requestId, role: 'assistant', source: 'math', text: '', status: 'generating', steps: []};
@@ -468,7 +493,7 @@
     if (active) return;
     openModal('Очистить историю?', ['Все сообщения этого чата будут удалены с телефона.'], [
       {label: 'Отмена', run: closeModal},
-      {label: 'Очистить', primary: true, run: function () { history = []; saveHistory(); renderMessages(); closeModal(); announce('История очищена'); }}
+      {label: 'Очистить', primary: true, run: function () { history = []; contextNotice.hidden = true; saveHistory(); renderMessages(); closeModal(); announce('История очищена'); }}
     ]);
   });
   byId('about-open').addEventListener('click', function () {

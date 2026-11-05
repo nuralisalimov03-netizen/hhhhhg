@@ -1,0 +1,258 @@
+{
+  "schema_version": 1,
+  "benchmark": "weqrom-v2-frozen-raw-native-100",
+  "inputs": {
+    "baseline": {
+      "report": "v11-baseline.json",
+      "report_sha256": "71ba8aafae52dd774da49edebe5bb35d85e48cbaa27f4c9168dadb358e5eb490",
+      "model_sha256": "d964a32292451cc9a547468cae245e41e0317fbba30cd51015e3e4b778990b95",
+      "passed": 17,
+      "evaluated": 100,
+      "runtime_errors": 0
+    },
+    "candidate": {
+      "report": "v11-candidate.json",
+      "report_sha256": "ff8e82cc5f9a463ba02ecbd2d8a15dfc3d971987aab776a82f7f54aba4e9cab1",
+      "model_sha256": "7e8fccd5fe76b83f3646a9a9d722cfb2c903f0d21b3f068c227c71c227758e77",
+      "selected_step": 3750,
+      "checkpoint_sha256": "9dade022120700d14aa50f3ff44747c6eb036212a22e34db9635fde36731bcbe",
+      "passed": 46,
+      "evaluated": 100,
+      "runtime_errors": 0
+    },
+    "runner_sha256": "f00464bba26808b28677a68c8e7a6b031d172c2aa866ca44359a2669f15126c7",
+    "scorer_sha256": "755211344bf5a220de6d4160005dd04cc656fdfa46ee62b78dc677eb337a920b",
+    "test_sha256": "573849f41748c95d75e5ab17c9f468f3cc2ca3b174c79884b514b03e12099cc7",
+    "v2_train_sha256": "29a7ab323245db89dac2b5419f53020a6bf9fe39b281096bd2628e9bffc01328",
+    "v2_validation_sha256": "b04e83a11c884b4e6befabeeb5ea876ceec87c5d95c96f70b234cebe65c2e1de",
+    "tokenizer_sha256": "3093ea4b3d57eca2c923d4f471d5235fba68ce3f267082311f8e1ff4dbed2b5d"
+  },
+  "comparison_controls": {
+    "same_100_case_payloads_and_prompt_hashes": true,
+    "same_runner_and_final_scorer": true,
+    "same_generation_settings": {
+      "max_tokens": 128,
+      "case_timeout_seconds": 10,
+      "sampling": "native greedy",
+      "format": "ChatML without system; complete supplied history"
+    },
+    "raw_grades_independently_recomputed": 200,
+    "application_tools_or_answer_replacements_used": false,
+    "runtime_errors_each": 0
+  },
+  "overall": {
+    "baseline_passed": 17,
+    "candidate_passed": 46,
+    "evaluated_each": 100,
+    "delta_passed": 29,
+    "improved_cases": 31,
+    "regressed_cases": 2,
+    "unchanged_cases": 67
+  },
+  "by_category": {
+    "advice": {
+      "baseline_passed": 2,
+      "candidate_passed": 2,
+      "evaluated_each": 2,
+      "delta_passed": 0
+    },
+    "arithmetic": {
+      "baseline_passed": 1,
+      "candidate_passed": 3,
+      "evaluated_each": 20,
+      "delta_passed": 2
+    },
+    "boundary": {
+      "baseline_passed": 3,
+      "candidate_passed": 3,
+      "evaluated_each": 3,
+      "delta_passed": 0
+    },
+    "code_example": {
+      "baseline_passed": 0,
+      "candidate_passed": 5,
+      "evaluated_each": 20,
+      "delta_passed": 5
+    },
+    "copy": {
+      "baseline_passed": 0,
+      "candidate_passed": 9,
+      "evaluated_each": 20,
+      "delta_passed": 9
+    },
+    "greeting": {
+      "baseline_passed": 3,
+      "candidate_passed": 3,
+      "evaluated_each": 3,
+      "delta_passed": 0
+    },
+    "html_js": {
+      "baseline_passed": 5,
+      "candidate_passed": 9,
+      "evaluated_each": 9,
+      "delta_passed": 4
+    },
+    "linear_equation": {
+      "baseline_passed": 1,
+      "candidate_passed": 1,
+      "evaluated_each": 10,
+      "delta_passed": 0
+    },
+    "math_concept": {
+      "baseline_passed": 2,
+      "candidate_passed": 3,
+      "evaluated_each": 3,
+      "delta_passed": 1
+    },
+    "multiturn": {
+      "baseline_passed": 0,
+      "candidate_passed": 8,
+      "evaluated_each": 10,
+      "delta_passed": 8
+    }
+  },
+  "by_metric": {
+    "code_slots_satisfied": {
+      "baseline_passed": 0,
+      "candidate_passed": 5,
+      "evaluated_each": 20,
+      "delta_passed": 5
+    },
+    "exact_terminal_payload": {
+      "baseline_passed": 0,
+      "candidate_passed": 17,
+      "evaluated_each": 30,
+      "delta_passed": 17
+    },
+    "known_reference_whitespace_match": {
+      "baseline_passed": 15,
+      "candidate_passed": 20,
+      "evaluated_each": 20,
+      "delta_passed": 5
+    },
+    "stated_numeric_answer": {
+      "baseline_passed": 2,
+      "candidate_passed": 4,
+      "evaluated_each": 30,
+      "delta_passed": 2
+    }
+  },
+  "regressions": [
+    {
+      "case_id": "weqrom-v2-63437cc01c6193f45e81",
+      "category": "linear_equation",
+      "task": {
+        "kind": "linear",
+        "operands": [
+          5,
+          8,
+          6
+        ],
+        "result": 6,
+        "rhs": 38,
+        "split_key": "[\"linear\", 5, 8, 6]"
+      },
+      "baseline_stated": 6.0,
+      "candidate_stated": 17.0
+    },
+    {
+      "case_id": "weqrom-v2-fd815158f8922fcf6665",
+      "category": "arithmetic",
+      "task": {
+        "kind": "arithmetic",
+        "operands": [
+          5,
+          5
+        ],
+        "operation": "subtract",
+        "result": 0,
+        "seen_operand_pair_in_v1_train": false,
+        "split_key": "arithmetic:[5, 5]"
+      },
+      "baseline_stated": 0.0,
+      "candidate_stated": -4.0
+    }
+  ],
+  "heldout_audit": {
+    "v2_test_task_parameters_overlapping_v2_train": 0,
+    "v2_test_task_parameters_overlapping_v2_validation": 0,
+    "v2_test_wording_families_overlapping_v2_train_or_validation": 0,
+    "v1_validation_prompts_arithmetic_pairs_or_linear_triples_found_in_v2_train": 0,
+    "final_arithmetic_cases": 20,
+    "distinct_final_arithmetic_pairs": 17,
+    "final_arithmetic_pairs_seen_in_v1_train": 0,
+    "legacy_v1_exposure": [
+      {
+        "case_id": "weqrom-v2-b52458535e018d178d70",
+        "task": {
+          "kind": "linear",
+          "operands": [
+            4,
+            13,
+            4
+          ],
+          "result": 4,
+          "rhs": 29,
+          "split_key": "[\"linear\", 4, 13, 4]"
+        },
+        "v1_train_example_ids": [
+          "weqrom-4686124887e35d2eb286"
+        ],
+        "baseline_passed": false,
+        "candidate_passed": false
+      },
+      {
+        "case_id": "weqrom-v2-3a996c517c8c7c236b15",
+        "task": {
+          "kind": "linear",
+          "operands": [
+            3,
+            11,
+            19
+          ],
+          "result": 19,
+          "rhs": 68,
+          "split_key": "[\"linear\", 3, 11, 19]"
+        },
+        "v1_train_example_ids": [
+          "weqrom-604c69cfd5abdbb647ac"
+        ],
+        "baseline_passed": false,
+        "candidate_passed": false
+      },
+      {
+        "case_id": "weqrom-v2-dae4eab9222c5b3e8c10",
+        "task": {
+          "kind": "code",
+          "slots": {
+            "initial": 38,
+            "step": 7
+          },
+          "split_key": "[\"code\", \"counter\", {\"initial\": 38, \"step\": 7}]",
+          "topic": "counter"
+        },
+        "v1_train_example_ids": [
+          "weqrom-da3ab900ef4ce0533f22"
+        ],
+        "baseline_passed": false,
+        "candidate_passed": true
+      }
+    ],
+    "training_input_trace": "train.py reads only train.jsonl and validation.jsonl; their hashes match checkpoint provenance; the original tokenizer SHA is unchanged"
+  },
+  "limits": [
+    "The 100-case synthetic test measures this narrow curriculum, not general intelligence or broad programming ability.",
+    "Known-fact matching reuses familiar reference answers under new wording and does not establish new factual knowledge.",
+    "Two final linear-equation triples and one counter parameter tuple occurred in V1 training; V2-only split independence does not make every case unseen across the full training lineage.",
+    "Code scores check only requested slots in the declared card/counter/function subset; they are not proof of arbitrary JavaScript or complete-game correctness.",
+    "Numeric scoring checks the explicitly stated final value, not the explanation. Candidate arithmetic passes are all zero-result cases; 26 of 30 numeric answers remain wrong.",
+    "The final test contains no division cases. Its 20 arithmetic cases use 17 distinct small-number operand pairs.",
+    "Host wall times differ with generated answer length and machine load; these reports do not establish phone latency or a model speedup.",
+    "Final test data were frozen before continuation training. The scorer was hardened and baseline raw outputs regraded, with zero grade changes; do not claim the scorer itself was frozen before training."
+  ],
+  "candidate_zero_result_arithmetic_pass_case_ids": [
+    "weqrom-v2-88a458d1aa9deef4bf1a",
+    "weqrom-v2-77fea46297647cbbdbf6",
+    "weqrom-v2-51b4f6c2142c28e10b91"
+  ]
+}

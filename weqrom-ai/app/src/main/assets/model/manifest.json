@@ -1,7 +1,7 @@
 {
   "architecture": "llama",
   "bytes": 19264160,
-  "checkpoint_sha256": "87589815d1af9184d211e9fc6ab0bab3961addbe85686b98942c6cfad547cb9e",
+  "checkpoint_sha256": "9dade022120700d14aa50f3ff44747c6eb036212a22e34db9635fde36731bcbe",
   "config": {
     "context_length": 2048,
     "dim": 256,
@@ -14,16 +14,16 @@
     "vocab_size": 4096
   },
   "llama_cpp_commit": "a7a98e0fffed794396b3fbad4dcdbbc184963645",
-  "name": "Weqrom Seed 10M",
+  "name": "Weqrom Seed 10M 1.1",
   "parameters": 9573632,
   "precision": "F16 matrices / F32 norms",
   "pretrained_tokenizer": false,
   "pretrained_weights": false,
   "schema_version": 1,
-  "sha256": "d964a32292451cc9a547468cae245e41e0317fbba30cd51015e3e4b778990b95",
+  "sha256": "7e8fccd5fe76b83f3646a9a9d722cfb2c903f0d21b3f068c227c71c227758e77",
   "tokenizer_sha256": "3093ea4b3d57eca2c923d4f471d5235fba68ce3f267082311f8e1ff4dbed2b5d",
   "trained_from_scratch": true,
-  "training_step": 2000,
+  "training_step": 3750,
   "validation": {
     "model_quality": "not_measured_by_exporter",
     "native_inference": "not_checked_by_exporter"

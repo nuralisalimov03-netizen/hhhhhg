@@ -218,6 +218,65 @@ def batch_from(data, masks, batch_size, length, generator):
     return x, y, weight
 
 
+def encode_dialogues(rows, tokenizer, seed, authored_repeat=1, code_repeat=1):
+    """Keep every question available for all of its supervised answer tokens.
+
+    An example is one complete conversation. User turns, assistant headers and
+    separators are context only; content and the actual assistant EOS are targets.
+    """
+    order = []
+    eos = tokenizer.piece_to_id('<|im_end|>')
+    header = tokenizer.encode('<|im_start|>assistant\n', out_type=int)
+    for row in rows:
+        messages = row['messages']
+        if (len(messages) < 2 or len(messages) % 2
+                or any(m['role'] != ('user' if index % 2 == 0 else 'assistant')
+                       for index, m in enumerate(messages))):
+            raise ValueError('Supervised conversations must alternate user/assistant and end with an answer')
+        tokens, weights = [], []
+        for message in messages:
+            encoded = tokenizer.encode(format_messages([message]), out_type=int)
+            mask = [0.0] * len(encoded)
+            if message['role'] == 'assistant':
+                if encoded[:len(header)] != header or encoded.count(eos) != 1:
+                    raise ValueError('Own tokenizer dialogue boundaries do not match the supervised format')
+                stop = encoded.index(eos)
+                if stop <= len(header):
+                    raise ValueError('Supervised assistant content is empty')
+                mask[len(header):stop+1] = [1.0] * (stop + 1 - len(header))
+            tokens.extend(encoded)
+            weights.extend(mask)
+        if len(tokens) < 2 or not any(weights):
+            raise ValueError('Supervised example has no answer targets')
+        count = code_repeat if row['category'] == 'code_example' else (
+            1 if row['category'] in ('arithmetic', 'linear_equation') else authored_repeat)
+        pair = torch.tensor(tokens, dtype=torch.long), torch.tensor(weights, dtype=torch.float32)
+        order.extend([pair] * count)
+    if not order:
+        raise ValueError('No supervised conversations')
+    random.Random(seed).shuffle(order)
+    return order
+
+
+def sft_batch(dialogues, batch_size, generator, pad_id, max_length):
+    """Right-pad complete conversations; never cut off a question or answer."""
+    if not dialogues or batch_size < 1 or max_length < 1:
+        raise ValueError('Invalid supervised batch')
+    indices = torch.randint(0, len(dialogues), (batch_size,), generator=generator)
+    selected = [dialogues[int(i)] for i in indices]
+    if any(len(ids) > max_length + 1 for ids, _ in selected):
+        raise ValueError('Supervised example exceeds context; shorten the data instead of truncating its prompt')
+    width = max(len(ids) for ids, _ in selected)
+    tokens = torch.full((batch_size, width), pad_id, dtype=torch.long)
+    weights = torch.zeros((batch_size, width), dtype=torch.float32)
+    for index, (ids, mask) in enumerate(selected):
+        if len(ids) != len(mask) or len(ids) < 2 or not torch.any(mask > 0):
+            raise ValueError('Malformed supervised example')
+        tokens[index, :len(ids)] = ids
+        weights[index, :len(mask)] = mask
+    return tokens[:, :-1], tokens[:, 1:], weights[:, 1:]
+
+
 def weighted_loss(logits, targets, weights):
     raw = F.cross_entropy(logits.flatten(0, 1), targets.flatten(), reduction='none').view_as(weights)
     return (raw * weights).sum() / weights.sum()
@@ -241,14 +300,26 @@ def train(args):
     heldout = read_rows(args.data_dir / 'validation.jsonl')
     config = Config()
     tokenizer = prepare_tokenizer(rows, output, config.vocab_size)
-    train_tokens, train_weights = encode_rows(rows, tokenizer, args.seed, args.authored_repeat, args.code_repeat)
-    validation_tokens, validation_weights = encode_rows(heldout, tokenizer, args.seed + 1)
+    supervised = args.objective == 'supervised'
+    if supervised:
+        training_dialogues = encode_dialogues(rows, tokenizer, args.seed, args.authored_repeat, args.code_repeat)
+        validation_dialogues = encode_dialogues(heldout, tokenizer, args.seed + 1)
+        maximum = max(len(ids) for ids, _ in training_dialogues + validation_dialogues)
+        if maximum > args.sequence_length + 1:
+            raise ValueError(f'Whole supervised example has {maximum} tokens, context permits {args.sequence_length + 1}')
+        train_token_count = sum(len(ids) for ids, _ in training_dialogues)
+        validation_token_count = sum(len(ids) for ids, _ in validation_dialogues)
+    else:
+        train_tokens, train_weights = encode_rows(rows, tokenizer, args.seed, args.authored_repeat, args.code_repeat)
+        validation_tokens, validation_weights = encode_rows(heldout, tokenizer, args.seed + 1)
+        train_token_count, validation_token_count = len(train_tokens), len(validation_tokens)
     model = SeedModel(config)
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.learning_rate, betas=(0.9, 0.95), weight_decay=0.01)
     start_step = 0
     previous_seconds = 0.0
     best_validation = float('inf')
     generator = torch.Generator().manual_seed(args.seed + 2)
+    previous_tokens = 0
     if args.resume:
         checkpoint = torch.load(args.resume, map_location='cpu', weights_only=True)
         if not checkpoint.get('trained_from_scratch') or checkpoint['config'] != asdict(config):
@@ -259,6 +330,8 @@ def train(args):
         optimizer.load_state_dict(checkpoint['optimizer'])
         start_step = checkpoint['step']
         previous_seconds = checkpoint['training_seconds']
+        previous_tokens = checkpoint.get('tokens_seen', checkpoint['step'] * checkpoint['provenance']['batch_size']
+                                         * checkpoint['provenance']['sequence_length'])
         best_validation = checkpoint['best_validation']
         if args.restart_schedule:
             best_validation = float('inf')
@@ -272,11 +345,13 @@ def train(args):
             'validation_sha256': digest(args.data_dir / 'validation.jsonl'),
             'tokenizer_sha256': digest(output / 'tokenizer.model'),
             'train_examples': len(rows), 'validation_examples': len(heldout),
-            'train_tokens': len(train_tokens), 'validation_tokens': len(validation_tokens),
+            'train_tokens': train_token_count, 'validation_tokens': validation_token_count,
             'sequence_length': args.sequence_length, 'batch_size': args.batch_size,
             'effective_tokens_per_step': args.sequence_length * args.batch_size,
             'training_context_limit': args.sequence_length}
     info['curriculum_repeats'] = {'authored': args.authored_repeat, 'code': args.code_repeat, 'numeric': 1}
+    info['objective'] = args.objective
+    info['loss_targets'] = 'assistant content and EOS only' if supervised else 'all tokens, user weight 0.3'
     if args.resume:
         info['resume_lineage'] = {'checkpoint_sha256': digest(args.resume), 'step': start_step,
                                   'previous_provenance': checkpoint['provenance']}
@@ -286,6 +361,8 @@ def train(args):
     model.train()
     latest_step = start_step
     losses = []
+    current_tokens = 0
+    current_targets = 0
 
     def checkpoint(step, validation):
         value = {'model': model.state_dict(), 'optimizer': optimizer.state_dict(),
@@ -293,7 +370,9 @@ def train(args):
                  'tokenizer_sha256': info['tokenizer_sha256'], 'step': step,
                  'training_seconds': previous_seconds + time.monotonic() - began,
                  'best_validation': best_validation, 'validation_loss': validation,
-                 'random_state': generator.get_state(), 'provenance': info}
+                 'random_state': generator.get_state(), 'provenance': info,
+                 'tokens_seen': previous_tokens + current_tokens,
+                 'current_phase_supervised_targets': current_targets}
         atomic_save(value, output / 'latest.pt')
         return value
 
@@ -309,7 +388,14 @@ def train(args):
             rate = args.learning_rate * warmup * decay
             for group in optimizer.param_groups:
                 group['lr'] = rate
-            x, y, weight = batch_from(train_tokens, train_weights, args.batch_size, args.sequence_length, generator)
+            if supervised:
+                x, y, weight = sft_batch(training_dialogues, args.batch_size, generator,
+                                        tokenizer.pad_id(), args.sequence_length)
+                current_tokens += int((x != tokenizer.pad_id()).sum())
+                current_targets += int((weight > 0).sum())
+            else:
+                x, y, weight = batch_from(train_tokens, train_weights, args.batch_size, args.sequence_length, generator)
+                current_tokens += args.batch_size * args.sequence_length
             optimizer.zero_grad(set_to_none=True)
             loss = weighted_loss(model(x), y, weight)
             if not torch.isfinite(loss):
@@ -323,7 +409,7 @@ def train(args):
                 item = {'step': step, 'loss': sum(losses) / len(losses), 'lr': rate,
                         'seconds': previous_seconds + now - began,
                         'step_seconds': now - elapsed_step,
-                        'tokens_per_second': (step - start_step) * args.batch_size * args.sequence_length / (now - began),
+                        'tokens_per_second': current_tokens / (now - began),
                         'gradient_norm': float(gradient)}
                 losses.clear()
                 line = json.dumps(item)
@@ -335,7 +421,11 @@ def train(args):
                 with torch.no_grad():
                     values = []
                     for _ in range(args.eval_batches):
-                        vx, vy, vw = batch_from(validation_tokens, validation_weights, args.batch_size, args.sequence_length, evaluation)
+                        if supervised:
+                            vx, vy, vw = sft_batch(validation_dialogues, args.batch_size, evaluation,
+                                                  tokenizer.pad_id(), args.sequence_length)
+                        else:
+                            vx, vy, vw = batch_from(validation_tokens, validation_weights, args.batch_size, args.sequence_length, evaluation)
                         values.append(float(weighted_loss(model(vx), vy, vw)))
                 validation = sum(values) / len(values)
                 improved = validation < best_validation
@@ -354,7 +444,8 @@ def train(args):
         checkpoint(latest_step, None)
     finally:
         logfile.close()
-    info.update({'steps': latest_step, 'seen_tokens': latest_step * args.batch_size * args.sequence_length,
+    info.update({'steps': latest_step, 'seen_tokens': previous_tokens + current_tokens,
+                 'current_phase_supervised_targets': current_targets,
                  'training_seconds': previous_seconds + time.monotonic() - began,
                  'best_validation_loss': best_validation,
                  'best_checkpoint_sha256': digest(output / 'best.pt') if (output / 'best.pt').exists() else None})
@@ -381,6 +472,7 @@ def main():
     parser.add_argument('--authored-repeat', type=int, default=1)
     parser.add_argument('--code-repeat', type=int, default=1)
     parser.add_argument('--restart-schedule', action='store_true')
+    parser.add_argument('--objective', choices=('packed', 'supervised'), default='packed')
     args = parser.parse_args()
     if not (1 <= args.batch_size <= 64 and 32 <= args.sequence_length <= 512 and 1 <= args.threads <= 4
             and 1 <= args.authored_repeat <= 16 and 1 <= args.code_repeat <= 16):

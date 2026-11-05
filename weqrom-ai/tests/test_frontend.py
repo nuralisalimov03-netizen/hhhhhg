@@ -134,6 +134,53 @@ class FrontendTests(unittest.TestCase):
         self.assertEqual(self.page.locator('.message').count(),0)
         expect(self.page.locator('#chat-empty')).to_be_visible()
 
+    def test_code_followup_sends_complete_previous_html_when_it_fits_context(self):
+        first=self.send('Напиши HTML страницу.')
+        html='<!doctype html><html><body><!--'+('x'*700)+'--><p id="last">Конец</p></body></html>'
+        fenced='```html\n'+html+'\n```'
+        self.event(id=first['id'],type='done',text=fenced)
+        followup=self.send('Измени фон в предыдущем коде.')
+        self.assertGreater(len(fenced),400)
+        self.assertEqual(followup['messages'],[
+            {'role':'user','content':'Напиши HTML страницу.'},
+            {'role':'assistant','content':fenced},
+            {'role':'user','content':'Измени фон в предыдущем коде.'}])
+        expect(self.page.locator('#context-notice')).to_be_hidden()
+        self.event(id=followup['id'],type='done',text='Тестовая заглушка не изменяет HTML.')
+        expect(self.page.locator('pre code')).to_have_text(html)
+        self.page.get_by_role('button',name='Сохранить .html',exact=True).click()
+        self.assertEqual(self.page.evaluate('window.fixture.exports[0].html'),html)
+
+    def test_oversize_previous_code_is_omitted_with_visible_notice_and_full_export(self):
+        first=self.send('Напиши большую HTML страницу.')
+        html='<!doctype html><html><body><!--'+('x'*2600)+'--><p id="last">Полный код</p></body></html>'
+        fenced='```html\n'+html+'\n```'
+        self.event(id=first['id'],type='done',text=fenced)
+        followup=self.send('Исправь предыдущий код.')
+        self.assertEqual(followup['messages'],[{'role':'user','content':'Исправь предыдущий код.'}])
+        expect(self.page.locator('#context-notice')).to_be_visible()
+        expect(self.page.locator('#context-notice')).to_contain_text('код не передан модели')
+        self.event(id=followup['id'],type='error',message='Тестовая ошибка')
+        expect(self.page.locator('pre code')).to_have_text(html)
+        self.page.get_by_role('button',name='Открыть HTML',exact=True).click()
+        self.page.get_by_role('button',name='Сохранить .html',exact=True).click()
+        self.assertEqual(self.page.evaluate('window.fixture.previews'),[html])
+        self.assertEqual(self.page.evaluate('window.fixture.exports[0].html'),html)
+        self.assertEqual(self.page.evaluate('JSON.parse(localStorage.getItem("weqrom-ai-chat-v1"))[1].text'),fenced)
+
+    def test_token_limited_code_is_marked_incomplete_and_preserved_without_fake_closure(self):
+        request=self.send('Напиши HTML игру.')
+        partial='```html\n<!doctype html><html><body><script>const level = '
+        self.event(id=request['id'],type='done',text=partial,finishReason='length',cancelled=False)
+        expect(self.page.locator('.assistant .message-footer')).to_contain_text('лимит длины')
+        expect(self.page.locator('#announcer')).to_have_text('Достигнут лимит длины ответа')
+        expect(self.page.locator('.assistant .message-body')).to_have_text(partial)
+        self.assertEqual(self.page.get_by_role('button',name='Открыть HTML',exact=True).count(),0)
+        self.page.reload(wait_until='networkidle')
+        expect(self.page.locator('.assistant .message-footer')).to_contain_text('может быть незавершён')
+        expect(self.page.locator('.assistant .message-body')).to_have_text(partial)
+        self.assertEqual(self.page.evaluate('JSON.parse(localStorage.getItem("weqrom-ai-chat-v1"))[1].finishReason'),'length')
+
     def test_real_math_worker_expression_equation_and_derivative(self):
         self.page.locator('#tab-math').click()
         self.page.locator('#math-input').fill('1/3+1/6')

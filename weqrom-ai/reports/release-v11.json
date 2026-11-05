@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "name": "Weqrom AI",
+  "version": "1.1",
+  "version_code": 2,
+  "package": "app.weqrom.ai",
+  "apk": "Weqrom-AI-1.1.apk",
+  "apk_sha256": "7f1e3063fedb6725b4ea0b321557aebb440a7f0978bbb10e7dc8a607abc52cfc",
+  "apk_bytes": 21005677,
+  "model": {
+    "architecture": "llama",
+    "bytes": 19264160,
+    "checkpoint_sha256": "9dade022120700d14aa50f3ff44747c6eb036212a22e34db9635fde36731bcbe",
+    "config": {
+      "context_length": 2048,
+      "dim": 256,
+      "hidden_dim": 768,
+      "n_heads": 4,
+      "n_kv_heads": 4,
+      "n_layers": 10,
+      "norm_eps": 1e-05,
+      "rope_theta": 10000.0,
+      "vocab_size": 4096
+    },
+    "llama_cpp_commit": "a7a98e0fffed794396b3fbad4dcdbbc184963645",
+    "name": "Weqrom Seed 10M 1.1",
+    "parameters": 9573632,
+    "precision": "F16 matrices / F32 norms",
+    "pretrained_tokenizer": false,
+    "pretrained_weights": false,
+    "schema_version": 1,
+    "sha256": "7e8fccd5fe76b83f3646a9a9d722cfb2c903f0d21b3f068c227c71c227758e77",
+    "tokenizer_sha256": "3093ea4b3d57eca2c923d4f471d5235fba68ce3f267082311f8e1ff4dbed2b5d",
+    "trained_from_scratch": true,
+    "training_step": 3750,
+    "validation": {
+      "model_quality": "not_measured_by_exporter",
+      "native_inference": "not_checked_by_exporter"
+    }
+  },
+  "certificate_sha256": "ca025ede6ba9d462ecc05f152a7560d1502bfcff738ea6f7c862f3b19a7ccd3a",
+  "same_certificate_as_1_0": true,
+  "min_sdk": 26,
+  "target_sdk": 35,
+  "abi": "arm64-v8a",
+  "internet_permission": false,
+  "all_permissions": [],
+  "native_library_sha256": "07c4d3304607c777f41f743cc1066b69421815d425ecc6e9f6e13e592c9aedce",
+  "native_library_needed": [
+    "libm.so",
+    "libdl.so",
+    "libc.so"
+  ],
+  "checks": {
+    "supervised_batch_semantics_tests_passed": 8,
+    "native_tokenizer_logits_parity_passed": true,
+    "apk_v2_v3_signature_verified": true,
+    "zip_crc_verified": true,
+    "zip_duplicate_entries": false,
+    "dex_sha1_and_adler_verified": true,
+    "dex_count": 1,
+    "alignment_16k_verified": true,
+    "native_elf_load_alignment_16k_verified": true,
+    "embedded_model_sha256_verified": true,
+    "embedded_model_stored_uncompressed": true,
+    "private_signing_key_not_in_apk": true,
+    "android_runtime_tested": false,
+    "native_cached_engine_generation_cases_passed": 7,
+    "independent_apk_audit_passed": true,
+    "training_tests_passed": 40,
+    "application_tests_passed": 35,
+    "java_prompt_boundaries_passed": true,
+    "independent_source_review_passed": true
+  },
+  "native_parity": {
+    "report": "reports/native-parity-v11.json",
+    "report_sha256": "73e38d8d7402e08d1a3417e5dcd64973e81dd961a8042bcb6a02add5667a0dd4",
+    "prompts": 3,
+    "logits_per_prompt": 4096,
+    "max_absolute_error": 0.005913496017456055,
+    "token_ids_match": true,
+    "argmax_match": true
+  },
+  "model_quality": {
+    "benchmark": "weqrom-v2-frozen-raw-native-100",
+    "report": "reports/v11-candidate.json",
+    "report_sha256": "ff8e82cc5f9a463ba02ecbd2d8a15dfc3d971987aab776a82f7f54aba4e9cab1",
+    "baseline_report": "reports/v11-baseline.json",
+    "baseline_report_sha256": "71ba8aafae52dd774da49edebe5bb35d85e48cbaa27f4c9168dadb358e5eb490",
+    "frozen_data_sha256": "573849f41748c95d75e5ab17c9f468f3cc2ca3b174c79884b514b03e12099cc7",
+    "scorer_sha256": "755211344bf5a220de6d4160005dd04cc656fdfa46ee62b78dc677eb337a920b",
+    "questions": 100,
+    "runtime_errors": 0,
+    "passed": 46,
+    "baseline_passed": 17,
+    "by_metric": {
+      "exact_terminal_payload": {
+        "evaluated": 30,
+        "passed": 17
+      },
+      "known_reference_whitespace_match": {
+        "evaluated": 20,
+        "passed": 20
+      },
+      "code_slots_satisfied": {
+        "evaluated": 20,
+        "passed": 5
+      },
+      "stated_numeric_answer": {
+        "evaluated": 30,
+        "passed": 4
+      }
+    },
+    "external_benchmark": false,
+    "limits": [
+      "Runtime failures are not graded as model-answer mistakes; compare successful-case denominators and runtime errors separately.",
+      "Code score checks only the declared counter/card/function subset and requested slots, not arbitrary program correctness.",
+      "Facts test known answers under held-out wording, not new factual knowledge.",
+      "This final sample has no division cases and does not establish general reasoning ability.",
+      "Two final linear-equation parameter triples and one counter tuple occurred in V1 training, although absent from V2 train/validation. All final arithmetic pairs are absent from V1/V2 training.",
+      "All three successful candidate arithmetic results are zero; there are 26 incorrect numeric answers out of 30.",
+      "31 cases improved and 2 regressed. The final test has now been seen and must not guide later training presented as independently evaluated."
+    ],
+    "comparison_report": "reports/v11-comparison.json"
+  },
+  "math_and_html_game_constructor_are_separate_algorithms": true,
+  "limitations": [
+    "No physical Android device or emulator execution was performed.",
+    "Native parity verifies inference arithmetic on three prompts; it is not a model quality benchmark.",
+    "The raw neural arithmetic and code capabilities remain limited; see the frozen benchmark report."
+  ],
+  "native_generation_checks": {
+    "model_sha256": "7e8fccd5fe76b83f3646a9a9d722cfb2c903f0d21b3f068c227c71c227758e77",
+    "engine_threads": 4,
+    "same_cached_engine": true,
+    "finish_reasons": [
+      "length",
+      "eos",
+      "cancelled",
+      "eos",
+      "cancelled",
+      "length",
+      "eos"
+    ],
+    "pre_cancel_verified": true,
+    "streaming_cancellation_from_another_thread_verified": true,
+    "generation_after_cancellation_verified": true,
+    "android_runtime_tested": false
+  }
+}
